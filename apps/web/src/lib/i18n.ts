@@ -13,7 +13,7 @@ export const ui = {
   en: {
     nav: { gallery: "Gallery", parts: "Parts", roster: "Roster", install: "Install", contribute: "Contribute" },
     fanProject: "Unofficial fan project",
-    status: { planned: "Planned", "pilot-review": "Base review", released: "Released" },
+    status: { planned: "Planned", "pilot-review": "Final review", released: "Released" },
     type: { character: "Character", stand: "Stand" },
     role: { protagonist: "Protagonist side", antagonist: "Principal antagonist side" },
     view: "views",
@@ -26,7 +26,7 @@ export const ui = {
   "zh-CN": {
     nav: { gallery: "宠物目录", parts: "篇章", roster: "名单", install: "安装", contribute: "投稿" },
     fanProject: "非官方同人项目",
-    status: { planned: "计划中", "pilot-review": "基础造型审核", released: "已发布" },
+    status: { planned: "计划中", "pilot-review": "最终动画审核", released: "已发布" },
     type: { character: "角色", stand: "替身" },
     role: { protagonist: "主角侧", antagonist: "篇章主反派侧" },
     view: "次浏览",

@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand is an independently installable Codex pet, presented in a public Part-by-Part gallery.
 
-> Public development status: the 36-pet headline roster is locked and the Part 3 Pilot Set is at its standard-animation approval gate. No Pilot pet is installable until its sixteen look directions, complete Codex pet v2 atlas, and QA package pass review.
+> Public development status: the 36-pet headline roster is locked. All four Part 3 Pilot pets now have complete Codex pet v2 atlases that passed deterministic validation, three independent blind direction reviews, and final visual QA. Jotaro is released; Star Platinum, DIO, and The World remain in owner animation review before their install buttons are enabled.
 
 ## Headline scope
 
@@ -30,6 +30,20 @@ Primary sections:
 
 The site publishes aggregate pet-page view totals. It does not collect install events, create visitor identifiers, estimate unique users, or run advertising analytics.
 
+## Install Jotaro Kujo
+
+Every method installs only the selected pet. After installation, open Codex **Settings → Pets**, choose **Refresh**, then select **Jotaro Kujo**.
+
+```bash
+curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jotaro-kujo
+```
+
+```bash
+npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet part-03-jotaro-kujo
+```
+
+Windows PowerShell and the official `codex://pets/install` action are available on the site's Install and Jotaro detail pages.
+
 ## Codex pet contract
 
 This catalog accepts only Codex pet v2 packages. A released pet must include:
@@ -49,7 +63,7 @@ apps/web/          Astro gallery
 apps/counter-api/  Minimal first-party aggregate view counter
 packages/catalog/  Typed bilingual Part and pet catalog
 docs/              Roster, decisions, and visual reviews
-pets/              Released v2 packages (added only after QA)
+pets/              QA-passed v2 packages; catalog status controls public release
 ```
 
 ## Development

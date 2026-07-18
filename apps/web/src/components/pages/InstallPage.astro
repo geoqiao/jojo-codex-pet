@@ -1,36 +1,62 @@
 ---
-import type { Locale } from "@jojo-codex-pet/catalog";
+import { pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { localize } from "../../lib/i18n";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
+const releasedPet = pets.find((pet) => pet.status === "released" && pet.packagePath)!;
+const siteOrigin = "https://jojo-preview.easytry.shop";
+const packageUrl = `${siteOrigin}${releasedPet.packagePath}`;
+const petName = localize(releasedPet.name, locale);
+const openInCodexUrl = `codex://pets/install?${new URLSearchParams({
+  name: releasedPet.name.en,
+  imageUrl: `${packageUrl}/spritesheet.webp`,
+  description: `Unofficial JoJo-themed Codex pet: ${releasedPet.name.en}`,
+  spriteVersionNumber: "2"
+}).toString()}`;
+
+const commands = {
+  bash: `curl -fsSL ${siteOrigin}/install.sh | bash -s -- ${releasedPet.id}`,
+  powershell: `& ([scriptblock]::Create((irm ${siteOrigin}/install.ps1))) ${releasedPet.id}`,
+  npx: `npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet ${releasedPet.id}`
+};
+
 const content = locale === "en" ? {
   title: "Install — JoJo Codex Pet",
-  description: "Cross-platform installation status for JoJo Codex Pet v2 companions.",
+  description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
   eyebrow: "One pet per primary action",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
-  intro: "The official installer will support Open in Codex, Bash, PowerShell, and npx. It will never silently add a Stand Pair or an entire Part.",
-  gate: "Installer activation is waiting for the Pilot animation gate.",
-  gateBody: "Publishing commands before a real v2 package exists would create a broken installation path. The commands become active together with the first validated pet.",
+  intro: "Every route verifies or delegates to the validated v2 spritesheet for the selected Part-scoped pet. It never silently adds a Stand Pair or an entire Part.",
+  released: "First validated hatch",
+  gate: `${petName} is ready to install.`,
+  gateBody: "Its 8 × 11 atlas passed deterministic checks, three blind direction reviews, and independent final visual QA.",
+  open: "Open in Codex",
+  copy: "Copy",
+  copied: "Copied",
   methods: [
-    ["Open in Codex", "One-click handoff from a released pet detail page."],
-    ["Bash", "macOS and Linux installation with package validation."],
-    ["PowerShell", "Windows installation with the same validation contract."],
-    ["npx", "A cross-platform CLI using stable Part-scoped pet IDs."]
+    ["Open in Codex", "Uses the official Codex pet-install deep link and the hosted v2 spritesheet."],
+    ["Bash", "macOS and Linux installer with SHA-256 and manifest validation."],
+    ["PowerShell", "Windows installer with the same package integrity checks."],
+    ["npx", "Cross-platform Node installer using the stable Part-scoped pet ID."]
   ]
 } : {
   title: "安装 — JoJo Codex Pet",
-  description: "JoJo Codex Pet V2 的跨平台安装状态。",
+  description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
   eyebrow: "主操作一次只安装一只",
   heading: "只安装你选中的宠物。",
-  intro: "官方安装器将支持在 Codex 中打开、Bash、PowerShell 和 npx。它不会暗中附带替身配对或整部合集。",
-  gate: "安装器等待 Pilot 动画质量门。",
-  gateBody: "在真实 V2 包出现前公开命令只会制造坏掉的安装路径。首只宠物验证通过时，安装命令会同步启用。",
+  intro: "每条安装路径都使用当前篇章稳定 ID 对应的已验证 V2 图集，不会暗中附带替身配对或整部合集。",
+  released: "首只通过验证的宠物",
+  gate: `${petName}现已可安装。`,
+  gateBody: "其 8 × 11 图集已通过确定性检查、三次方向盲测和独立最终视觉 QA。",
+  open: "在 Codex 中打开",
+  copy: "复制",
+  copied: "已复制",
   methods: [
-    ["在 Codex 中打开", "从已发布宠物详情页一键交接。"],
-    ["Bash", "面向 macOS 与 Linux，并验证宠物包。"],
-    ["PowerShell", "面向 Windows，使用相同验证契约。"],
-    ["npx", "使用篇章稳定 ID 的跨平台 CLI。"]
+    ["在 Codex 中打开", "使用 Codex 官方宠物安装深链与托管的 V2 图集。"],
+    ["Bash", "面向 macOS 与 Linux，校验 SHA-256 和宠物清单。"],
+    ["PowerShell", "面向 Windows，执行相同的宠物包完整性校验。"],
+    ["npx", "使用篇章稳定宠物 ID 的跨平台 Node 安装器。"]
   ]
 };
 ---
@@ -42,16 +68,43 @@ const content = locale === "en" ? {
       <p>{content.intro}</p>
     </header>
     <section class="gate-card">
-      <span aria-hidden="true">V2</span>
-      <div><p class="eyebrow">QUALITY GATE</p><h2>{content.gate}</h2><p>{content.gateBody}</p></div>
+      <span aria-hidden="true">01</span>
+      <div><p class="eyebrow">{content.released}</p><h2>{content.gate}</h2><p>{content.gateBody}</p></div>
     </section>
     <div class="method-grid">
-      {content.methods.map(([name, detail], index) => (
-        <article><span>0{index + 1}</span><h2>{name}</h2><p>{detail}</p><button class="button" aria-disabled="true" disabled>{locale === "en" ? "Pending" : "尚未开放"}</button></article>
-      ))}
+      {content.methods.map(([name, detail], index) => {
+        const command = index === 1 ? commands.bash : index === 2 ? commands.powershell : index === 3 ? commands.npx : undefined;
+        return (
+          <article>
+            <span>0{index + 1}</span>
+            <h2>{name}</h2>
+            <p>{detail}</p>
+            {index === 0 ? (
+              <a class="button" href={openInCodexUrl}>{content.open} ↗</a>
+            ) : (
+              <div class="install-command">
+                <code>{command}</code>
+                <button class="button" type="button" data-copy-command={command} data-copy-label={content.copy} data-copied-label={content.copied}>{content.copy}</button>
+              </div>
+            )}
+          </article>
+        );
+      })}
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-command]")) {
+    button.addEventListener("click", async () => {
+      const command = button.dataset.copyCommand;
+      if (!command) return;
+      await navigator.clipboard.writeText(command);
+      button.textContent = button.dataset.copiedLabel ?? "Copied";
+      window.setTimeout(() => { button.textContent = button.dataset.copyLabel ?? "Copy"; }, 1400);
+    });
+  }
+</script>
 
 <style>
   .gate-card {
@@ -75,9 +128,7 @@ const content = locale === "en" ? {
     font-weight: 900;
   }
 
-  .gate-card > div {
-    padding: clamp(28px, 5vw, 60px);
-  }
+  .gate-card > div { padding: clamp(28px, 5vw, 60px); }
 
   .gate-card h2 {
     max-width: 18ch;
@@ -88,29 +139,25 @@ const content = locale === "en" ? {
     line-height: 0.9;
   }
 
-  .gate-card p:last-child {
-    max-width: 65ch;
-    line-height: 1.6;
-  }
+  .gate-card p:last-child { max-width: 65ch; line-height: 1.6; }
 
   .method-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 22px;
     margin-top: 44px;
   }
 
   .method-grid article {
+    display: flex;
+    min-width: 0;
     padding: 26px;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
+    flex-direction: column;
   }
 
-  .method-grid article > span {
-    color: var(--coral);
-    font-size: 0.72rem;
-    font-weight: 850;
-  }
+  .method-grid article > span { color: var(--coral); font-size: 0.72rem; font-weight: 850; }
 
   .method-grid h2 {
     min-height: 2em;
@@ -121,16 +168,25 @@ const content = locale === "en" ? {
     line-height: 0.95;
   }
 
-  .method-grid p {
-    min-height: 7em;
-    color: var(--muted);
-    line-height: 1.55;
+  .method-grid p { min-height: 7em; color: var(--muted); line-height: 1.55; }
+
+  .install-command {
+    display: grid;
+    gap: 12px;
+    margin-top: auto;
   }
 
-  @media (max-width: 1050px) {
-    .method-grid { grid-template-columns: repeat(2, 1fr); }
+  .install-command code {
+    min-height: 92px;
+    padding: 12px;
+    overflow-wrap: anywhere;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    font-size: 0.68rem;
+    line-height: 1.5;
   }
 
+  @media (max-width: 1050px) { .method-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 650px) {
     .gate-card { grid-template-columns: 1fr; }
     .gate-card > span { min-height: 170px; border-right: 0; border-bottom: 3px solid var(--ink); }

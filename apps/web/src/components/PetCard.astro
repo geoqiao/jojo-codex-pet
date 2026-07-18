@@ -26,7 +26,7 @@ const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
   <div class="pet-card-content" data-spoiler-content aria-hidden={pet.spoiler ? "true" : undefined}>
     <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
       {pet.image ? (
-        <img src={pet.image} alt={`${name} base design`} width="1024" height="1024" loading="lazy" />
+        <img src={pet.image} alt={`${name} pixel pet`} width="1024" height="1024" loading="lazy" />
       ) : (
         <div class="planned-art" aria-hidden="true">
           <span>{initial}</span>

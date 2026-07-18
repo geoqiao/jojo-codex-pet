@@ -4,7 +4,7 @@
 
 这是一个非官方、非商业、无广告的 JoJo 主题 Codex 动态宠物合集。每个具名角色与替身都是独立可安装的 Codex 宠物，并按篇章展示在公开目录中。
 
-> 当前公开开发状态：36 只首发名单已锁定，第三部 Pilot 四只正在等待基础造型审核。在完整 Codex Pet V2 动画和 QA 包通过之前，Pilot 宠物不会标记为可安装。
+> 当前公开开发状态：36 只首发名单已锁定。第三部 Pilot 四只均已完成 Codex Pet V2 图集，并通过确定性校验、三次独立方向盲测和最终视觉 QA。承太郎已经发布；白金之星、DIO 与世界仍等待站长最终动画审核，审核前不会开放安装按钮。
 
 ## 首发范围
 
@@ -21,6 +21,20 @@
 在正式域名启用前，[jojo-preview.easytry.shop](https://jojo-preview.easytry.shop/) 就是可索引的正式站。默认英文，可切换简体中文。
 
 站点只公开累计宠物详情页浏览次数，不统计安装、不创建访客标识、不估算独立访客，也不接入广告分析。
+
+## 安装空条承太郎
+
+每种方式都只安装当前选择的宠物。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择 **Jotaro Kujo**。
+
+```bash
+curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jotaro-kujo
+```
+
+```bash
+npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet part-03-jotaro-kujo
+```
+
+Windows PowerShell 与官方 `codex://pets/install` 入口见网站的 Install 页面和承太郎详情页。
 
 ## 开发
 

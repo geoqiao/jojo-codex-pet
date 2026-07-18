@@ -7,3 +7,4 @@ node_modules/
 *.local
 apps/web/public/api/views.php
 apps/web/public/api/catalog-ids.json
+apps/web/public/packages/

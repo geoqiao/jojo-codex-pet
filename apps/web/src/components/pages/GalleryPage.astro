@@ -6,7 +6,7 @@ import ViewCounts from "../ViewCounts.astro";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
-const pilot = pets.filter((pet) => pet.status === "pilot-review");
+const pilot = pets.filter((pet) => pet.part === 3 && pet.status !== "planned");
 const content = locale === "en" ? {
   title: "JoJo Codex Pet — V2 companions across every Part",
   description: "An unofficial, non-commercial JoJo-themed Codex pet gallery. Browse the locked 36-pet roster and the Part 3 Pilot Set.",
@@ -16,8 +16,8 @@ const content = locale === "en" ? {
   locked: "Roster locked",
   parts: "Parts",
   contract: "V2 only",
-  pilotTitle: "Pilot under review",
-  pilotNote: "Four Part 3 base designs establish the visual system before animation begins.",
+  pilotTitle: "The Part 3 Pilot Set",
+  pilotNote: "Jotaro is released. Star Platinum, DIO, and The World passed engineering QA and await final owner animation review.",
   allTitle: "The headline roster",
   allNote: "36 pets · Parts 1–9",
   filters: { all: "All", pilot: "Pilot", character: "Characters", stand: "Stands" },
@@ -31,8 +31,8 @@ const content = locale === "en" ? {
   locked: "名单已锁定",
   parts: "篇章",
   contract: "仅 V2",
-  pilotTitle: "Pilot 基础造型审核中",
-  pilotNote: "第三部四张基础设计先确立统一视觉系统，通过后才开始动画。",
+  pilotTitle: "第三部 Pilot 合集",
+  pilotNote: "承太郎已发布；白金之星、DIO 与世界已通过工程 QA，正等待站长最终动画审核。",
   allTitle: "首发完整名单",
   allNote: "36 只 · 第 1–9 部",
   filters: { all: "全部", pilot: "Pilot", character: "角色", stand: "替身" },
@@ -69,7 +69,7 @@ const content = locale === "en" ? {
     <div class="filter-bar" aria-label="Catalog filters">
       <div class="filter-options">
         <button type="button" class="active" data-gallery-filter="all">{content.filters.all}</button>
-        <button type="button" data-gallery-filter="pilot-review">{content.filters.pilot}</button>
+        <button type="button" data-gallery-filter="pilot">{content.filters.pilot}</button>
         <button type="button" data-gallery-filter="character">{content.filters.character}</button>
         <button type="button" data-gallery-filter="stand">{content.filters.stand}</button>
         {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`}>P{part}</button>)}
@@ -91,7 +91,8 @@ const content = locale === "en" ? {
   const applyFilter = (filter: string) => {
     let visible = 0;
     for (const card of cards) {
-      const matches = filter === "all" || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
+      const isPilot = filter === "pilot" && card.getAttribute("data-part") === "part-03" && card.getAttribute("data-status") !== "planned";
+      const matches = filter === "all" || isPilot || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
       card.toggleAttribute("hidden", !matches);
       if (matches) visible += 1;
     }

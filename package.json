@@ -4,6 +4,12 @@
   "private": true,
   "description": "An unofficial JoJo-themed Codex pet gallery and v2 pet collection.",
   "license": "SEE LICENSE IN LICENSE AND FAN-ASSET-NOTICE.md",
+  "bin": {
+    "jojo-codex-pet": "packages/installer/src/cli.mjs"
+  },
+  "files": [
+    "packages/installer/src/cli.mjs"
+  ],
   "packageManager": "pnpm@11.9.0",
   "engines": {
     "node": ">=22.12.0"
@@ -14,6 +20,7 @@
     "dev": "pnpm --filter @jojo-codex-pet/web dev",
     "catalog:export": "pnpm --filter @jojo-codex-pet/catalog export",
     "catalog:validate": "pnpm --filter @jojo-codex-pet/catalog test",
-    "counter:stage": "pnpm --filter @jojo-codex-pet/counter-api run stage"
+    "counter:stage": "pnpm --filter @jojo-codex-pet/counter-api run stage",
+    "install:pet": "node packages/installer/src/cli.mjs"
   }
 }

@@ -270,6 +270,20 @@ const navigation = [
       font-size: 0.6rem;
     }
 
+    nav {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      width: 100%;
+      overflow: visible;
+    }
+
+    nav a {
+      min-width: 0;
+      padding-inline: 4px;
+      font-size: 0.56rem;
+      letter-spacing: 0.04em;
+    }
+
     .footer-grid {
       grid-template-columns: 1fr;
     }

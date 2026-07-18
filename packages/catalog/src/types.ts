@@ -33,4 +33,5 @@ export interface Pet {
   abilityModes?: LocalizedText[];
   image?: string;
   palette?: string[];
+  packagePath?: string;
 }

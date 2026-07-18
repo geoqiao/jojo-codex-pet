@@ -12,6 +12,19 @@ const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   const match = pets.find((item) => item.id === id);
   return match ? [match] : [];
 });
+const siteOrigin = "https://jojo-preview.easytry.shop";
+const packageUrl = pet.packagePath ? `${siteOrigin}${pet.packagePath}` : undefined;
+const openInCodexUrl = packageUrl ? `codex://pets/install?${new URLSearchParams({
+  name: pet.name.en,
+  imageUrl: `${packageUrl}/spritesheet.webp`,
+  description: `Unofficial JoJo-themed Codex pet: ${pet.name.en}`,
+  spriteVersionNumber: "2"
+}).toString()}` : undefined;
+const installCommands = packageUrl ? [
+  { label: "Bash · macOS / Linux", command: `curl -fsSL ${siteOrigin}/install.sh | bash -s -- ${pet.id}` },
+  { label: "PowerShell · Windows", command: `& ([scriptblock]::Create((irm ${siteOrigin}/install.ps1))) ${pet.id}` },
+  { label: "npx · cross-platform", command: `npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet ${pet.id}` }
+] : [];
 const content = locale === "en" ? {
   identity: "Catalog identity",
   relationship: "Stand relationship",
@@ -20,9 +33,15 @@ const content = locale === "en" ? {
   source: "Source",
   install: "Install this pet",
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
-  review: "This is a base-design review image—not a final spritesheet.",
+  ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
+  released: "Released as a validated Codex pet v2 package.",
+  review: "Its complete v2 atlas passed engineering QA and is waiting for final owner animation approval before release.",
   planned: "Artwork begins in its assigned quality-gated release wave.",
-  views: "Public page views"
+  views: "Public page views",
+  openInCodex: "Open in Codex",
+  download: "Package files",
+  copy: "Copy",
+  copied: "Copied"
 } : {
   identity: "目录身份",
   relationship: "替身关系",
@@ -31,16 +50,22 @@ const content = locale === "en" ? {
   source: "来源",
   install: "安装这只宠物",
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
-  review: "当前展示的是基础造型审核图，不是最终 spritesheet。",
+  ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
+  released: "已作为通过验证的 Codex Pet V2 包发布。",
+  review: "完整 V2 图集已通过工程 QA，正在等待站长最终动画审核后发布。",
   planned: "素材将在所属质量门发布波次中开始制作。",
-  views: "公开页面浏览次数"
+  views: "公开页面浏览次数",
+  openInCodex: "在 Codex 中打开",
+  download: "宠物包文件",
+  copy: "复制",
+  copied: "已复制"
 };
 ---
 
 <div class="detail-grid">
   <div class="detail-art" style={`--accent:${part.accent}`}>
     {pet.image ? (
-      <img src={pet.image} alt={`${name} base design`} width="1024" height="1024" />
+      <img src={pet.image} alt={`${name} pixel pet`} width="1024" height="1024" />
     ) : (
       <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
     )}
@@ -50,7 +75,7 @@ const content = locale === "en" ? {
     <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
     <h1>{name}</h1>
     <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
-    <p class="status-note">{pet.status === "pilot-review" ? content.review : content.planned}</p>
+    <p class="status-note">{pet.status === "released" ? content.released : pet.status === "pilot-review" ? content.review : content.planned}</p>
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
       <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
@@ -64,7 +89,29 @@ const content = locale === "en" ? {
       {pet.palette && <div><dt>{content.palette}</dt><dd class="detail-palette">{pet.palette.map((color) => <span style={`--swatch:${color}`}><i>{color}</i></span>)}</dd></div>}
       <div><dt>{content.source}</dt><dd><a href={pet.source}>geoqiao/jojo-codex-pet ↗</a></dd></div>
     </dl>
-    <section class="install-box"><h2>{content.install}</h2><p>{content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{copy.notInstallable}</button></section>
+    <section class="install-box">
+      <h2>{content.install}</h2>
+      {pet.status === "released" && packageUrl && openInCodexUrl ? (
+        <>
+          <p>{content.ready}</p>
+          <div class="install-primary">
+            <a class="button" href={openInCodexUrl}>{content.openInCodex} ↗</a>
+            <a class="package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
+          </div>
+          <div class="command-list">
+            {installCommands.map(({ label, command }) => (
+              <div class="command-row">
+                <span>{label}</span>
+                <code>{command}</code>
+                <button type="button" data-copy-command={command} data-copy-label={content.copy} data-copied-label={content.copied}>{content.copy}</button>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <><p>{content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{copy.notInstallable}</button></>
+      )}
+    </section>
   </div>
 </div>
 
@@ -154,11 +201,11 @@ const content = locale === "en" ? {
   .detail-pills { display: flex; gap: 8px; }
 
   h1 {
-    margin: 28px 0 12px;
+    margin: 28px 0 24px;
     font-family: "Bodoni Moda Variable", Georgia, serif;
     font-size: clamp(4rem, 9vw, 9rem);
     letter-spacing: -0.07em;
-    line-height: 0.83;
+    line-height: 0.92;
   }
 
   .part-title {
@@ -234,6 +281,65 @@ const content = locale === "en" ? {
 
   .install-box p { max-width: 58ch; line-height: 1.55; }
 
+  .install-primary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .package-link {
+    color: var(--paper-bright);
+    font-size: 0.72rem;
+    font-weight: 820;
+    letter-spacing: 0.06em;
+    text-underline-offset: 4px;
+    text-transform: uppercase;
+  }
+
+  .command-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .command-row {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid rgb(255 255 255 / 35%);
+  }
+
+  .command-row > span {
+    color: var(--acid);
+    font-size: 0.65rem;
+    font-weight: 850;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .command-row code {
+    min-width: 0;
+    overflow-x: auto;
+    color: var(--paper-bright);
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .command-row button {
+    min-height: 34px;
+    padding: 6px 10px;
+    border: 1px solid var(--paper-bright);
+    color: var(--paper-bright);
+    background: transparent;
+    font-size: 0.62rem;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
   @media (max-width: 900px) {
     .detail-grid { grid-template-columns: 1fr; }
     .detail-art { min-height: 500px; border-right: 0; border-bottom: 3px solid var(--ink); }
@@ -244,5 +350,19 @@ const content = locale === "en" ? {
     dl > div { grid-template-columns: 1fr; gap: 5px; }
     .detail-art { min-height: 410px; }
     .detail-art img { height: 390px; }
+    .command-row { grid-template-columns: 1fr auto; }
+    .command-row code { grid-column: 1 / -1; grid-row: 2; }
   }
 </style>
+
+<script>
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-command]")) {
+    button.addEventListener("click", async () => {
+      const command = button.dataset.copyCommand;
+      if (!command) return;
+      await navigator.clipboard.writeText(command);
+      button.textContent = button.dataset.copiedLabel ?? "Copied";
+      window.setTimeout(() => { button.textContent = button.dataset.copyLabel ?? "Copy"; }, 1400);
+    });
+  }
+</script>
