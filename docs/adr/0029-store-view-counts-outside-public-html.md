@@ -1,0 +1,3 @@
+# Store page-view totals outside public HTML without credentials
+
+This amends only the storage detail in ADR-0019 and ADR-0024. The same-origin PHP endpoint will keep one small JSON document in the Hostinger account home, outside `public_html`, rather than connect to MySQL. A private lock file serializes readers and writers, and each update atomically replaces the data file. The data contract remains limited to Catalog Pet ID, aggregate total, and update time. This removes database credentials from deployment artifacts, preserves totals across site redeployments, and is proportionate to a 36-key, low-write public counter.

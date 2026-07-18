@@ -26,44 +26,97 @@ function loadAllowedIds(): array
     return array_fill_keys($ids, true);
 }
 
-function connectDatabase(): PDO
+function storagePaths(): array
 {
-    $configPath = __DIR__ . '/config.php';
-    if (!is_file($configPath)) {
+    $override = getenv('JOJO_COUNTER_STORAGE_DIR');
+    $root = is_string($override) && $override !== '' ? $override : dirname(__DIR__, 5);
+
+    if (!is_dir($root) || !is_writable($root)) {
         respond(503, ['error' => 'counter_unavailable']);
     }
 
-    $config = require $configPath;
-    if (!is_array($config) || !isset($config['dsn'], $config['username'], $config['password'])) {
-        respond(503, ['error' => 'counter_unavailable']);
+    return [
+        'data' => $root . '/.jojo-codex-pet-views.json',
+        'lock' => $root . '/.jojo-codex-pet-views.lock',
+    ];
+}
+
+function readStore(string $path): array
+{
+    if (!is_file($path)) {
+        return [];
+    }
+
+    $json = file_get_contents($path);
+    if ($json === false || trim($json) === '') {
+        return [];
+    }
+
+    $store = json_decode($json, true);
+    if (!is_array($store)) {
+        throw new RuntimeException('Counter store is invalid JSON.');
+    }
+
+    foreach ($store as $id => $entry) {
+        if (
+            !is_string($id)
+            || !is_array($entry)
+            || !isset($entry['count'], $entry['updated_at'])
+            || !is_int($entry['count'])
+            || $entry['count'] < 0
+            || !is_string($entry['updated_at'])
+        ) {
+            throw new RuntimeException('Counter store contains an invalid entry.');
+        }
+    }
+
+    return $store;
+}
+
+function writeStore(string $path, array $store): void
+{
+    $directory = dirname($path);
+    $temporary = tempnam($directory, '.jojo-pet-views-');
+    if ($temporary === false) {
+        throw new RuntimeException('Unable to create a temporary counter file.');
     }
 
     try {
-        return new PDO(
-            $config['dsn'],
-            $config['username'],
-            $config['password'],
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ],
-        );
-    } catch (Throwable $error) {
-        error_log('JoJo page counter database connection failed: ' . $error->getMessage());
-        respond(503, ['error' => 'counter_unavailable']);
+        $json = json_encode($store, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        if (file_put_contents($temporary, $json . PHP_EOL) === false) {
+            throw new RuntimeException('Unable to write the counter store.');
+        }
+        @chmod($temporary, 0600);
+        if (!rename($temporary, $path)) {
+            throw new RuntimeException('Unable to replace the counter store.');
+        }
+    } finally {
+        if (is_file($temporary)) {
+            @unlink($temporary);
+        }
     }
 }
 
-function ensureSchema(PDO $database): void
+function withStoreLock(int $mode, callable $operation): mixed
 {
-    $database->exec(
-        'CREATE TABLE IF NOT EXISTS pet_page_views ('
-        . 'pet_id VARCHAR(96) NOT NULL PRIMARY KEY,'
-        . 'view_count BIGINT UNSIGNED NOT NULL DEFAULT 0,'
-        . 'updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'
-        . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci',
-    );
+    $paths = storagePaths();
+    $handle = @fopen($paths['lock'], 'c');
+    if (is_resource($handle)) {
+        @chmod($paths['lock'], 0600);
+    }
+    if ($handle === false || !flock($handle, $mode)) {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+        throw new RuntimeException('Unable to lock the counter store.');
+    }
+
+    try {
+        return $operation($paths['data']);
+    } finally {
+        flock($handle, LOCK_UN);
+        fclose($handle);
+    }
 }
 
 $allowedIds = loadAllowedIds();
@@ -83,18 +136,13 @@ if ($method === 'GET') {
         }
     }
 
-    $counts = array_fill_keys($requested, 0);
-    $placeholders = implode(',', array_fill(0, count($requested), '?'));
-
     try {
-        $database = connectDatabase();
-        ensureSchema($database);
-        $statement = $database->prepare(
-            "SELECT pet_id, view_count FROM pet_page_views WHERE pet_id IN ($placeholders)",
-        );
-        $statement->execute($requested);
-        foreach ($statement->fetchAll() as $row) {
-            $counts[$row['pet_id']] = (int) $row['view_count'];
+        $store = withStoreLock(LOCK_SH, fn (string $path): array => readStore($path));
+        $counts = array_fill_keys($requested, 0);
+        foreach ($requested as $id) {
+            if (isset($store[$id])) {
+                $counts[$id] = $store[$id]['count'];
+            }
         }
         respond(200, ['counts' => $counts]);
     } catch (Throwable $error) {
@@ -115,23 +163,18 @@ if ($method === 'POST') {
     }
 
     try {
-        $database = connectDatabase();
-        ensureSchema($database);
-        $database->beginTransaction();
-        $statement = $database->prepare(
-            'INSERT INTO pet_page_views (pet_id, view_count) VALUES (?, 1) '
-            . 'ON DUPLICATE KEY UPDATE view_count = view_count + 1',
-        );
-        $statement->execute([$petId]);
-        $read = $database->prepare('SELECT view_count FROM pet_page_views WHERE pet_id = ?');
-        $read->execute([$petId]);
-        $count = (int) $read->fetchColumn();
-        $database->commit();
+        $count = withStoreLock(LOCK_EX, function (string $path) use ($petId): int {
+            $store = readStore($path);
+            $count = ($store[$petId]['count'] ?? 0) + 1;
+            $store[$petId] = [
+                'count' => $count,
+                'updated_at' => gmdate(DATE_ATOM),
+            ];
+            writeStore($path, $store);
+            return $count;
+        });
         respond(200, ['pet_id' => $petId, 'count' => $count]);
     } catch (Throwable $error) {
-        if (isset($database) && $database->inTransaction()) {
-            $database->rollBack();
-        }
         error_log('JoJo page counter write failed: ' . $error->getMessage());
         respond(503, ['error' => 'counter_unavailable']);
     }

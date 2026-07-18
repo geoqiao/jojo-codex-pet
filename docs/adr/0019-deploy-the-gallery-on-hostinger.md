@@ -1,3 +1,7 @@
+---
+storage-amended-by: ADR-0029
+---
+
 # Deploy the static gallery and view counter on Hostinger
 
 The gallery will build its Astro application from the monorepo and deploy the prebuilt static output to the owner's existing active Hostinger Business Web Hosting subscription. A narrowly scoped same-origin PHP endpoint and dedicated MySQL table will provide the aggregate Page View Count selected in ADR-0024; the remainder of the site stays static. GitHub remains the source and contribution workflow while Hostinger serves the production site. This reuses already-paid PHP/MySQL capacity, avoids another hosting provider, and matches the pre-rendered pages and client islands selected in ADR-0018. A persistent Node.js runtime will not be introduced unless a later accepted requirement needs other server-side behavior.
