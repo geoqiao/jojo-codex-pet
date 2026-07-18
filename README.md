@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand is an independently installable Codex pet, presented in a public Part-by-Part gallery.
 
-> Public development status: the 36-pet headline roster is locked. All four Part 3 Pilot pets now have complete Codex pet v2 atlases that passed deterministic validation, three independent blind direction reviews, and final visual QA. Jotaro is released; Star Platinum, DIO, and The World remain in owner animation review before their install buttons are enabled.
+> Public development status: the 36-pet headline roster is locked. All eight Wave 1 pets now have complete QA-passed Codex Pet V2 packages. Jotaro is released; the other seven remain in owner animation review before their public install buttons are enabled. The Parts 1–2 base designs were approved and installed locally for owner testing on 2026-07-19.
 
 ## Headline scope
 
@@ -14,7 +14,7 @@ An unofficial, non-commercial, advertisement-free collection of JoJo-themed anim
 - Ability modes remain animation cues rather than separate pets
 - Part 9's principal-antagonist slot stays unassigned while the story is ongoing
 
-The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md) and [current Wave 1 progress](docs/wave-1-status.md).
+The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md), [current Wave 1 progress](docs/wave-1-status.md), and the [Parts 1–2 animation review](docs/visual/wave-1-animation-review/README.md).
 
 ## Gallery
 
@@ -68,7 +68,7 @@ pets/              QA-passed v2 packages; catalog status controls public release
 
 ## Development
 
-Requirements: Node.js 22.12+ and pnpm 11.
+Requirements: Node.js 22.13+ and pnpm 11.
 
 ```bash
 pnpm install

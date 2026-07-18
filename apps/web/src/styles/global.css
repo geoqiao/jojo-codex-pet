@@ -138,7 +138,8 @@ img {
   text-transform: uppercase;
 }
 
-.status-pill[data-status="pilot-review"] {
+.status-pill[data-status="pilot-review"],
+.status-pill[data-status="wave-review"] {
   background: var(--acid);
 }
 
