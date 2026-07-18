@@ -1,6 +1,7 @@
-import { readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 import { parts } from "./parts";
 import { pets } from "./pets";
 
@@ -33,38 +34,29 @@ if (pilot.length !== 4 || pilot.some((pet) => pet.part !== 3)) {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(here, "../../..");
+const packagesRoot = resolve(repositoryRoot, "pets");
+const cellWidth = 192;
+const cellHeight = 208;
+// V2 reserves row 0, column 6 as the neutral look frame in addition to the six idle frames.
+const expectedFramesByRow = [7, 8, 8, 4, 5, 8, 6, 6, 6, 8, 8] as const;
 
-const readWebpDimensions = (data: Buffer): { width: number; height: number } => {
-  if (data.length < 30 || data.toString("ascii", 0, 4) !== "RIFF" || data.toString("ascii", 8, 12) !== "WEBP") {
-    return fail("Released spritesheet must be a valid WebP file");
-  }
-
-  const chunk = data.toString("ascii", 12, 16);
-  if (chunk === "VP8L" && data[20] === 0x2f) {
-    const bits = data.readUInt32LE(21);
-    return { width: (bits & 0x3fff) + 1, height: ((bits >>> 14) & 0x3fff) + 1 };
-  }
-  if (chunk === "VP8X") {
-    return {
-      width: data.readUIntLE(24, 3) + 1,
-      height: data.readUIntLE(27, 3) + 1
-    };
-  }
-
-  return fail(`Unsupported WebP chunk ${chunk || "unknown"}`);
-};
+const packageIds = new Set(
+  (await readdir(packagesRoot, { withFileTypes: true }))
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+);
 
 for (const pet of pets) {
-  if (pet.status !== "released") {
-    if (pet.packagePath) fail(`${pet.id}: only released pets may expose a package path`);
-    continue;
-  }
-
-  if (pet.packagePath !== `/packages/${pet.id}`) {
+  const isPackaged = packageIds.has(pet.id);
+  if (pet.status === "planned" && isPackaged) fail(`${pet.id}: planned pets may not have a release package`);
+  if (pet.status !== "planned" && !isPackaged) fail(`${pet.id}: review and released pets require a package`);
+  if (pet.status === "released" && pet.packagePath !== `/packages/${pet.id}`) {
     fail(`${pet.id}: released package path must be /packages/${pet.id}`);
   }
+  if (pet.status !== "released" && pet.packagePath) fail(`${pet.id}: only released pets may expose a package path`);
+  if (!isPackaged) continue;
 
-  const packageDirectory = resolve(repositoryRoot, "pets", pet.id);
+  const packageDirectory = resolve(packagesRoot, pet.id);
   const manifestPath = resolve(packageDirectory, "pet.json");
   const spritesheetPath = resolve(packageDirectory, "spritesheet.webp");
   await stat(manifestPath);
@@ -72,13 +64,58 @@ for (const pet of pets) {
 
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Record<string, unknown>;
   if (manifest.id !== pet.id) fail(`${pet.id}: package manifest ID does not match catalog`);
+  if (manifest.displayName !== pet.name.en) fail(`${pet.id}: package displayName does not match the English catalog name`);
+  if (typeof manifest.description !== "string" || manifest.description.trim() === "") {
+    fail(`${pet.id}: package description must be a non-empty string`);
+  }
   if (manifest.spriteVersionNumber !== 2) fail(`${pet.id}: package must declare spriteVersionNumber 2`);
   if (manifest.spritesheetPath !== "spritesheet.webp") fail(`${pet.id}: package must use spritesheet.webp`);
 
-  const dimensions = readWebpDimensions(await readFile(spritesheetPath));
-  if (dimensions.width !== 1536 || dimensions.height !== 2288) {
-    fail(`${pet.id}: expected a 1536x2288 v2 spritesheet, found ${dimensions.width}x${dimensions.height}`);
+  const metadata = await sharp(spritesheetPath).metadata();
+  if (metadata.format !== "webp") fail(`${pet.id}: spritesheet must be WebP`);
+  if (metadata.width !== cellWidth * 8 || metadata.height !== cellHeight * 11) {
+    fail(`${pet.id}: expected a 1536x2288 v2 spritesheet, found ${metadata.width}x${metadata.height}`);
+  }
+  if (!metadata.hasAlpha) fail(`${pet.id}: spritesheet must contain an alpha channel`);
+
+  const { data, info } = await sharp(spritesheetPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  if (info.channels !== 4) fail(`${pet.id}: decoded spritesheet must be RGBA`);
+  let transparentRgbResidue = 0;
+
+  for (const [row, expectedFrames] of expectedFramesByRow.entries()) {
+    for (let column = 0; column < 8; column += 1) {
+      let visiblePixels = 0;
+      for (let y = row * cellHeight; y < (row + 1) * cellHeight; y += 1) {
+        for (let x = column * cellWidth; x < (column + 1) * cellWidth; x += 1) {
+          const offset = (y * info.width + x) * info.channels;
+          const alpha = data[offset + 3];
+          if (alpha !== 0) {
+            visiblePixels += 1;
+          } else if (data[offset] !== 0 || data[offset + 1] !== 0 || data[offset + 2] !== 0) {
+            transparentRgbResidue += 1;
+          }
+        }
+      }
+
+      const shouldBeUsed = column < expectedFrames;
+      if (shouldBeUsed && visiblePixels < 128) {
+        fail(`${pet.id}: row ${row} column ${column} is missing or effectively empty`);
+      }
+      if (shouldBeUsed && visiblePixels > cellWidth * cellHeight * 0.95) {
+        fail(`${pet.id}: row ${row} column ${column} is nearly opaque and likely retains a background`);
+      }
+      if (!shouldBeUsed && visiblePixels !== 0) {
+        fail(`${pet.id}: row ${row} column ${column} must be fully transparent`);
+      }
+    }
+  }
+  if (transparentRgbResidue !== 0) {
+    fail(`${pet.id}: spritesheet has ${transparentRgbResidue} fully transparent pixels with RGB residue`);
   }
 }
 
-console.log(`Catalog OK: ${pets.length} pets across ${parts.length} Parts`);
+for (const packageId of packageIds) {
+  if (!ids.has(packageId)) fail(`${packageId}: package directory has no catalog entry`);
+}
+
+console.log(`Catalog OK: ${pets.length} pets across ${parts.length} Parts; ${packageIds.size} v2 packages validated`);

@@ -14,7 +14,7 @@ An unofficial, non-commercial, advertisement-free collection of JoJo-themed anim
 - Ability modes remain animation cues rather than separate pets
 - Part 9's principal-antagonist slot stays unassigned while the story is ongoing
 
-The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md).
+The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md) and [current Wave 1 progress](docs/wave-1-status.md).
 
 ## Gallery
 

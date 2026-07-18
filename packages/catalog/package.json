@@ -11,6 +11,7 @@
     "test": "tsx src/validate.ts"
   },
   "devDependencies": {
+    "sharp": "0.35.3",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   }
