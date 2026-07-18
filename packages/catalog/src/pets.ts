@@ -3,11 +3,11 @@ import type { Pet } from "./types";
 const source = "https://github.com/geoqiao/jojo-codex-pet";
 
 export const pets: readonly Pet[] = [
-  { id: "part-01-jonathan-joestar", part: 1, name: { en: "Jonathan Joestar", "zh-CN": "乔纳森·乔斯达" }, type: "character", role: "protagonist", status: "planned", source },
-  { id: "part-01-dio-brando", part: 1, name: { en: "Dio Brando", "zh-CN": "迪奥·布兰度" }, type: "character", role: "antagonist", status: "planned", source, spoiler: true },
+  { id: "part-01-jonathan-joestar", part: 1, name: { en: "Jonathan Joestar", "zh-CN": "乔纳森·乔斯达" }, type: "character", role: "protagonist", status: "wave-review", source, image: "/wave-1-bases/part-01-jonathan-joestar.png", palette: ["#11142c", "#6fc4a3", "#e47867", "#f5d24f"] },
+  { id: "part-01-dio-brando", part: 1, name: { en: "Dio Brando", "zh-CN": "迪奥·布兰度" }, type: "character", role: "antagonist", status: "wave-review", source, spoiler: true, image: "/wave-1-bases/part-01-dio-brando.png", palette: ["#171a2b", "#f4e6e1", "#396a46", "#df3b87", "#79dcf0"] },
 
-  { id: "part-02-joseph-joestar", part: 2, name: { en: "Joseph Joestar", "zh-CN": "乔瑟夫·乔斯达" }, type: "character", role: "protagonist", status: "planned", source },
-  { id: "part-02-kars", part: 2, name: { en: "Kars", "zh-CN": "卡兹" }, type: "character", role: "antagonist", status: "planned", source, spoiler: true },
+  { id: "part-02-joseph-joestar", part: 2, name: { en: "Joseph Joestar", "zh-CN": "乔瑟夫·乔斯达" }, type: "character", role: "protagonist", status: "wave-review", source, image: "/wave-1-bases/part-02-joseph-joestar.png", palette: ["#182348", "#3155c7", "#e87516", "#55d9d2", "#f0b33c"] },
+  { id: "part-02-kars", part: 2, name: { en: "Kars", "zh-CN": "卡兹" }, type: "character", role: "antagonist", status: "wave-review", source, spoiler: true, image: "/wave-1-bases/part-02-kars.png", palette: ["#11152d", "#a56fc1", "#199a9b", "#e4b54c", "#a52f4e"] },
 
   { id: "part-03-jotaro-kujo", part: 3, name: { en: "Jotaro Kujo", "zh-CN": "空条承太郎" }, type: "character", role: "protagonist", status: "released", source, pairIds: ["part-03-star-platinum"], image: "/pilot-bases/part-03-jotaro-kujo.png", palette: ["#171a33", "#7ed6c4", "#ff6b6b", "#e8c66a"], packagePath: "/packages/part-03-jotaro-kujo" },
   { id: "part-03-star-platinum", part: 3, name: { en: "Star Platinum", "zh-CN": "白金之星" }, type: "stand", role: "protagonist", status: "pilot-review", source, ownerId: "part-03-jotaro-kujo", lineageStage: 1, image: "/pilot-bases/part-03-star-platinum.png", palette: ["#5a2c6f", "#42c7d9", "#ff6b6b", "#f4e6c2"] },

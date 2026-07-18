@@ -16,7 +16,7 @@ export interface Part {
 
 export type PetType = "character" | "stand";
 export type StoryRole = "protagonist" | "antagonist";
-export type PetStatus = "planned" | "pilot-review" | "released";
+export type PetStatus = "planned" | "pilot-review" | "wave-review" | "released";
 
 export interface Pet {
   id: string;

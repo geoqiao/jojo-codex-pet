@@ -6,6 +6,7 @@ interface Props { locale: Locale; pet: Pet }
 const { locale, pet } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
+const isReview = pet.status === "pilot-review" || pet.status === "wave-review";
 const part = parts.find((item) => item.number === pet.part)!;
 const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   if (!id) return [];
@@ -33,6 +34,7 @@ const content = locale === "en" ? {
   source: "Source",
   install: "Install this pet",
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
+  reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
   ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
   released: "Released as a validated Codex pet v2 package.",
   review: "Its complete v2 atlas passed engineering QA and is waiting for final owner animation approval before release.",
@@ -50,6 +52,7 @@ const content = locale === "en" ? {
   source: "来源",
   install: "安装这只宠物",
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
+  reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
   ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
   released: "已作为通过验证的 Codex Pet V2 包发布。",
   review: "完整 V2 图集已通过工程 QA，正在等待站长最终动画审核后发布。",
@@ -75,7 +78,7 @@ const content = locale === "en" ? {
     <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
     <h1>{name}</h1>
     <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
-    <p class="status-note">{pet.status === "released" ? content.released : pet.status === "pilot-review" ? content.review : content.planned}</p>
+    <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
       <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
@@ -109,7 +112,7 @@ const content = locale === "en" ? {
           </div>
         </>
       ) : (
-        <><p>{content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{copy.notInstallable}</button></>
+        <><p>{isReview ? content.reviewPending : content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{isReview ? copy.reviewNotInstallable : copy.notInstallable}</button></>
       )}
     </section>
   </div>
