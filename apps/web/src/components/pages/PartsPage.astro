@@ -1,0 +1,155 @@
+---
+import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { localize, route } from "../../lib/i18n";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = locale === "en" ? {
+  title: "Parts — JoJo Codex Pet",
+  description: "Browse the JoJo Codex Pet headline roster Part by Part.",
+  eyebrow: "Nine chronological collections",
+  heading: "EVERY PART. ONE BLOODLINE.",
+  intro: "Each Part groups its headline character pets, Stand pairs, and persistent Stand lineages. Release waves are quality gates—not new identities.",
+  protagonist: "Protagonist side",
+  antagonist: "Antagonist side",
+  open: "Open collection",
+  ongoing: "Ongoing · antagonist unassigned"
+} : {
+  title: "篇章 — JoJo Codex Pet",
+  description: "按篇章浏览 JoJo Codex Pet 的首发名单。",
+  eyebrow: "九个按时间排列的篇章合集",
+  heading: "每一部，同一条血脉。",
+  intro: "每个篇章收录主角与篇章主反派的角色宠物、替身配对和持久替身谱系。发布波次只是质量门，不改变宠物身份。",
+  protagonist: "主角侧",
+  antagonist: "主反派侧",
+  open: "打开篇章",
+  ongoing: "连载中 · 主反派暂不指定"
+};
+---
+
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/parts/">
+  <div class="shell">
+    <header class="page-intro">
+      <div><p class="eyebrow">{content.eyebrow}</p><h1 class="display">{content.heading}</h1></div>
+      <p>{content.intro}</p>
+    </header>
+    <div class="parts-grid">
+      {parts.map((part) => {
+        const collection = pets.filter((pet) => pet.part === part.number);
+        const heroes = collection.filter((pet) => pet.role === "protagonist");
+        const antagonists = collection.filter((pet) => pet.role === "antagonist");
+        return (
+          <article class="part-card" style={`--accent:${part.accent}`}>
+            <div class="part-number">{String(part.number).padStart(2, "0")}</div>
+            <div class="part-copy">
+              <p class="eyebrow">PART {part.number} · {part.count} PETS</p>
+              <h2>{localize(part.title, locale)}</h2>
+              <p>{localize(part.subtitle, locale)}</p>
+              <dl>
+                <div><dt>{content.protagonist}</dt><dd>{heroes.map((pet) => localize(pet.name, locale)).join(" · ")}</dd></div>
+                <div><dt>{content.antagonist}</dt><dd>{antagonists.length > 0 ? `${antagonists.length} spoiler-protected pets` : content.ongoing}</dd></div>
+              </dl>
+              <a class="button" href={`${route(locale, "/")}?part=${part.number}#roster`}>{content.open} ↗</a>
+            </div>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .parts-grid {
+    display: grid;
+    gap: 32px;
+  }
+
+  .part-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.32fr) 1fr;
+    min-height: 360px;
+    overflow: hidden;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+    box-shadow: var(--shadow);
+  }
+
+  .part-number {
+    display: grid;
+    place-items: center;
+    color: var(--paper-bright);
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 18%) 0 18%, transparent 18% 70%, rgb(23 19 30 / 20%) 70%),
+      var(--accent);
+    border-right: 3px solid var(--ink);
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(6rem, 14vw, 13rem);
+    font-weight: 900;
+    letter-spacing: -0.08em;
+    text-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .part-copy {
+    padding: clamp(28px, 5vw, 64px);
+  }
+
+  h2 {
+    margin: 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(3rem, 7vw, 6.5rem);
+    letter-spacing: -0.06em;
+    line-height: 0.9;
+  }
+
+  .part-copy > p:not(.eyebrow) {
+    margin: 18px 0 30px;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  dl {
+    display: grid;
+    gap: 12px;
+    margin: 0 0 28px;
+  }
+
+  dl div {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 15px;
+    padding-top: 10px;
+    border-top: 2px solid var(--ink);
+  }
+
+  dt {
+    font-size: 0.67rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.86rem;
+    font-weight: 650;
+  }
+
+  @media (max-width: 720px) {
+    .part-card {
+      grid-template-columns: 1fr;
+    }
+
+    .part-number {
+      min-height: 190px;
+      border-right: 0;
+      border-bottom: 3px solid var(--ink);
+    }
+
+    dl div {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>

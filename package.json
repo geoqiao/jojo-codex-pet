@@ -1,0 +1,19 @@
+{
+  "name": "jojo-codex-pet",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An unofficial JoJo-themed Codex pet gallery and v2 pet collection.",
+  "license": "SEE LICENSE IN LICENSE AND FAN-ASSET-NOTICE.md",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "pnpm run catalog:export && pnpm run counter:stage && pnpm --filter @jojo-codex-pet/web build",
+    "check": "pnpm catalog:validate && pnpm --filter @jojo-codex-pet/web check",
+    "dev": "pnpm --filter @jojo-codex-pet/web dev",
+    "catalog:export": "pnpm --filter @jojo-codex-pet/catalog export",
+    "catalog:validate": "pnpm --filter @jojo-codex-pet/catalog test",
+    "counter:stage": "pnpm --filter @jojo-codex-pet/counter-api run stage"
+  }
+}

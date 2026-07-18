@@ -1,0 +1,86 @@
+---
+import type { Locale, Pet } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PetDetailContent from "../PetDetailContent.astro";
+import ViewCounts from "../ViewCounts.astro";
+import { localize, route, ui } from "../../lib/i18n";
+
+interface Props { locale: Locale; pet: Pet }
+const { locale, pet } = Astro.props;
+const copy = ui[locale];
+const name = localize(pet.name, locale);
+const content = locale === "en" ? {
+  description: `${name}, a ${copy.type[pet.type].toLowerCase()} in the JoJo Codex Pet headline roster.`,
+  back: "Back to gallery",
+  reveal: "Reveal this spoiler-protected pet"
+} : {
+  description: `${name}，JoJo Codex Pet 首发名单中的${copy.type[pet.type]}宠物。`,
+  back: "返回宠物目录",
+  reveal: "显示这只包含剧透的宠物"
+};
+---
+
+<BaseLayout locale={locale} title={`${pet.spoiler ? (locale === "en" ? "Spoiler pet" : "剧透宠物") : name} — JoJo Codex Pet`} description={content.description} path={`/pets/${pet.id}/`}>
+  <div class="shell detail-shell">
+    <p class="back-link"><a href={route(locale, "/")}>← {content.back}</a></p>
+    {pet.spoiler ? (
+      <details class="detail-spoiler">
+        <summary>✦ {content.reveal}</summary>
+        <PetDetailContent locale={locale} pet={pet} />
+      </details>
+    ) : (
+      <PetDetailContent locale={locale} pet={pet} />
+    )}
+  </div>
+  <ViewCounts locale={locale} incrementId={pet.id} />
+</BaseLayout>
+
+<style>
+  .detail-shell { padding-top: 38px; }
+
+  .back-link {
+    margin: 0 0 24px;
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .back-link a { text-underline-offset: 4px; }
+
+  .detail-spoiler {
+    min-height: 500px;
+    border: 3px solid var(--ink);
+    background: var(--ink);
+    box-shadow: 7px 7px 0 var(--coral);
+  }
+
+  .detail-spoiler > summary {
+    display: grid;
+    min-height: 500px;
+    place-items: center;
+    padding: 40px;
+    color: var(--paper-bright);
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(2.5rem, 7vw, 7rem);
+    font-weight: 800;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .detail-spoiler[open] > summary {
+    min-height: auto;
+    padding: 18px;
+    color: var(--ink);
+    background: var(--coral);
+    font-family: inherit;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .detail-spoiler[open] :global(.detail-grid) {
+    border: 0;
+    box-shadow: none;
+  }
+</style>

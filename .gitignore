@@ -1,0 +1,11 @@
+.DS_Store
+.astro/
+.work/
+dist/
+node_modules/
+.pnpm-store/
+*.local
+apps/counter-api/config.php
+apps/web/public/api/config.php
+apps/web/public/api/views.php
+apps/web/public/api/catalog-ids.json

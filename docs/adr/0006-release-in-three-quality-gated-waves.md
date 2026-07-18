@@ -1,0 +1,3 @@
+# Release in three quality-gated waves
+
+The 36-pet Headline Roster will ship in three chronological public Release Waves: Parts 1–3 with 8 pets, Parts 4–6 with 15 pets, and Parts 7–9 with 13 pets. Before generation begins, the complete named roster must receive one approval. The Part 3 quartet will then serve as an internal Pilot Set whose base designs and final v2 animations each require approval before it remains inside the first wave. Each later wave must pass animation, package-installation, and gallery acceptance through a batch QA overview that highlights anomalies for focused review, bringing feedback forward and bounding rework without requiring per-frame approval.

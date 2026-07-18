@@ -1,0 +1,3 @@
+# Use exact JoJo identities in an unofficial fan project
+
+The Fan Project will use named JoJo characters and Stands rather than original lookalikes because recognizable character-and-Stand pairings are the intended product. The public repository and gallery will be free, ad-free, non-commercial, and explicitly unofficial: they will not use AdSense, display advertising, affiliate placement, or paid promotion. This decision does not establish permission, accepts possible removal or takedown, and keeps Project Code licensing separate from Character Assets and the underlying JoJo rights; avoiding monetization also avoids adding a commercial-use claim and Google publisher-policy exposure to an already permission-sensitive fan project.

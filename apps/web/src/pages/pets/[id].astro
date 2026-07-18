@@ -1,0 +1,11 @@
+---
+import { pets } from "@jojo-codex-pet/catalog";
+import PetDetailPage from "../../components/pages/PetDetailPage.astro";
+
+export function getStaticPaths() {
+  return pets.map((pet) => ({ params: { id: pet.id }, props: { pet } }));
+}
+
+const { pet } = Astro.props;
+---
+<PetDetailPage locale="en" pet={pet} />

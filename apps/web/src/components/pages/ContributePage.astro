@@ -1,0 +1,100 @@
+---
+import type { Locale } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = locale === "en" ? {
+  title: "Contribute — JoJo Codex Pet",
+  description: "Contribution gate and future JoJo Codex Pet submission rules.",
+  eyebrow: "Public repository · gated pet submissions",
+  heading: "WAVE 1 FIRST. COMMUNITY NEXT.",
+  intro: "Code, accessibility, translations, and documentation can improve now. New pet pull requests open only after Parts 1–3 prove the complete v2 pipeline.",
+  gate: "Pet submission gate: closed",
+  allowed: "Open now",
+  allowedItems: ["Project code", "Accessibility", "English / Chinese copy", "Documentation and validation"],
+  later: "After Wave 1",
+  laterItems: ["JoJo-only Expansion Pets", "One character or one Stand per package", "Complete v2 animation and QA", "Stable Part-scoped IDs"],
+  github: "View the public repository"
+} : {
+  title: "投稿 — JoJo Codex Pet",
+  description: "JoJo Codex Pet 的投稿质量门与未来宠物投稿规则。",
+  eyebrow: "公开仓库 · 宠物投稿设质量门",
+  heading: "先完成 WAVE 1，再开放社区投稿。",
+  intro: "现在可以改进代码、无障碍、中英文文案和文档。新宠物 PR 需要等第 1–3 部证明完整 V2 流程后才开放。",
+  gate: "宠物投稿入口：暂未开放",
+  allowed: "现在可参与",
+  allowedItems: ["项目代码", "无障碍", "中英文文案", "文档与验证"],
+  later: "Wave 1 之后",
+  laterItems: ["仅 JoJo 扩展宠物", "每包一个角色或一个替身", "完整 V2 动画与 QA", "篇章稳定 ID"],
+  github: "查看公开仓库"
+};
+---
+
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/contribute/">
+  <div class="shell">
+    <header class="page-intro">
+      <div><p class="eyebrow">{content.eyebrow}</p><h1 class="display">{content.heading}</h1></div>
+      <p>{content.intro}</p>
+    </header>
+    <div class="gate-banner"><span>LOCKED</span><strong>{content.gate}</strong></div>
+    <div class="contribute-grid">
+      <section class="prose-card"><p class="eyebrow">01</p><h2>{content.allowed}</h2><ul>{content.allowedItems.map((item) => <li>{item}</li>)}</ul></section>
+      <section class="prose-card"><p class="eyebrow">02</p><h2>{content.later}</h2><ul>{content.laterItems.map((item) => <li>{item}</li>)}</ul></section>
+    </div>
+    <p class="repository-link"><a class="button" href="https://github.com/geoqiao/jojo-codex-pet">{content.github} ↗</a></p>
+  </div>
+</BaseLayout>
+
+<style>
+  .gate-banner {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    padding: 18px 24px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    border: 3px solid var(--ink);
+    box-shadow: 7px 7px 0 var(--coral);
+  }
+
+  .gate-banner span {
+    padding: 7px 10px;
+    color: var(--ink);
+    background: var(--coral);
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+
+  .gate-banner strong {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(1.5rem, 4vw, 3rem);
+    letter-spacing: -0.03em;
+  }
+
+  .contribute-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-top: 42px;
+  }
+
+  .prose-card h2 {
+    margin: 0;
+    font-size: clamp(2.7rem, 6vw, 5.2rem);
+    line-height: 0.9;
+  }
+
+  .prose-card li {
+    padding-block: 9px;
+    border-bottom: 1px solid var(--ink);
+    font-weight: 650;
+  }
+
+  .repository-link { margin-top: 38px; }
+
+  @media (max-width: 720px) {
+    .contribute-grid { grid-template-columns: 1fr; }
+  }
+</style>

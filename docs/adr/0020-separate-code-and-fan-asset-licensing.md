@@ -1,0 +1,3 @@
+# Separate code and fan-asset licensing
+
+Project Code will use the MIT License, while Character Assets and franchise-specific catalog content will be expressly excluded from MIT and governed by a separate Fan Asset Notice. That notice will permit personal non-commercial installation and use only to the extent contributors can grant those rights, will not claim or grant rights in the underlying JoJo intellectual property, and will preserve takedown and removal handling. This keeps the software genuinely open source without implying that derivative franchise material may be commercially reused, sublicensed, or sold.

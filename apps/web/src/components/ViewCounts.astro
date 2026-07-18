@@ -1,0 +1,51 @@
+---
+import type { Locale } from "@jojo-codex-pet/catalog";
+
+interface Props {
+  locale: Locale;
+  incrementId?: string;
+}
+
+const { locale, incrementId } = Astro.props;
+---
+
+<script is:inline define:vars={{ locale, incrementId }}>
+  const elements = [...document.querySelectorAll("[data-view-count]")];
+  const ids = [...new Set(elements.map((element) => element.getAttribute("data-view-count")).filter(Boolean))];
+  const suffix = locale === "zh-CN" ? "次浏览" : "views";
+  const formatter = new Intl.NumberFormat(locale);
+
+  const render = (counts) => {
+    for (const element of elements) {
+      const id = element.getAttribute("data-view-count");
+      if (!id || typeof counts[id] !== "number") continue;
+      element.textContent = `${formatter.format(counts[id])} ${suffix}`;
+    }
+  };
+
+  const load = async () => {
+    try {
+      if (incrementId) {
+        const response = await fetch("/api/views.php", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ pet_id: incrementId })
+        });
+        if (!response.ok) return;
+        const payload = await response.json();
+        render({ [payload.pet_id]: payload.count });
+        return;
+      }
+
+      if (ids.length === 0) return;
+      const response = await fetch(`/api/views.php?ids=${encodeURIComponent(ids.join(","))}`);
+      if (!response.ok) return;
+      const payload = await response.json();
+      render(payload.counts ?? {});
+    } catch {
+      // The static UI remains usable if the counter endpoint is unavailable.
+    }
+  };
+
+  void load();
+</script>

@@ -1,0 +1,139 @@
+---
+import type { Locale } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const content = locale === "en" ? {
+  title: "Install — JoJo Codex Pet",
+  description: "Cross-platform installation status for JoJo Codex Pet v2 companions.",
+  eyebrow: "One pet per primary action",
+  heading: "INSTALL ONLY WHAT YOU CHOOSE.",
+  intro: "The official installer will support Open in Codex, Bash, PowerShell, and npx. It will never silently add a Stand Pair or an entire Part.",
+  gate: "Installer activation is waiting for the Pilot animation gate.",
+  gateBody: "Publishing commands before a real v2 package exists would create a broken installation path. The commands become active together with the first validated pet.",
+  methods: [
+    ["Open in Codex", "One-click handoff from a released pet detail page."],
+    ["Bash", "macOS and Linux installation with package validation."],
+    ["PowerShell", "Windows installation with the same validation contract."],
+    ["npx", "A cross-platform CLI using stable Part-scoped pet IDs."]
+  ]
+} : {
+  title: "安装 — JoJo Codex Pet",
+  description: "JoJo Codex Pet V2 的跨平台安装状态。",
+  eyebrow: "主操作一次只安装一只",
+  heading: "只安装你选中的宠物。",
+  intro: "官方安装器将支持在 Codex 中打开、Bash、PowerShell 和 npx。它不会暗中附带替身配对或整部合集。",
+  gate: "安装器等待 Pilot 动画质量门。",
+  gateBody: "在真实 V2 包出现前公开命令只会制造坏掉的安装路径。首只宠物验证通过时，安装命令会同步启用。",
+  methods: [
+    ["在 Codex 中打开", "从已发布宠物详情页一键交接。"],
+    ["Bash", "面向 macOS 与 Linux，并验证宠物包。"],
+    ["PowerShell", "面向 Windows，使用相同验证契约。"],
+    ["npx", "使用篇章稳定 ID 的跨平台 CLI。"]
+  ]
+};
+---
+
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/install/">
+  <div class="shell">
+    <header class="page-intro">
+      <div><p class="eyebrow">{content.eyebrow}</p><h1 class="display">{content.heading}</h1></div>
+      <p>{content.intro}</p>
+    </header>
+    <section class="gate-card">
+      <span aria-hidden="true">V2</span>
+      <div><p class="eyebrow">QUALITY GATE</p><h2>{content.gate}</h2><p>{content.gateBody}</p></div>
+    </section>
+    <div class="method-grid">
+      {content.methods.map(([name, detail], index) => (
+        <article><span>0{index + 1}</span><h2>{name}</h2><p>{detail}</p><button class="button" aria-disabled="true" disabled>{locale === "en" ? "Pending" : "尚未开放"}</button></article>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .gate-card {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.35fr) 1fr;
+    overflow: hidden;
+    border: 3px solid var(--ink);
+    background: var(--acid);
+    box-shadow: var(--shadow);
+  }
+
+  .gate-card > span {
+    display: grid;
+    min-height: 280px;
+    place-items: center;
+    color: var(--paper-bright);
+    background: var(--violet);
+    border-right: 3px solid var(--ink);
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 8rem;
+    font-weight: 900;
+  }
+
+  .gate-card > div {
+    padding: clamp(28px, 5vw, 60px);
+  }
+
+  .gate-card h2 {
+    max-width: 18ch;
+    margin: 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(2.6rem, 6vw, 5.8rem);
+    letter-spacing: -0.06em;
+    line-height: 0.9;
+  }
+
+  .gate-card p:last-child {
+    max-width: 65ch;
+    line-height: 1.6;
+  }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 22px;
+    margin-top: 44px;
+  }
+
+  .method-grid article {
+    padding: 26px;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+  }
+
+  .method-grid article > span {
+    color: var(--coral);
+    font-size: 0.72rem;
+    font-weight: 850;
+  }
+
+  .method-grid h2 {
+    min-height: 2em;
+    margin: 18px 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 2.3rem;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  .method-grid p {
+    min-height: 7em;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 1050px) {
+    .method-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 650px) {
+    .gate-card { grid-template-columns: 1fr; }
+    .gate-card > span { min-height: 170px; border-right: 0; border-bottom: 3px solid var(--ink); }
+    .method-grid { grid-template-columns: 1fr; }
+  }
+</style>

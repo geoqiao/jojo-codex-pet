@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://jojo-preview.easytry.shop/sitemap-index.xml

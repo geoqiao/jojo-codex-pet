@@ -1,0 +1,3 @@
+# Use stable Part-scoped pet IDs
+
+Every installable pet will use a contributor-independent ID shaped as `part-NN-subject-slug`, such as `part-03-jotaro-kujo` or `part-03-star-platinum`. A canonical variant or Stand Form qualifier will be appended when the Part and subject alone are not unique, such as `part-04-echoes-act-1`. This deliberately differs from the reference catalog's author-suffixed IDs: the JoJo catalog treats each curated Part identity as the stable package, keeps attribution in submission metadata, prevents an author change from creating a new installed pet, and accepts that alternate interpretations of the same Catalog Pet ID cannot coexist as separate official packages.

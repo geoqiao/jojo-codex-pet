@@ -1,0 +1,3 @@
+# Launch with protagonists and principal antagonists across Parts
+
+The Headline Roster will cover Parts 1 through 9 and prioritize each Part's protagonist and Principal Antagonist instead of completing one Part's ensemble first. Parts 1 and 2 may contain Character Pets without Stand Pets, while an Ongoing Part includes confirmed protagonists and Stand Lineages but leaves its Principal Antagonist position empty until the story concludes; a last opponent who is not the Principal Antagonist belongs in later expansion content. With Part 9 ongoing, these rules establish an initial baseline of 36 Codex Pets, distributed by Part as 2, 2, 4, 4, 5, 6, 7, 4, and 2.

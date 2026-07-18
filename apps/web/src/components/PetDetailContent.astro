@@ -1,0 +1,248 @@
+---
+import { parts, pets, type Locale, type Pet } from "@jojo-codex-pet/catalog";
+import { localize, route, ui } from "../lib/i18n";
+
+interface Props { locale: Locale; pet: Pet }
+const { locale, pet } = Astro.props;
+const copy = ui[locale];
+const name = localize(pet.name, locale);
+const part = parts.find((item) => item.number === pet.part)!;
+const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
+  if (!id) return [];
+  const match = pets.find((item) => item.id === id);
+  return match ? [match] : [];
+});
+const content = locale === "en" ? {
+  identity: "Catalog identity",
+  relationship: "Stand relationship",
+  ability: "Ability modes inside this pet",
+  palette: "Locked signature palette",
+  source: "Source",
+  install: "Install this pet",
+  pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
+  review: "This is a base-design review image—not a final spritesheet.",
+  planned: "Artwork begins in its assigned quality-gated release wave.",
+  views: "Public page views"
+} : {
+  identity: "目录身份",
+  relationship: "替身关系",
+  ability: "包含在本宠物中的能力模式",
+  palette: "锁定标志配色",
+  source: "来源",
+  install: "安装这只宠物",
+  pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
+  review: "当前展示的是基础造型审核图，不是最终 spritesheet。",
+  planned: "素材将在所属质量门发布波次中开始制作。",
+  views: "公开页面浏览次数"
+};
+---
+
+<div class="detail-grid">
+  <div class="detail-art" style={`--accent:${part.accent}`}>
+    {pet.image ? (
+      <img src={pet.image} alt={`${name} base design`} width="1024" height="1024" />
+    ) : (
+      <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
+    )}
+    <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
+  </div>
+  <div class="detail-copy">
+    <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
+    <h1>{name}</h1>
+    <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
+    <p class="status-note">{pet.status === "pilot-review" ? content.review : content.planned}</p>
+    <dl>
+      <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
+      <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
+      {related.length > 0 && (
+        <div>
+          <dt>{content.relationship}</dt>
+          <dd>{related.map((item, index) => <><a href={route(locale, `/pets/${item.id}/`)}>{localize(item.name, locale)}</a>{index < related.length - 1 ? " · " : ""}</>)}</dd>
+        </div>
+      )}
+      {pet.abilityModes && <div><dt>{content.ability}</dt><dd>{pet.abilityModes.map((mode) => localize(mode, locale)).join(" · ")}</dd></div>}
+      {pet.palette && <div><dt>{content.palette}</dt><dd class="detail-palette">{pet.palette.map((color) => <span style={`--swatch:${color}`}><i>{color}</i></span>)}</dd></div>}
+      <div><dt>{content.source}</dt><dd><a href={pet.source}>geoqiao/jojo-codex-pet ↗</a></dd></div>
+    </dl>
+    <section class="install-box"><h2>{content.install}</h2><p>{content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{copy.notInstallable}</button></section>
+  </div>
+</div>
+
+<style>
+  .detail-grid {
+    display: grid;
+    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1fr);
+    min-height: 720px;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+    box-shadow: var(--shadow);
+  }
+
+  .detail-art {
+    position: relative;
+    display: grid;
+    min-height: 680px;
+    place-items: center;
+    overflow: hidden;
+    background:
+      linear-gradient(140deg, rgb(255 255 255 / 38%) 0 14%, transparent 14% 68%, rgb(23 19 30 / 18%) 68%),
+      var(--accent);
+    border-right: 3px solid var(--ink);
+  }
+
+  .detail-art::before {
+    position: absolute;
+    width: 78%;
+    aspect-ratio: 1;
+    content: "";
+    border: 34px solid rgb(255 255 255 / 24%);
+    border-radius: 50%;
+    rotate: -14deg;
+  }
+
+  .detail-art img {
+    position: relative;
+    z-index: 1;
+    width: 88%;
+    height: 620px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
+  }
+
+  .detail-part {
+    position: absolute;
+    z-index: 2;
+    top: 24px;
+    left: 24px;
+    padding: 7px 11px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+  }
+
+  .planned-sigil {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 250px;
+    height: 310px;
+    place-items: center;
+    color: var(--paper-bright);
+    background: var(--ink);
+    clip-path: polygon(16% 0, 86% 7%, 100% 52%, 74% 100%, 7% 90%, 0 35%);
+  }
+
+  .planned-sigil span {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 8rem;
+    font-weight: 900;
+  }
+
+  .planned-sigil i {
+    position: absolute;
+    right: 32px;
+    bottom: 26px;
+    color: var(--acid);
+    font-style: normal;
+    font-weight: 900;
+  }
+
+  .detail-copy { padding: clamp(30px, 5vw, 70px); }
+  .detail-pills { display: flex; gap: 8px; }
+
+  h1 {
+    margin: 28px 0 12px;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(4rem, 9vw, 9rem);
+    letter-spacing: -0.07em;
+    line-height: 0.83;
+  }
+
+  .part-title {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .status-note {
+    margin: 30px 0;
+    padding: 14px 16px;
+    border: 2px solid var(--ink);
+    background: var(--acid);
+    font-weight: 720;
+  }
+
+  dl { margin: 0; }
+
+  dl > div {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 18px;
+    padding: 14px 0;
+    border-top: 2px solid var(--ink);
+  }
+
+  dt {
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  dd { margin: 0; font-weight: 620; }
+  dd a { text-underline-offset: 4px; }
+  code { font-size: 0.78rem; }
+
+  .detail-palette { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .detail-palette span {
+    display: grid;
+    width: 86px;
+    height: 42px;
+    align-items: end;
+    padding: 4px;
+    border: 2px solid var(--ink);
+    background: var(--swatch);
+  }
+
+  .detail-palette i {
+    padding: 2px 4px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.55rem;
+    font-style: normal;
+  }
+
+  .install-box {
+    margin-top: 32px;
+    padding: 22px;
+    color: var(--paper-bright);
+    background: var(--ink);
+  }
+
+  .install-box h2 {
+    margin: 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 2.4rem;
+  }
+
+  .install-box p { max-width: 58ch; line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .detail-grid { grid-template-columns: 1fr; }
+    .detail-art { min-height: 500px; border-right: 0; border-bottom: 3px solid var(--ink); }
+    .detail-art img { height: 470px; }
+  }
+
+  @media (max-width: 600px) {
+    dl > div { grid-template-columns: 1fr; gap: 5px; }
+    .detail-art { min-height: 410px; }
+    .detail-art img { height: 390px; }
+  }
+</style>

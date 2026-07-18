@@ -1,0 +1,277 @@
+---
+import "@fontsource-variable/archivo";
+import "@fontsource-variable/bodoni-moda";
+import "../styles/global.css";
+import type { Locale } from "@jojo-codex-pet/catalog";
+import { route, ui } from "../lib/i18n";
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  path: string;
+}
+
+const { locale, title, description, path } = Astro.props;
+const copy = ui[locale];
+const alternateLocale: Locale = locale === "en" ? "zh-CN" : "en";
+const alternatePath = route(alternateLocale, path);
+const canonical = new URL(route(locale, path), Astro.site);
+const navigation = [
+  [copy.nav.gallery, "/"],
+  [copy.nav.parts, "/parts/"],
+  [copy.nav.roster, "/roster/"],
+  [copy.nav.install, "/install/"],
+  [copy.nav.contribute, "/contribute/"]
+] as const;
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={alternateLocale} href={new URL(alternatePath, Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(route("en", path), Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#17131e" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner shell">
+        <a class="brand" href={route(locale, "/")} aria-label="JoJo Codex Pet home">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span><strong>JOJO</strong><small>CODEX PET</small></span>
+        </a>
+        <nav aria-label="Primary navigation">
+          {navigation.map(([label, href]) => (
+            <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
+          ))}
+        </nav>
+        <div class="header-tools">
+          <span>{copy.fanProject}</span>
+          <a href={alternatePath} lang={alternateLocale} hreflang={alternateLocale}>{copy.language}</a>
+          <a href="https://github.com/geoqiao/jojo-codex-pet" rel="noreferrer">GitHub ↗</a>
+        </div>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-grid">
+        <p><strong>JoJo Codex Pet</strong><br />Unofficial · non-commercial · ad-free</p>
+        <p>Project code: MIT<br />Fan materials: separate notice</p>
+        <p><a href="https://github.com/geoqiao/jojo-codex-pet">GitHub</a><br /><a href={route(locale, "/contribute/")}>{copy.nav.contribute}</a></p>
+      </div>
+    </footer>
+    <script>
+      document.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+        const button = target.closest("[data-reveal-spoiler]");
+        if (!(button instanceof HTMLButtonElement)) return;
+        const card = button.closest("[data-spoiler-card]");
+        card?.setAttribute("data-revealed", "true");
+        card?.querySelector("[data-spoiler-content]")?.setAttribute("aria-hidden", "false");
+        button.setAttribute("aria-expanded", "true");
+      });
+    </script>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: fixed;
+    z-index: 100;
+    top: 8px;
+    left: 8px;
+    translate: 0 -160%;
+    padding: 10px 14px;
+    border: 2px solid var(--ink);
+    background: var(--acid);
+    font-weight: 800;
+  }
+
+  .skip-link:focus {
+    translate: 0;
+  }
+
+  .site-header {
+    position: sticky;
+    z-index: 20;
+    top: 0;
+    color: var(--paper-bright);
+    background: var(--ink);
+    border-bottom: 3px solid var(--ink);
+  }
+
+  .header-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    min-height: 76px;
+    align-items: stretch;
+  }
+
+  .brand {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    min-width: 190px;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .brand-mark {
+    color: var(--acid);
+    font-size: 2.2rem;
+  }
+
+  .brand strong,
+  .brand small {
+    display: block;
+    line-height: 0.9;
+  }
+
+  .brand strong {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 1.6rem;
+    letter-spacing: -0.06em;
+  }
+
+  .brand small {
+    margin-top: 5px;
+    font-size: 0.58rem;
+    font-weight: 850;
+    letter-spacing: 0.22em;
+  }
+
+  nav {
+    display: flex;
+    justify-content: center;
+  }
+
+  nav a {
+    display: grid;
+    place-items: center;
+    padding: 0 16px;
+    color: inherit;
+    border-inline-start: 1px solid rgb(255 255 255 / 16%);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  nav a:last-child {
+    border-inline-end: 1px solid rgb(255 255 255 / 16%);
+  }
+
+  nav a:hover,
+  nav a.active {
+    color: var(--ink);
+    background: var(--acid);
+  }
+
+  .header-tools {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: end;
+    padding-inline-start: 16px;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .header-tools a {
+    color: inherit;
+    text-underline-offset: 4px;
+  }
+
+  .header-tools span {
+    color: #aaa2b3;
+  }
+
+  .site-footer {
+    margin-top: 110px;
+    padding: 54px 0 70px;
+    color: var(--paper-bright);
+    background: var(--ink);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 30px;
+  }
+
+  .footer-grid p {
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1040px) {
+    .header-inner {
+      grid-template-columns: auto 1fr;
+    }
+
+    .header-tools span {
+      display: none;
+    }
+
+    nav {
+      grid-row: 2;
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-top: 1px solid rgb(255 255 255 / 16%);
+    }
+
+    nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    nav a {
+      min-height: 44px;
+      white-space: nowrap;
+    }
+
+    .header-tools {
+      min-height: 72px;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .brand {
+      min-width: 0;
+    }
+
+    .header-tools {
+      gap: 10px;
+      padding-left: 8px;
+    }
+
+    .header-tools a {
+      font-size: 0.6rem;
+    }
+
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

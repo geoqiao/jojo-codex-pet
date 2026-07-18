@@ -1,0 +1,322 @@
+---
+import { pets, type Locale } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PetCard from "../PetCard.astro";
+import ViewCounts from "../ViewCounts.astro";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const pilot = pets.filter((pet) => pet.status === "pilot-review");
+const content = locale === "en" ? {
+  title: "JoJo Codex Pet — V2 companions across every Part",
+  description: "An unofficial, non-commercial JoJo-themed Codex pet gallery. Browse the locked 36-pet roster and the Part 3 Pilot Set.",
+  overline: "Unofficial · non-commercial · ad-free",
+  hero: "A BIZARRE LITTLE COMPANION.",
+  intro: "Named JoJo characters and Stands, rebuilt as independent Codex pet v2 companions. The catalog is public from day one; artwork ships only after it survives the quality gate.",
+  locked: "Roster locked",
+  parts: "Parts",
+  contract: "V2 only",
+  pilotTitle: "Pilot under review",
+  pilotNote: "Four Part 3 base designs establish the visual system before animation begins.",
+  allTitle: "The headline roster",
+  allNote: "36 pets · Parts 1–9",
+  filters: { all: "All", pilot: "Pilot", character: "Characters", stand: "Stands" },
+  count: "pets shown"
+} : {
+  title: "JoJo Codex Pet — 横跨历代篇章的 V2 宠物",
+  description: "非官方、非商业的 JoJo 主题 Codex 宠物目录，展示锁定的 36 只名单与第三部 Pilot 四只。",
+  overline: "非官方 · 非商业 · 无广告",
+  hero: "一只奇妙的小伙伴。",
+  intro: "把具名 JoJo 角色与替身分别做成独立的 Codex Pet V2。目录从第一天起公开，宠物素材通过质量门后才正式发布。",
+  locked: "名单已锁定",
+  parts: "篇章",
+  contract: "仅 V2",
+  pilotTitle: "Pilot 基础造型审核中",
+  pilotNote: "第三部四张基础设计先确立统一视觉系统，通过后才开始动画。",
+  allTitle: "首发完整名单",
+  allNote: "36 只 · 第 1–9 部",
+  filters: { all: "全部", pilot: "Pilot", character: "角色", stand: "替身" },
+  count: "只宠物"
+};
+---
+
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/">
+  <section class="hero">
+    <div class="shell hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">{content.overline}</p>
+        <h1 class="display">{content.hero}</h1>
+        <p class="hero-intro">{content.intro}</p>
+      </div>
+      <div class="hero-metrics" aria-label="Project metrics">
+        <div><strong>36</strong><span>{content.locked}</span></div>
+        <div><strong>09</strong><span>{content.parts}</span></div>
+        <div><strong>V2</strong><span>{content.contract}</span></div>
+      </div>
+      <div class="hero-slash" aria-hidden="true"><span>ORA</span><span>MUDA</span></div>
+    </div>
+  </section>
+
+  <section class="shell catalog-section">
+    <div class="section-title"><h2>{content.pilotTitle}</h2><span>{content.pilotNote}</span></div>
+    <div class="pet-grid pilot-grid">
+      {pilot.map((pet) => <PetCard pet={pet} locale={locale} />)}
+    </div>
+  </section>
+
+  <section class="shell catalog-section" id="roster">
+    <div class="section-title"><h2>{content.allTitle}</h2><span>{content.allNote}</span></div>
+    <div class="filter-bar" aria-label="Catalog filters">
+      <div class="filter-options">
+        <button type="button" class="active" data-gallery-filter="all">{content.filters.all}</button>
+        <button type="button" data-gallery-filter="pilot-review">{content.filters.pilot}</button>
+        <button type="button" data-gallery-filter="character">{content.filters.character}</button>
+        <button type="button" data-gallery-filter="stand">{content.filters.stand}</button>
+        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`}>P{part}</button>)}
+      </div>
+      <span aria-live="polite"><strong data-visible-count>36</strong> {content.count}</span>
+    </div>
+    <div class="pet-grid full-grid">
+      {pets.map((pet) => <PetCard pet={pet} locale={locale} />)}
+    </div>
+  </section>
+  <ViewCounts locale={locale} />
+</BaseLayout>
+
+<script>
+  const filterButtons = [...document.querySelectorAll("[data-gallery-filter]")];
+  const cards = [...document.querySelectorAll("#roster [data-catalog-card]")];
+  const visibleCount = document.querySelector("[data-visible-count]");
+
+  const applyFilter = (filter: string) => {
+    let visible = 0;
+    for (const card of cards) {
+      const matches = filter === "all" || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
+      card.toggleAttribute("hidden", !matches);
+      if (matches) visible += 1;
+    }
+    if (visibleCount) visibleCount.textContent = String(visible);
+    for (const button of filterButtons) button.classList.toggle("active", button.getAttribute("data-gallery-filter") === filter);
+  };
+
+  for (const button of filterButtons) {
+    button.addEventListener("click", () => applyFilter(button.getAttribute("data-gallery-filter") ?? "all"));
+  }
+
+  const part = new URLSearchParams(window.location.search).get("part");
+  if (part && /^[1-9]$/.test(part)) applyFilter(`part-${part.padStart(2, "0")}`);
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    color: var(--paper-bright);
+    background: var(--ink);
+  }
+
+  .hero::after {
+    position: absolute;
+    inset: auto -10% -40% 45%;
+    height: 75%;
+    content: "";
+    background: var(--violet);
+    transform: skewY(-11deg);
+  }
+
+  .hero-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.32fr);
+    gap: 50px;
+    min-height: 720px;
+    align-items: center;
+    padding-block: 92px 120px;
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+    min-width: 0;
+  }
+
+  .hero h1 {
+    max-width: 1050px;
+    font-size: clamp(5.2rem, 10.2vw, 10.5rem);
+  }
+
+  .hero-intro {
+    max-width: 58ch;
+    margin: 38px 0 0;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    font-weight: 600;
+    line-height: 1.55;
+  }
+
+  .hero-metrics {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    align-self: end;
+    margin-bottom: 30px;
+    border: 3px solid var(--paper-bright);
+    background: var(--ink);
+    box-shadow: 8px 8px 0 var(--acid);
+  }
+
+  .hero-metrics div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 18px;
+    border-bottom: 2px solid var(--paper-bright);
+  }
+
+  .hero-metrics div:last-child {
+    border: 0;
+  }
+
+  .hero-metrics strong {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 3rem;
+    line-height: 1;
+  }
+
+  .hero-metrics span {
+    font-size: 0.63rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-slash {
+    position: absolute;
+    z-index: 1;
+    right: -5%;
+    bottom: 12%;
+    display: grid;
+    color: rgb(255 255 255 / 8%);
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(7rem, 18vw, 18rem);
+    font-weight: 900;
+    line-height: 0.57;
+    rotate: -8deg;
+  }
+
+  .catalog-section {
+    padding-top: 90px;
+  }
+
+  .pet-grid {
+    display: grid;
+    gap: 26px;
+  }
+
+  .pilot-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .full-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding: 12px;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+  }
+
+  .filter-options {
+    display: flex;
+    gap: 7px;
+    overflow-x: auto;
+  }
+
+  .filter-options button {
+    flex: 0 0 auto;
+    min-height: 36px;
+    padding: 7px 12px;
+    border: 2px solid var(--ink);
+    background: transparent;
+    font-size: 0.67rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .filter-options button:hover,
+  .filter-options button.active {
+    background: var(--acid);
+  }
+
+  .filter-bar > span {
+    flex: 0 0 auto;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 760;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1180px) {
+    .pilot-grid,
+    .full-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 840px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      min-height: 660px;
+    }
+
+    .hero-metrics {
+      grid-template-columns: repeat(3, 1fr);
+      margin: 0;
+    }
+
+    .hero-metrics div {
+      display: grid;
+      border-right: 2px solid var(--paper-bright);
+      border-bottom: 0;
+    }
+
+    .pilot-grid,
+    .full-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .filter-bar {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 540px) {
+    .hero h1 {
+      font-size: clamp(3.1rem, 14vw, 4.1rem);
+    }
+
+    .hero-metrics {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-metrics div {
+      display: flex;
+      border-right: 0;
+      border-bottom: 2px solid var(--paper-bright);
+    }
+
+    .pilot-grid,
+    .full-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

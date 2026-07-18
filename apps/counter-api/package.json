@@ -1,0 +1,9 @@
+{
+  "name": "@jojo-codex-pet/counter-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "stage": "node stage.mjs"
+  }
+}

@@ -1,0 +1,191 @@
+---
+import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { localize, route, ui } from "../../lib/i18n";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const copy = ui[locale];
+const content = locale === "en" ? {
+  title: "Roster — JoJo Codex Pet",
+  description: "The approved 36-pet JoJo Codex Pet headline roster.",
+  eyebrow: "Approved before generation",
+  heading: "THE LOCKED 36.",
+  intro: "Stable IDs define each independently installable subject. Antagonist identities and evolved forms stay behind explicit spoiler reveals.",
+  pet: "Pet",
+  identity: "Identity",
+  status: "Status",
+  reveal: "Reveal identity",
+  part9: "Part 9 remains at two pets while its principal antagonist is unassigned."
+} : {
+  title: "名单 — JoJo Codex Pet",
+  description: "已确认的 36 只 JoJo Codex Pet 首发名单。",
+  eyebrow: "生成前已完成确认",
+  heading: "锁定的 36 只。",
+  intro: "稳定 ID 对应每一只可独立安装的宠物。主反派身份和进化形态需要主动展开剧透。",
+  pet: "宠物",
+  identity: "身份",
+  status: "状态",
+  reveal: "显示身份",
+  part9: "第 9 部连载期间保持两只，篇章主反派暂不指定。"
+};
+---
+
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/roster/">
+  <div class="shell">
+    <header class="page-intro">
+      <div><p class="eyebrow">{content.eyebrow}</p><h1 class="display">{content.heading}</h1></div>
+      <p>{content.intro}</p>
+    </header>
+
+    <div class="roster-stack">
+      {parts.map((part) => (
+        <section class="roster-part">
+          <header style={`--accent:${part.accent}`}>
+            <span>{String(part.number).padStart(2, "0")}</span>
+            <div><p>PART {part.number}</p><h2>{localize(part.title, locale)}</h2></div>
+          </header>
+          <div class="roster-table" role="table" aria-label={`${localize(part.title, locale)} roster`}>
+            {pets.filter((pet) => pet.part === part.number).map((pet, index) => (
+              <div class="roster-row" role="row">
+                <span role="cell">{String(index + 1).padStart(2, "0")}</span>
+                <div role="cell">
+                  {pet.spoiler ? (
+                    <details><summary>{content.reveal}</summary><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a></details>
+                  ) : (
+                    <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
+                  )}
+                  <code>{pet.id}</code>
+                </div>
+                <span role="cell">{copy.type[pet.type]} · {copy.role[pet.role]}</span>
+                <span class="status-pill" data-status={pet.status} role="cell">{copy.status[pet.status]}</span>
+              </div>
+            ))}
+            {part.number === 9 && <p class="part-note">{content.part9}</p>}
+          </div>
+        </section>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .roster-stack {
+    display: grid;
+    gap: 42px;
+  }
+
+  .roster-part {
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+    box-shadow: var(--shadow);
+  }
+
+  .roster-part > header {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    min-height: 130px;
+    color: var(--paper-bright);
+    background: var(--ink);
+  }
+
+  .roster-part > header > span {
+    display: grid;
+    place-items: center;
+    color: var(--ink);
+    background: var(--accent);
+    border-right: 3px solid var(--paper-bright);
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 4.8rem;
+    font-weight: 900;
+  }
+
+  .roster-part header div {
+    display: grid;
+    align-content: center;
+    padding: 18px 28px;
+  }
+
+  .roster-part header p {
+    margin: 0 0 5px;
+    color: var(--acid);
+    font-size: 0.67rem;
+    font-weight: 850;
+    letter-spacing: 0.12em;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(2.3rem, 5vw, 4.7rem);
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+  }
+
+  .roster-row {
+    display: grid;
+    grid-template-columns: 48px minmax(240px, 1.5fr) minmax(180px, 0.8fr) auto;
+    gap: 18px;
+    align-items: center;
+    min-height: 88px;
+    padding: 14px 22px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .roster-row > span:first-child {
+    color: var(--muted);
+    font-size: 0.7rem;
+    font-weight: 800;
+  }
+
+  .roster-row > div > a,
+  details a {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 1.7rem;
+    font-weight: 760;
+    letter-spacing: -0.03em;
+  }
+
+  code {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 0.68rem;
+  }
+
+  details summary {
+    width: fit-content;
+    cursor: pointer;
+    font-size: 0.72rem;
+    font-weight: 850;
+    text-transform: uppercase;
+  }
+
+  .roster-row > span:nth-child(3) {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 750;
+    text-transform: uppercase;
+  }
+
+  .part-note {
+    margin: 0;
+    padding: 18px 22px;
+    border-top: 2px solid var(--ink);
+    background: var(--acid);
+    font-size: 0.8rem;
+    font-weight: 760;
+  }
+
+  @media (max-width: 760px) {
+    .roster-row {
+      grid-template-columns: 34px 1fr;
+    }
+
+    .roster-row > span:nth-child(3),
+    .roster-row > span:nth-child(4) {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+</style>

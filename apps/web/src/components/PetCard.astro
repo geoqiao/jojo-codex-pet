@@ -1,0 +1,280 @@
+---
+import type { Locale, Pet } from "@jojo-codex-pet/catalog";
+import { localize, route, ui } from "../lib/i18n";
+
+interface Props {
+  pet: Pet;
+  locale: Locale;
+}
+
+const { pet, locale } = Astro.props;
+const copy = ui[locale];
+const name = localize(pet.name, locale);
+const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
+---
+
+<article
+  class="pet-card"
+  data-catalog-card
+  data-pet-id={pet.id}
+  data-part={`part-${String(pet.part).padStart(2, "0")}`}
+  data-type={pet.type}
+  data-status={pet.status}
+  data-spoiler-card={pet.spoiler ? "true" : undefined}
+  data-revealed={pet.spoiler ? undefined : "true"}
+>
+  <div class="pet-card-content" data-spoiler-content aria-hidden={pet.spoiler ? "true" : undefined}>
+    <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
+      {pet.image ? (
+        <img src={pet.image} alt={`${name} base design`} width="1024" height="1024" loading="lazy" />
+      ) : (
+        <div class="planned-art" aria-hidden="true">
+          <span>{initial}</span>
+          <i>{String(pet.part).padStart(2, "0")}</i>
+        </div>
+      )}
+      <span class="part-tag">PART {String(pet.part).padStart(2, "0")}</span>
+    </div>
+    <div class="pet-copy">
+      <div class="pet-meta">
+        <span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span>
+        <span class="type-pill">{copy.type[pet.type]}</span>
+      </div>
+      <h3>{name}</h3>
+      <p>{copy.role[pet.role]}</p>
+      {pet.palette && (
+        <div class="palette" aria-label="Locked signature palette">
+          {pet.palette.map((color) => <span style={`--swatch:${color}`} title={color}></span>)}
+        </div>
+      )}
+      <div class="pet-actions">
+        <a href={route(locale, `/pets/${pet.id}/`)} aria-label={`${copy.open}: ${name}`}>{copy.open} ↗</a>
+        <span class="view-count" data-view-count={pet.id}>— {copy.view}</span>
+      </div>
+    </div>
+  </div>
+  {pet.spoiler && (
+    <div class="spoiler-cover">
+      <span>✦</span>
+      <strong>{locale === "en" ? "Story spoiler" : "剧情剧透"}</strong>
+      <button type="button" data-reveal-spoiler aria-expanded="false">{copy.reveal}</button>
+    </div>
+  )}
+</article>
+
+<style define:vars={{
+  "--part-1": "#d84b57",
+  "--part-2": "#e69a38",
+  "--part-3": "#7657d9",
+  "--part-4": "#e553a4",
+  "--part-5": "#d7b63f",
+  "--part-6": "#54a58a",
+  "--part-7": "#b56b3d",
+  "--part-8": "#4ca7ba",
+  "--part-9": "#6fbe5b"
+}}>
+  .pet-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+    box-shadow: 6px 6px 0 var(--ink);
+  }
+
+  .pet-card[hidden] {
+    display: none;
+  }
+
+  .pet-art {
+    position: relative;
+    display: grid;
+    min-height: 290px;
+    place-items: center;
+    overflow: hidden;
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 44%) 0 12%, transparent 12% 74%, rgb(23 19 30 / 17%) 74%),
+      var(--part-accent);
+    border-bottom: 3px solid var(--ink);
+  }
+
+  .pet-art::after {
+    position: absolute;
+    right: -70px;
+    bottom: -80px;
+    width: 210px;
+    height: 210px;
+    content: "";
+    border: 32px solid rgb(255 255 255 / 26%);
+    border-radius: 50%;
+  }
+
+  .pet-art img {
+    position: relative;
+    z-index: 1;
+    width: min(92%, 330px);
+    height: 280px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
+  }
+
+  .planned-art {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    width: 160px;
+    height: 190px;
+    place-items: center;
+    color: var(--paper-bright);
+    background: var(--ink);
+    clip-path: polygon(20% 0, 84% 8%, 100% 48%, 76% 100%, 11% 91%, 0 42%);
+  }
+
+  .planned-art span {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 7rem;
+    font-weight: 900;
+    line-height: 0.8;
+  }
+
+  .planned-art i {
+    position: absolute;
+    right: 24px;
+    bottom: 18px;
+    color: var(--acid);
+    font-size: 0.72rem;
+    font-style: normal;
+    font-weight: 850;
+    letter-spacing: 0.16em;
+  }
+
+  .part-tag {
+    position: absolute;
+    z-index: 2;
+    top: 14px;
+    left: 14px;
+    padding: 5px 8px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.13em;
+  }
+
+  .pet-copy {
+    padding: 20px;
+  }
+
+  .pet-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  h3 {
+    min-height: 2.1em;
+    margin: 18px 0 8px;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: -0.055em;
+    line-height: 0.96;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .palette {
+    display: flex;
+    gap: 5px;
+    margin-top: 16px;
+  }
+
+  .palette span {
+    width: 23px;
+    height: 13px;
+    border: 1px solid var(--ink);
+    background: var(--swatch);
+  }
+
+  .pet-actions {
+    display: flex;
+    gap: 12px;
+    align-items: end;
+    justify-content: space-between;
+    min-height: 38px;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .pet-actions a {
+    font-size: 0.7rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-underline-offset: 4px;
+    text-transform: uppercase;
+  }
+
+  .view-count {
+    color: var(--muted);
+    font-size: 0.66rem;
+    font-weight: 760;
+    white-space: nowrap;
+  }
+
+  .spoiler-cover {
+    position: absolute;
+    z-index: 4;
+    inset: 0;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding: 28px;
+    color: var(--paper-bright);
+    text-align: center;
+    background:
+      repeating-linear-gradient(135deg, transparent 0 14px, rgb(216 255 85 / 8%) 14px 28px),
+      rgb(23 19 30 / 96%);
+  }
+
+  [data-revealed="true"] .spoiler-cover {
+    display: none;
+  }
+
+  .spoiler-cover span {
+    color: var(--acid);
+    font-size: 3.5rem;
+  }
+
+  .spoiler-cover strong {
+    margin: 8px 0 20px;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 2rem;
+  }
+
+  .spoiler-cover button {
+    min-height: 42px;
+    padding: 8px 14px;
+    border: 2px solid var(--paper-bright);
+    color: var(--paper-bright);
+    background: transparent;
+    font-size: 0.7rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .spoiler-cover button:hover {
+    color: var(--ink);
+    background: var(--acid);
+    border-color: var(--acid);
+  }
+</style>
