@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand is an independently installable Codex pet, presented in a public Part-by-Part gallery.
 
-> Public development status: the 36-pet headline roster is locked and the Part 3 Pilot Set is at its base-design approval gate. No Pilot pet is installable until its complete Codex pet v2 animation and QA package passes review.
+> Public development status: the 36-pet headline roster is locked and the Part 3 Pilot Set is at its standard-animation approval gate. No Pilot pet is installable until its sixteen look directions, complete Codex pet v2 atlas, and QA package pass review.
 
 ## Headline scope
 
