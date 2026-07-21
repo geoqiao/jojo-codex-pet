@@ -13,7 +13,7 @@ The public Fan Project website, which carries no ad units, display advertising, 
 _Avoid_: Ad-supported gallery, monetized fan site
 
 **Canonical Production Gallery**:
-The public, indexable Gallery served from `pixelstand.pet`, with the former `jojo-preview.easytry.shop` host retained only to preserve and redirect legacy links.
+The public, indexable Gallery served only from `pixelstand.pet`; `www.pixelstand.pet` permanently redirects to the apex host, and the former test subdomain has been retired.
 _Avoid_: Temporary domain, staging site, noindex preview
 
 **Default Locale**:
@@ -160,9 +160,9 @@ _Avoid_: Part Collection, complete roster
 A required human review point covering the complete 36-pet roster before generation, the Pilot Set's base designs and final animations, or a later wave's QA overview and anomalies.
 _Avoid_: Per-frame approval, unreviewed batch release
 
-**Spoiler Gate**:
-A user-controlled reveal that hides antagonist identities, evolved Stand Forms, and ability details behind a clear spoiler warning while leaving spoiler-safe browsing available.
-_Avoid_: Spoiler-free catalog, unmarked reveal
+**Full-Display Catalog**:
+The Gallery presentation in which every named catalog identity and every released artwork is shown directly without a spoiler cover or reveal interaction; unfinished pets remain explicit Planned entries.
+_Avoid_: Spoiler gate, hidden released artwork, anonymous pet card
 
 **Contribution Gate**:
 The milestone after the first public Release Wave passes quality acceptance, at which JoJo Community Submissions may open.

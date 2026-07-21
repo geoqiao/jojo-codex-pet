@@ -11,22 +11,20 @@ const content = locale === "en" ? {
   description: "The approved 36-pet JoJo Codex Pet headline roster.",
   eyebrow: "Approved before generation",
   heading: "THE LOCKED 36.",
-  intro: "Stable IDs define each independently installable subject. Antagonist identities and evolved forms stay behind explicit spoiler reveals.",
+  intro: "Stable IDs define each independently installable subject. Every named character, Stand, and evolved form is shown directly.",
   pet: "Pet",
   identity: "Identity",
   status: "Status",
-  reveal: "Reveal identity",
   part9: "Part 9 remains at two pets while its principal antagonist is unassigned."
 } : {
   title: "名单 — JoJo Codex Pet",
   description: "已确认的 36 只 JoJo Codex Pet 首发名单。",
   eyebrow: "生成前已完成确认",
   heading: "锁定的 36 只。",
-  intro: "稳定 ID 对应每一只可独立安装的宠物。主反派身份和进化形态需要主动展开剧透。",
+  intro: "稳定 ID 对应每一只可独立安装的宠物。所有具名角色、替身与进化形态都会直接展示。",
   pet: "宠物",
   identity: "身份",
   status: "状态",
-  reveal: "显示身份",
   part9: "第 9 部连载期间保持两只，篇章主反派暂不指定。"
 };
 ---
@@ -50,11 +48,7 @@ const content = locale === "en" ? {
               <div class="roster-row" role="row">
                 <span role="cell">{String(index + 1).padStart(2, "0")}</span>
                 <div role="cell">
-                  {pet.spoiler ? (
-                    <details><summary>{content.reveal}</summary><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a></details>
-                  ) : (
-                    <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
-                  )}
+                  <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
                   <code>{pet.id}</code>
                 </div>
                 <span role="cell">{copy.type[pet.type]} · {copy.role[pet.role]}</span>
@@ -138,8 +132,7 @@ const content = locale === "en" ? {
     font-weight: 800;
   }
 
-  .roster-row > div > a,
-  details a {
+  .roster-row > div > a {
     font-family: "Bodoni Moda Variable", Georgia, serif;
     font-size: 1.7rem;
     font-weight: 760;
@@ -151,14 +144,6 @@ const content = locale === "en" ? {
     margin-top: 4px;
     color: var(--muted);
     font-size: 0.68rem;
-  }
-
-  details summary {
-    width: fit-content;
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 850;
-    text-transform: uppercase;
   }
 
   .roster-row > span:nth-child(3) {

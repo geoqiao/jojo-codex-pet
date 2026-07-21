@@ -10,13 +10,29 @@ interface Props {
   title: string;
   description: string;
   path: string;
+  image?: string;
+  imageAlt?: string;
+  structuredData?: Record<string, unknown>;
 }
 
-const { locale, title, description, path } = Astro.props;
+const {
+  locale,
+  title,
+  description,
+  path,
+  image = "/social/jojo-codex-pet-promo-v1.png",
+  imageAlt = "JoJo Codex Pet pixel companion gallery",
+  structuredData
+} = Astro.props;
 const copy = ui[locale];
 const alternateLocale: Locale = locale === "en" ? "zh-CN" : "en";
 const alternatePath = route(alternateLocale, path);
 const canonical = new URL(route(locale, path), Astro.site);
+const enUrl = new URL(route("en", path), Astro.site);
+const zhCnUrl = new URL(route("zh-CN", path), Astro.site);
+const socialImage = new URL(image, Astro.site);
+const openGraphLocale = locale === "en" ? "en_US" : "zh_CN";
+const alternateOpenGraphLocale = locale === "en" ? "zh_CN" : "en_US";
 const navigation = [
   [copy.nav.gallery, "/"],
   [copy.nav.parts, "/parts/"],
@@ -32,17 +48,29 @@ const navigation = [
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="google-site-verification" content="tfvOJaUir_p6nethyb3vLwlTubhjqdMXfPyPLjA71_s" />
     <meta name="google-adsense-account" content="ca-pub-3369430294552960" />
     <meta name="description" content={description} />
     <meta name="robots" content="index, follow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang={alternateLocale} href={new URL(alternatePath, Astro.site)} />
-    <link rel="alternate" hreflang="x-default" href={new URL(route("en", path), Astro.site)} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="zh-CN" href={zhCnUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="JoJo Codex Pet" />
+    <meta property="og:locale" content={openGraphLocale} />
+    <meta property="og:locale:alternate" content={alternateOpenGraphLocale} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    {structuredData && <script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />}
     <meta name="theme-color" content="#17131e" />
     <title>{title}</title>
   </head>
@@ -76,18 +104,6 @@ const navigation = [
         <p><a href="https://github.com/geoqiao/jojo-codex-pet">GitHub</a><br /><a href={route(locale, "/contribute/")}>{copy.nav.contribute}</a></p>
       </div>
     </footer>
-    <script>
-      document.addEventListener("click", (event) => {
-        const target = event.target;
-        if (!(target instanceof Element)) return;
-        const button = target.closest("[data-reveal-spoiler]");
-        if (!(button instanceof HTMLButtonElement)) return;
-        const card = button.closest("[data-spoiler-card]");
-        card?.setAttribute("data-revealed", "true");
-        card?.querySelector("[data-spoiler-content]")?.setAttribute("aria-hidden", "false");
-        button.setAttribute("aria-expanded", "true");
-      });
-    </script>
   </body>
 </html>
 

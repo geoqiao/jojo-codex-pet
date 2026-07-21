@@ -8,6 +8,12 @@ const copy = ui[locale];
 const name = localize(pet.name, locale);
 const isReview = pet.status === "pilot-review" || pet.status === "wave-review";
 const part = parts.find((item) => item.number === pet.part)!;
+const partTitle = localize(part.title, locale);
+const wave = pet.part <= 3 ? 1 : pet.part <= 6 ? 2 : 3;
+const displayImage = pet.image?.replace(/\.png$/, "-card.webp");
+const imageAlt = locale === "en"
+  ? `${name}, Part ${pet.part} pixel Codex pet`
+  : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
 const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   if (!id) return [];
   const match = pets.find((item) => item.id === id);
@@ -36,9 +42,10 @@ const content = locale === "en" ? {
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
   reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
   ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
-  released: "Released as a validated Codex pet v2 package.",
-  review: "Its complete v2 atlas passed engineering QA and is waiting for final owner animation approval before release.",
-  planned: "Artwork begins in its assigned quality-gated release wave.",
+  overview: `${name} is the ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} entry for Part ${pet.part}, ${partTitle}, in the 36-pet headline roster.`,
+  released: `${name} is released as a validated Codex Pet V2 package from Wave ${wave}.`,
+  review: `${name}'s complete V2 atlas passed engineering QA and is waiting for final owner animation approval before release.`,
+  planned: `${name} is assigned to Wave ${wave}. Its base art, complete V2 animation, package validation, and visual QA are not published yet.`,
   views: "Public page views",
   openInCodex: "Open in Codex",
   download: "Package files",
@@ -54,9 +61,10 @@ const content = locale === "en" ? {
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
   reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
   ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
-  released: "已作为通过验证的 Codex Pet V2 包发布。",
-  review: "完整 V2 图集已通过工程 QA，正在等待站长最终动画审核后发布。",
-  planned: "素材将在所属质量门发布波次中开始制作。",
+  overview: `${name}是 36 只首发名单中 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物。`,
+  released: `${name}已在第 ${wave} 波次作为通过验证的 Codex Pet V2 包发布。`,
+  review: `${name}的完整 V2 图集已通过工程 QA，正在等待站长最终动画审核后发布。`,
+  planned: `${name}属于第 ${wave} 波次，基础造型、完整 V2 动画、宠物包验证与视觉 QA 尚未发布。`,
   views: "公开页面浏览次数",
   openInCodex: "在 Codex 中打开",
   download: "宠物包文件",
@@ -67,8 +75,8 @@ const content = locale === "en" ? {
 
 <div class="detail-grid">
   <div class="detail-art" style={`--accent:${part.accent}`}>
-    {pet.image ? (
-      <img src={pet.image} alt={`${name} pixel pet`} width="1024" height="1024" />
+    {displayImage ? (
+      <img src={displayImage} alt={imageAlt} width="640" height="640" />
     ) : (
       <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
     )}
@@ -78,6 +86,7 @@ const content = locale === "en" ? {
     <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
     <h1>{name}</h1>
     <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
+    <p class="pet-overview">{content.overview}</p>
     <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
@@ -218,6 +227,15 @@ const content = locale === "en" ? {
     font-weight: 850;
     letter-spacing: 0.09em;
     text-transform: uppercase;
+  }
+
+  .pet-overview {
+    max-width: 66ch;
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 1rem;
+    font-weight: 620;
+    line-height: 1.65;
   }
 
   .status-note {

@@ -17,6 +17,7 @@
   "scripts": {
     "build": "pnpm run catalog:export && pnpm run counter:stage && pnpm --filter @jojo-codex-pet/web build",
     "check": "pnpm catalog:validate && pnpm --filter @jojo-codex-pet/web check",
+    "site:validate": "node scripts/validate_web_output.mjs",
     "dev": "pnpm --filter @jojo-codex-pet/web dev",
     "catalog:export": "pnpm --filter @jojo-codex-pet/catalog export",
     "catalog:validate": "pnpm --filter @jojo-codex-pet/catalog test",
