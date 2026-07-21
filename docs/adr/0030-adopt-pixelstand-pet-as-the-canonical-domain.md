@@ -1,0 +1,3 @@
+# ADR 0030: Adopt pixelstand.pet as the canonical domain
+
+The public Gallery will use `https://pixelstand.pet` as its canonical production origin, package host, sitemap origin, and installer default. The former `jojo-preview.easytry.shop` host will redirect matching routes to the new domain so existing links remain useful. Every page will also include the publisher-account verification metadata `<meta name="google-adsense-account" content="ca-pub-3369430294552960">`; this metadata alone does not add ad scripts, ad units, behavioral analytics, or change the project's ad-free presentation. This supersedes only ADR 0001's prohibition on carrying AdSense account metadata, not its prohibition on advertising or monetizing the Fan Project.

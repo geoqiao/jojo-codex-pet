@@ -7,7 +7,7 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packagePath);
 const releasedPet = releasedPets[0]!;
-const siteOrigin = "https://jojo-preview.easytry.shop";
+const siteOrigin = "https://pixelstand.pet";
 const localePrefix = locale === "zh-CN" ? "/zh-CN" : "";
 const packageUrl = `${siteOrigin}${releasedPet.packagePath}`;
 const petName = localize(releasedPet.name, locale);

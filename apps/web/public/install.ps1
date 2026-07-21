@@ -8,7 +8,7 @@ if ($PetId -notmatch '^part-[0-9]{2}-[a-z0-9-]+$') {
   throw "Expected a Part-scoped pet ID such as part-03-jotaro-kujo."
 }
 
-$BaseUrl = if ($env:JOJO_CODEX_PET_BASE_URL) { $env:JOJO_CODEX_PET_BASE_URL.TrimEnd('/') } else { "https://jojo-preview.easytry.shop/packages" }
+$BaseUrl = if ($env:JOJO_CODEX_PET_BASE_URL) { $env:JOJO_CODEX_PET_BASE_URL.TrimEnd('/') } else { "https://pixelstand.pet/packages" }
 $CodexHome = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME ".codex" }
 $PackageUrl = "$BaseUrl/$PetId"
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ("jojo-codex-pet-" + [guid]::NewGuid().ToString("N"))

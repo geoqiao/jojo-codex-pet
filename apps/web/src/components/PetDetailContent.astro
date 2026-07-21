@@ -13,7 +13,7 @@ const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   const match = pets.find((item) => item.id === id);
   return match ? [match] : [];
 });
-const siteOrigin = "https://jojo-preview.easytry.shop";
+const siteOrigin = "https://pixelstand.pet";
 const packageUrl = pet.packagePath ? `${siteOrigin}${pet.packagePath}` : undefined;
 const openInCodexUrl = packageUrl ? `codex://pets/install?${new URLSearchParams({
   name: pet.name.en,

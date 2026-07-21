@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^jojo-preview\.easytry\.shop$ [NC]
+RewriteRule ^ https://pixelstand.pet%{REQUEST_URI} [R=301,L,NE]

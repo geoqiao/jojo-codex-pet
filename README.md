@@ -18,7 +18,7 @@ The approved launch roster contains 36 pets across three quality-gated waves. Se
 
 ## Gallery
 
-The production site will be served at [jojo-preview.easytry.shop](https://jojo-preview.easytry.shop/) until a dedicated domain replaces it. English is the default language and Simplified Chinese is available.
+The canonical production site is [pixelstand.pet](https://pixelstand.pet/). English is the default language and Simplified Chinese is available.
 
 Primary sections:
 
@@ -28,14 +28,14 @@ Primary sections:
 - Install
 - Contribute
 
-The site publishes aggregate pet-page view totals. It does not collect install events, create visitor identifiers, estimate unique users, or run advertising analytics.
+The site publishes aggregate pet-page view totals. It does not collect install events, create visitor identifiers, estimate unique users, run advertising analytics, or render ad units. It includes the owner's Google AdSense account-verification metadata only.
 
 ## Install a released pet
 
-Every method installs only the selected pet. Choose any of the 23 released stable IDs on the site's [Install page](https://jojo-preview.easytry.shop/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
+Every method installs only the selected pet. Choose any of the 23 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
 
 ```bash
-curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jotaro-kujo
+curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo
 ```
 
 ```bash

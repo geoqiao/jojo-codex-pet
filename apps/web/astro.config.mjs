@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://jojo-preview.easytry.shop',
+  site: 'https://pixelstand.pet',
   integrations: [sitemap()],
   output: 'static',
   build: {

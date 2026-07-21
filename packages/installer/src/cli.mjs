@@ -7,7 +7,7 @@ import { get as httpsGet } from "node:https";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
-const DEFAULT_BASE_URL = "https://jojo-preview.easytry.shop/packages";
+const DEFAULT_BASE_URL = "https://pixelstand.pet/packages";
 
 const usage = () => {
   console.log(`JoJo Codex Pet installer

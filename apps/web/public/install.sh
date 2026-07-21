@@ -7,7 +7,7 @@ if [[ ! "$pet_id" =~ ^part-[0-9]{2}-[a-z0-9-]+$ ]]; then
   exit 2
 fi
 
-base_url="${JOJO_CODEX_PET_BASE_URL:-https://jojo-preview.easytry.shop/packages}"
+base_url="${JOJO_CODEX_PET_BASE_URL:-https://pixelstand.pet/packages}"
 codex_home="${CODEX_HOME:-${HOME}/.codex}"
 package_url="${base_url%/}/${pet_id}"
 temp_dir="$(mktemp -d "${TMPDIR:-/tmp}/jojo-codex-pet.XXXXXX")"

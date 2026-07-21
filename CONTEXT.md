@@ -9,12 +9,12 @@ The complete unofficial, non-commercial JoJo-themed repository and gallery, offe
 _Avoid_: Official project, licensed project
 
 **Ad-Free Gallery**:
-The public Fan Project website, which carries no AdSense, display advertising, affiliate placement, or paid promotion.
+The public Fan Project website, which carries no ad units, display advertising, affiliate placement, or paid promotion. It may include passive publisher-account verification metadata that does not load ads or track behavior.
 _Avoid_: Ad-supported gallery, monetized fan site
 
-**Temporary Production Gallery**:
-The public, indexable Gallery served from `jojo-preview.easytry.shop` as the project's canonical site until a dedicated domain replaces it.
-_Avoid_: Staging site, noindex preview
+**Canonical Production Gallery**:
+The public, indexable Gallery served from `pixelstand.pet`, with the former `jojo-preview.easytry.shop` host retained only to preserve and redirect legacy links.
+_Avoid_: Temporary domain, staging site, noindex preview
 
 **Default Locale**:
 The English version of every public Gallery route, paired with a user-selectable Simplified Chinese version of the same catalog content.
