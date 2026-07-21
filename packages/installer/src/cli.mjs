@@ -2,6 +2,8 @@
 
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { get as httpGet } from "node:http";
+import { get as httpsGet } from "node:https";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -45,11 +47,39 @@ const baseUrl = (option("--base-url") ?? process.env.JOJO_CODEX_PET_BASE_URL ?? 
 const codexHome = resolve(option("--codex-home") ?? process.env.CODEX_HOME ?? join(homedir(), ".codex"));
 const packageUrl = `${baseUrl}/${petId}`;
 
-const fetchBytes = async (url) => {
-  const response = await fetch(url, { redirect: "follow" });
-  if (!response.ok) throw new Error(`Download failed (${response.status}): ${url}`);
-  return Buffer.from(await response.arrayBuffer());
-};
+const fetchBytes = (url, redirectCount = 0) => new Promise((resolveDownload, rejectDownload) => {
+  const parsedUrl = new URL(url);
+  const get = parsedUrl.protocol === "https:" ? httpsGet : parsedUrl.protocol === "http:" ? httpGet : undefined;
+  if (!get) {
+    rejectDownload(new Error(`Unsupported download protocol: ${parsedUrl.protocol}`));
+    return;
+  }
+
+  const request = get(parsedUrl, { headers: { "user-agent": "jojo-codex-pet-installer" } }, (response) => {
+    const status = response.statusCode ?? 0;
+    if (status >= 300 && status < 400 && response.headers.location) {
+      response.resume();
+      if (redirectCount >= 5) {
+        rejectDownload(new Error(`Too many redirects while downloading: ${url}`));
+        return;
+      }
+      fetchBytes(new URL(response.headers.location, parsedUrl).href, redirectCount + 1).then(resolveDownload, rejectDownload);
+      return;
+    }
+    if (status < 200 || status >= 300) {
+      response.resume();
+      rejectDownload(new Error(`Download failed (${status}): ${url}`));
+      return;
+    }
+
+    const chunks = [];
+    response.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
+    response.on("end", () => resolveDownload(Buffer.concat(chunks)));
+    response.on("error", rejectDownload);
+  });
+  request.setTimeout(15_000, () => request.destroy(new Error(`Download timed out: ${url}`)));
+  request.on("error", rejectDownload);
+});
 
 const sha256 = (data) => createHash("sha256").update(data).digest("hex");
 
