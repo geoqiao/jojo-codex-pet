@@ -29,7 +29,10 @@ function loadAllowedIds(): array
 function storagePaths(): array
 {
     $override = getenv('JOJO_COUNTER_STORAGE_DIR');
-    $root = is_string($override) && $override !== '' ? $override : dirname(__DIR__, 5);
+    $domainsMarker = DIRECTORY_SEPARATOR . 'domains' . DIRECTORY_SEPARATOR;
+    $domainsOffset = strpos(__DIR__, $domainsMarker);
+    $accountRoot = $domainsOffset === false ? dirname(__DIR__, 4) : substr(__DIR__, 0, $domainsOffset);
+    $root = is_string($override) && $override !== '' ? $override : $accountRoot;
 
     if (!is_dir($root) || !is_writable($root)) {
         respond(503, ['error' => 'counter_unavailable']);
