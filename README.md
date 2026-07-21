@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand is an independently installable Codex pet, presented in a public Part-by-Part gallery.
 
-> Public development status: the 36-pet headline roster is locked. All eight Wave 1 pets now have complete QA-passed Codex Pet V2 packages. Jotaro is released; the other seven remain in owner animation review before their public install buttons are enabled. The Parts 1–2 base designs were approved and installed locally for owner testing on 2026-07-19.
+> Public development status: the 36-pet headline roster is locked. All eight Wave 1 pets and all 15 Wave 2 pets now have complete QA-passed Codex Pet V2 packages. Jotaro is released; the other 22 packaged pets remain in owner animation review before their public install buttons are enabled. All 15 Wave 2 pets are installed locally for owner testing.
 
 ## Headline scope
 
@@ -14,7 +14,7 @@ An unofficial, non-commercial, advertisement-free collection of JoJo-themed anim
 - Ability modes remain animation cues rather than separate pets
 - Part 9's principal-antagonist slot stays unassigned while the story is ongoing
 
-The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md), [current Wave 1 progress](docs/wave-1-status.md), and the [Parts 1–2 animation review](docs/visual/wave-1-animation-review/README.md).
+The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md), [Wave 1 progress](docs/wave-1-status.md), the [Wave 1 Parts 1–2 animation review](docs/visual/wave-1-animation-review/README.md), [Wave 2 progress](docs/wave-2-status.md), and the [complete 15-pet Wave 2 animation review](docs/visual/wave-2-animation-review/README.md).
 
 ## Gallery
 
