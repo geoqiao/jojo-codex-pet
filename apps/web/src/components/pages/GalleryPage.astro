@@ -7,6 +7,14 @@ import ViewCounts from "../ViewCounts.astro";
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const pilot = pets.filter((pet) => pet.part === 3 && pet.status !== "planned");
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  url: "https://pixelstand.pet/",
+  name: "JoJo Codex Pet",
+  description: "An unofficial, non-commercial JoJo-themed Codex pet gallery.",
+  inLanguage: ["en", "zh-CN"]
+};
 const content = locale === "en" ? {
   title: "JoJo Codex Pet — V2 companions across every Part",
   description: "An unofficial, non-commercial JoJo-themed Codex pet gallery. Browse the locked 36-pet roster and the Part 3 Pilot Set.",
@@ -40,7 +48,7 @@ const content = locale === "en" ? {
 };
 ---
 
-<BaseLayout locale={locale} title={content.title} description={content.description} path="/">
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/" structuredData={structuredData}>
   <section class="hero">
     <div class="shell hero-grid">
       <div class="hero-copy">

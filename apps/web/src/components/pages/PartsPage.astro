@@ -48,7 +48,7 @@ const content = locale === "en" ? {
               <p>{localize(part.subtitle, locale)}</p>
               <dl>
                 <div><dt>{content.protagonist}</dt><dd>{heroes.map((pet) => localize(pet.name, locale)).join(" · ")}</dd></div>
-                <div><dt>{content.antagonist}</dt><dd>{antagonists.length > 0 ? `${antagonists.length} spoiler-protected pets` : content.ongoing}</dd></div>
+                <div><dt>{content.antagonist}</dt><dd>{antagonists.length > 0 ? antagonists.map((pet) => localize(pet.name, locale)).join(" · ") : content.ongoing}</dd></div>
               </dl>
               <a class="button" href={`${route(locale, "/")}?part=${part.number}#roster`}>{content.open} ↗</a>
             </div>

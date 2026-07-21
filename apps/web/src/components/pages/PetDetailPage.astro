@@ -1,5 +1,5 @@
 ---
-import type { Locale, Pet } from "@jojo-codex-pet/catalog";
+import { parts, type Locale, type Pet } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PetDetailContent from "../PetDetailContent.astro";
 import ViewCounts from "../ViewCounts.astro";
@@ -9,28 +9,53 @@ interface Props { locale: Locale; pet: Pet }
 const { locale, pet } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
+const part = parts.find((item) => item.number === pet.part)!;
+const partTitle = localize(part.title, locale);
+const statusLabel = copy.status[pet.status];
 const content = locale === "en" ? {
-  description: `${name}, a ${copy.type[pet.type].toLowerCase()} in the JoJo Codex Pet headline roster.`,
+  title: `${name} — Part ${pet.part}: ${partTitle} Codex Pet`,
+  description: `${name} is the Part ${pet.part} ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} pet for ${partTitle}. Status: ${statusLabel}.`,
   back: "Back to gallery",
-  reveal: "Reveal this spoiler-protected pet"
+  imageAlt: `${name}, a pixel-art Codex pet from JoJo Part ${pet.part}`
 } : {
-  description: `${name}，JoJo Codex Pet 首发名单中的${copy.type[pet.type]}宠物。`,
+  title: `${name} — JoJo 第 ${pet.part} 部《${partTitle}》Codex 宠物`,
+  description: `${name}是 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物，当前状态：${statusLabel}。`,
   back: "返回宠物目录",
-  reveal: "显示这只包含剧透的宠物"
+  imageAlt: `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`
+};
+const pageUrl = new URL(route(locale, `/pets/${pet.id}/`), Astro.site);
+const imageUrl = pet.image ? new URL(pet.image, Astro.site) : new URL("/social/jojo-codex-pet-promo-v1.png", Astro.site);
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  name: content.title,
+  description: content.description,
+  url: pageUrl.href,
+  inLanguage: locale,
+  primaryImageOfPage: {
+    "@type": "ImageObject",
+    url: imageUrl.href
+  },
+  isPartOf: {
+    "@type": "WebSite",
+    name: "JoJo Codex Pet",
+    url: "https://pixelstand.pet/"
+  }
 };
 ---
 
-<BaseLayout locale={locale} title={`${pet.spoiler ? (locale === "en" ? "Spoiler pet" : "剧透宠物") : name} — JoJo Codex Pet`} description={content.description} path={`/pets/${pet.id}/`}>
+<BaseLayout
+  locale={locale}
+  title={content.title}
+  description={content.description}
+  path={`/pets/${pet.id}/`}
+  image={pet.image}
+  imageAlt={content.imageAlt}
+  structuredData={structuredData}
+>
   <div class="shell detail-shell">
     <p class="back-link"><a href={route(locale, "/")}>← {content.back}</a></p>
-    {pet.spoiler ? (
-      <details class="detail-spoiler">
-        <summary>✦ {content.reveal}</summary>
-        <PetDetailContent locale={locale} pet={pet} />
-      </details>
-    ) : (
-      <PetDetailContent locale={locale} pet={pet} />
-    )}
+    <PetDetailContent locale={locale} pet={pet} />
   </div>
   <ViewCounts locale={locale} incrementId={pet.id} />
 </BaseLayout>
@@ -48,39 +73,4 @@ const content = locale === "en" ? {
 
   .back-link a { text-underline-offset: 4px; }
 
-  .detail-spoiler {
-    min-height: 500px;
-    border: 3px solid var(--ink);
-    background: var(--ink);
-    box-shadow: 7px 7px 0 var(--coral);
-  }
-
-  .detail-spoiler > summary {
-    display: grid;
-    min-height: 500px;
-    place-items: center;
-    padding: 40px;
-    color: var(--paper-bright);
-    font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: clamp(2.5rem, 7vw, 7rem);
-    font-weight: 800;
-    text-align: center;
-    cursor: pointer;
-  }
-
-  .detail-spoiler[open] > summary {
-    min-height: auto;
-    padding: 18px;
-    color: var(--ink);
-    background: var(--coral);
-    font-family: inherit;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .detail-spoiler[open] :global(.detail-grid) {
-    border: 0;
-    box-shadow: none;
-  }
 </style>

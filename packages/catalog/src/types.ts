@@ -29,7 +29,6 @@ export interface Pet {
   ownerId?: string;
   pairIds?: string[];
   lineageStage?: number;
-  spoiler?: boolean;
   abilityModes?: LocalizedText[];
   image?: string;
   palette?: string[];

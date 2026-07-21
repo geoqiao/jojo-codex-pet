@@ -11,6 +11,10 @@ const { pet, locale } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
 const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
+const cardImage = pet.image?.replace(/\.png$/, "-card.webp");
+const imageAlt = locale === "en"
+  ? `${name}, Part ${pet.part} pixel Codex pet`
+  : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
 ---
 
 <article
@@ -20,13 +24,11 @@ const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
   data-part={`part-${String(pet.part).padStart(2, "0")}`}
   data-type={pet.type}
   data-status={pet.status}
-  data-spoiler-card={pet.spoiler ? "true" : undefined}
-  data-revealed={pet.spoiler ? undefined : "true"}
 >
-  <div class="pet-card-content" data-spoiler-content aria-hidden={pet.spoiler ? "true" : undefined}>
+  <div class="pet-card-content">
     <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
-      {pet.image ? (
-        <img src={pet.image} alt={`${name} pixel pet`} width="1024" height="1024" loading="lazy" />
+      {cardImage ? (
+        <img src={cardImage} alt={imageAlt} width="640" height="640" loading="lazy" decoding="async" />
       ) : (
         <div class="planned-art" aria-hidden="true">
           <span>{initial}</span>
@@ -53,13 +55,6 @@ const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
       </div>
     </div>
   </div>
-  {pet.spoiler && (
-    <div class="spoiler-cover">
-      <span>✦</span>
-      <strong>{locale === "en" ? "Story spoiler" : "剧情剧透"}</strong>
-      <button type="button" data-reveal-spoiler aria-expanded="false">{copy.reveal}</button>
-    </div>
-  )}
 </article>
 
 <style define:vars={{
@@ -229,52 +224,4 @@ const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
     white-space: nowrap;
   }
 
-  .spoiler-cover {
-    position: absolute;
-    z-index: 4;
-    inset: 0;
-    display: grid;
-    align-content: center;
-    justify-items: center;
-    padding: 28px;
-    color: var(--paper-bright);
-    text-align: center;
-    background:
-      repeating-linear-gradient(135deg, transparent 0 14px, rgb(216 255 85 / 8%) 14px 28px),
-      rgb(23 19 30 / 96%);
-  }
-
-  [data-revealed="true"] .spoiler-cover {
-    display: none;
-  }
-
-  .spoiler-cover span {
-    color: var(--acid);
-    font-size: 3.5rem;
-  }
-
-  .spoiler-cover strong {
-    margin: 8px 0 20px;
-    font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: 2rem;
-  }
-
-  .spoiler-cover button {
-    min-height: 42px;
-    padding: 8px 14px;
-    border: 2px solid var(--paper-bright);
-    color: var(--paper-bright);
-    background: transparent;
-    font-size: 0.7rem;
-    font-weight: 850;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    cursor: pointer;
-  }
-
-  .spoiler-cover button:hover {
-    color: var(--ink);
-    background: var(--acid);
-    border-color: var(--acid);
-  }
 </style>
