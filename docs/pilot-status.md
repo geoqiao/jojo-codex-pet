@@ -30,4 +30,4 @@
 
 The owner approved all four Pilot base designs and the standard animation direction on 2026-07-19. Every Pilot now has all nine standard rows plus 16 look directions in a validated 1536×2288 V2 atlas. Each final candidate passed deterministic validation, three independent blind direction reviews, and independent final visual QA.
 
-Jotaro is released and installed locally for owner testing. Star Platinum, DIO, and The World are packaged but stay in `pilot-review` until the owner approves the final V2 animation reels.
+All four Pilot pets were owner-approved and publicly released on 2026-07-21. Each is independently installable from its gallery detail page.

@@ -1,6 +1,6 @@
 # Pilot Base Design Brief
 
-Approval status: pending base-design review.
+Approval status: all four base designs were approved on 2026-07-19; their complete V2 packages were publicly released on 2026-07-21.
 
 These four images establish the visual source of truth for the Part 3 Pilot Set before any animation row is generated. They are original unofficial fan-art interpretations, not traced panels, anime frames, game sprites, or attempts to reproduce a living artist's exact drawing style.
 

@@ -5,8 +5,10 @@ import { localize } from "../../lib/i18n";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
-const releasedPet = pets.find((pet) => pet.status === "released" && pet.packagePath)!;
+const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packagePath);
+const releasedPet = releasedPets[0]!;
 const siteOrigin = "https://jojo-preview.easytry.shop";
+const localePrefix = locale === "zh-CN" ? "/zh-CN" : "";
 const packageUrl = `${siteOrigin}${releasedPet.packagePath}`;
 const petName = localize(releasedPet.name, locale);
 const openInCodexUrl = `codex://pets/install?${new URLSearchParams({
@@ -27,10 +29,14 @@ const content = locale === "en" ? {
   description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
   eyebrow: "One pet per primary action",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
-  intro: "Every route verifies or delegates to the validated v2 spritesheet for the selected Part-scoped pet. It never silently adds a Stand Pair or an entire Part.",
-  released: "First validated hatch",
-  gate: `${petName} is ready to install.`,
+  intro: "Choose any released pet below. Every route installs only the selected Part-scoped pet and never silently adds a Stand Pair or an entire Part.",
+  released: "Featured released pet",
+  gate: `${petName} is the featured install example.`,
   gateBody: "Its 8 × 11 atlas passed deterministic checks, three blind direction reviews, and independent final visual QA.",
+  availableTitle: `${releasedPets.length} validated pets are live`,
+  availableNote: "Open any pet to use its Codex deep link or copy its Bash, PowerShell, or npx command.",
+  character: "Character",
+  stand: "Stand",
   open: "Open in Codex",
   copy: "Copy",
   copied: "Copied",
@@ -45,10 +51,14 @@ const content = locale === "en" ? {
   description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
   eyebrow: "主操作一次只安装一只",
   heading: "只安装你选中的宠物。",
-  intro: "每条安装路径都使用当前篇章稳定 ID 对应的已验证 V2 图集，不会暗中附带替身配对或整部合集。",
-  released: "首只通过验证的宠物",
-  gate: `${petName}现已可安装。`,
+  intro: "从下方选择任意已发布宠物。每条安装路径只安装当前篇章稳定 ID 对应的宠物，不会暗中附带替身配对或整部合集。",
+  released: "推荐安装示例",
+  gate: `${petName}是当前安装示例。`,
   gateBody: "其 8 × 11 图集已通过确定性检查、三次方向盲测和独立最终视觉 QA。",
+  availableTitle: `${releasedPets.length} 只已验证宠物现已开放`,
+  availableNote: "打开任意宠物详情页，即可使用 Codex 深链，或复制 Bash、PowerShell、npx 安装命令。",
+  character: "角色",
+  stand: "替身",
   open: "在 Codex 中打开",
   copy: "复制",
   copied: "已复制",
@@ -70,6 +80,21 @@ const content = locale === "en" ? {
     <section class="gate-card">
       <span aria-hidden="true">01</span>
       <div><p class="eyebrow">{content.released}</p><h2>{content.gate}</h2><p>{content.gateBody}</p></div>
+    </section>
+    <section class="released-section" aria-labelledby="released-pets-title">
+      <header>
+        <h2 id="released-pets-title">{content.availableTitle}</h2>
+        <p>{content.availableNote}</p>
+      </header>
+      <div class="released-grid">
+        {releasedPets.map((pet) => (
+          <a href={`${localePrefix}/pets/${pet.id}/`}>
+            <span>PART {String(pet.part).padStart(2, "0")}</span>
+            <strong>{localize(pet.name, locale)}</strong>
+            <small>{pet.type === "character" ? content.character : content.stand} ↗</small>
+          </a>
+        ))}
+      </div>
     </section>
     <div class="method-grid">
       {content.methods.map(([name, detail], index) => {
@@ -141,6 +166,56 @@ const content = locale === "en" ? {
 
   .gate-card p:last-child { max-width: 65ch; line-height: 1.6; }
 
+  .released-section {
+    margin-top: 64px;
+  }
+
+  .released-section > header {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(280px, 0.5fr);
+    gap: 32px;
+    align-items: end;
+    margin-bottom: 24px;
+  }
+
+  .released-section h2 {
+    margin: 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: clamp(2.6rem, 5vw, 5.2rem);
+    letter-spacing: -0.055em;
+    line-height: 0.9;
+  }
+
+  .released-section header p { margin: 0; color: var(--muted); line-height: 1.6; }
+
+  .released-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 3px solid var(--ink);
+    border-left: 3px solid var(--ink);
+  }
+
+  .released-grid a {
+    display: grid;
+    min-height: 150px;
+    padding: 18px;
+    color: var(--ink);
+    background: var(--paper-bright);
+    border-right: 3px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
+    text-decoration: none;
+  }
+
+  .released-grid a:hover,
+  .released-grid a:focus-visible { background: var(--acid); }
+
+  .released-grid span,
+  .released-grid small { font-size: 0.66rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .released-grid strong { align-self: center; font-family: "Bodoni Moda Variable", Georgia, serif; font-size: 1.65rem; line-height: 0.95; }
+
+  .released-grid small { align-self: end; }
+
   .method-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -186,8 +261,13 @@ const content = locale === "en" ? {
     line-height: 1.5;
   }
 
-  @media (max-width: 1050px) { .method-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 1050px) {
+    .released-grid { grid-template-columns: repeat(3, 1fr); }
+    .method-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 650px) {
+    .released-section > header { grid-template-columns: 1fr; }
+    .released-grid { grid-template-columns: 1fr; }
     .gate-card { grid-template-columns: 1fr; }
     .gate-card > span { min-height: 170px; border-right: 0; border-bottom: 3px solid var(--ink); }
     .method-grid { grid-template-columns: 1fr; }

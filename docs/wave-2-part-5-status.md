@@ -2,17 +2,17 @@
 
 Date: 2026-07-20
 
-Part 5 contains five pets. The batch stays unpublished until all five complete the v2 engineering and owner-review gates.
+Part 5 contains five pets. All five completed the V2 engineering and owner-review gates and were publicly released on 2026-07-21.
 
 ## Production status
 
 | Pet | V2 package | Blind direction QA | Final visual QA | Local install | Status |
 | --- | --- | --- | --- | --- | --- |
-| Giorno Giovanna | Pass | Hard gates pass; intermediate-angle warnings reviewed | Pass | Verified | Wave review |
-| Gold Experience | Pass | Hard gates pass; intermediate-angle warning reviewed | Pass | Verified | Wave review |
-| Gold Experience Requiem | Pass | Hard gates pass; one near-down horizontal ambiguity reviewed | Pass | Verified | Wave review |
-| Diavolo | Pass | Hard gates pass; subtle intermediate axes reviewed | Pass | Verified | Wave review |
-| King Crimson | Pass | Hard gates pass; two near-down ambiguities reviewed | Pass | Verified | Wave review |
+| Giorno Giovanna | Pass | Hard gates pass; intermediate-angle warnings reviewed | Pass | Verified | Released |
+| Gold Experience | Pass | Hard gates pass; intermediate-angle warning reviewed | Pass | Verified | Released |
+| Gold Experience Requiem | Pass | Hard gates pass; one near-down horizontal ambiguity reviewed | Pass | Verified | Released |
+| Diavolo | Pass | Hard gates pass; subtle intermediate axes reviewed | Pass | Verified | Released |
+| King Crimson | Pass | Hard gates pass; two near-down ambiguities reviewed | Pass | Verified | Released |
 
 ## Giorno acceptance evidence
 
@@ -75,6 +75,6 @@ Part 5 contains five pets. The batch stays unpublished until all five complete t
 - Direct validation of `~/.codex/pets/part-05-giorno-giovanna/spritesheet.webp` passes with zero errors and zero warnings.
 - Direct validation of `~/.codex/pets/part-05-diavolo/spritesheet.webp` and `~/.codex/pets/part-05-king-crimson/spritesheet.webp` also passes with zero errors and zero warnings.
 
-## Release gate
+## Release result
 
-All five Part 5 pets remain `wave-review`. Their engineering gates are complete; public install controls stay disabled until the owner approves the Part 5 QA overview and its reviewed exceptions.
+The owner approved the Part 5 QA overview and its reviewed exceptions on 2026-07-21. All five pets are `released`, publicly exported, and independently installable.

@@ -2,9 +2,9 @@
 
 [简体中文](docs/zh-CN/README.md)
 
-An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand is an independently installable Codex pet, presented in a public Part-by-Part gallery.
+An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand has an independent pet identity in the public Part-by-Part gallery; completed V2 packages are installed one pet at a time.
 
-> Public development status: the 36-pet headline roster is locked. All eight Wave 1 pets and all 15 Wave 2 pets now have complete QA-passed Codex Pet V2 packages. Jotaro is released; the other 22 packaged pets remain in owner animation review before their public install buttons are enabled. All 15 Wave 2 pets are installed locally for owner testing.
+> Public release status: all 36 headline pets are visible across Parts 1–9. The 23 pets with complete QA-passed Codex Pet V2 packages are released and independently installable. The remaining 13 headline pets stay visible as planned entries until their real packages pass the same quality gate.
 
 ## Headline scope
 
@@ -30,9 +30,9 @@ Primary sections:
 
 The site publishes aggregate pet-page view totals. It does not collect install events, create visitor identifiers, estimate unique users, or run advertising analytics.
 
-## Install Jotaro Kujo
+## Install a released pet
 
-Every method installs only the selected pet. After installation, open Codex **Settings → Pets**, choose **Refresh**, then select **Jotaro Kujo**.
+Every method installs only the selected pet. Choose any of the 23 released stable IDs on the site's [Install page](https://jojo-preview.easytry.shop/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
 
 ```bash
 curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jotaro-kujo
@@ -42,7 +42,7 @@ curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jot
 npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet part-03-jotaro-kujo
 ```
 
-Windows PowerShell and the official `codex://pets/install` action are available on the site's Install and Jotaro detail pages.
+Windows PowerShell and the official `codex://pets/install` action are available on the site's Install and released-pet detail pages.
 
 ## Codex pet contract
 
@@ -79,7 +79,7 @@ pnpm dev
 
 ## Contributing
 
-Community pet pull requests open only after Wave 1 passes its quality gate. See [CONTRIBUTING.md](CONTRIBUTING.md) for the current boundary.
+Wave 1 passed its quality gate, so JoJo-only Expansion Pet pull requests are now open. See [CONTRIBUTING.md](CONTRIBUTING.md) for the V2 and licensing requirements.
 
 ## Licensing
 

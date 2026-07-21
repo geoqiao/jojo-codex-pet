@@ -1,6 +1,6 @@
 # Pilot V2 Animation Review
 
-Status: engineering QA passed for all four Pilot pets; owner final animation review is pending.
+Status: engineering QA and owner final animation review passed for all four Pilot pets; all four were publicly released on 2026-07-21.
 
 Each 73-frame reel presents all nine standard Codex Pet V2 states in contract order, followed by the 16 clockwise look directions. The corresponding contact sheet shows the complete 8×11 atlas and every transparent unused cell.
 
@@ -30,4 +30,4 @@ Every final atlas is 1536×2288 with 192×208 cells and passed deterministic val
 
 [Full contact sheet](part-03-the-world-v2-contact-sheet.png) · [16 look directions](part-03-the-world-look-directions.png)
 
-The owner approved the Pilot base designs and standard animation direction on 2026-07-19. Jotaro is released; the remaining three pets stay in `pilot-review` until this final animation review is approved.
+The owner approved the Pilot base designs and standard animation direction on 2026-07-19, then approved the complete final-animation release on 2026-07-21. All four pets are independently installable.

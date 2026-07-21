@@ -1,6 +1,6 @@
 # Wave 2 Part 6 Visual Brief
 
-Status: production brief for the first Part 6 batch. These are project-authored free-color interpretations, not canonical JoJo palettes. Every pet remains `wave-review` until the complete Part 6 batch passes engineering QA and owner review.
+Status: production brief for the first Part 6 batch. These are project-authored free-color interpretations, not canonical JoJo palettes. All six pets passed engineering QA and owner review and were publicly released on 2026-07-21.
 
 ## Shared contract
 

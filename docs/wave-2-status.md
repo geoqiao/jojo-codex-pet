@@ -4,16 +4,16 @@ Date: 2026-07-21
 
 All 15 Wave 2 pets now have complete Codex Pet v2 packages. Every package contains a validated 8 × 11, 1536 × 2288 RGBA WebP atlas with all nine standard animation states and all sixteen look directions. Deterministic validation, three isolated blind direction reviews, continuity review, independent final visual QA, package-hash verification, and local-install verification are complete.
 
-All 15 remain `wave-review`. Their public install controls stay disabled until the owner approves the complete animation overview.
+The owner approved the complete animation overview on 2026-07-21. All 15 are now `released`, exported publicly, and independently installable.
 
 ## Batch result
 
 | Part | Pets | Packages | Engineering gate | Local install | Release state |
 | --- | ---: | ---: | --- | --- | --- |
-| Part 4 | 4 | 4 | Pass | Verified | Wave review |
-| Part 5 | 5 | 5 | Pass | Verified | Wave review |
-| Part 6 | 6 | 6 | Pass | Verified | Wave review |
-| **Wave 2** | **15** | **15** | **Pass** | **Verified** | **Owner approval pending** |
+| Part 4 | 4 | 4 | Pass | Verified | Released |
+| Part 5 | 5 | 5 | Pass | Verified | Released |
+| Part 6 | 6 | 6 | Pass | Verified | Released |
+| **Wave 2** | **15** | **15** | **Pass** | **Verified** | **Released** |
 
 Review the complete reels, contact sheets, and direction sheets in the [Wave 2 animation review](visual/wave-2-animation-review/README.md). Part-specific implementation evidence is recorded in [Part 5 status](wave-2-part-5-status.md) and [Part 6 status](wave-2-part-6-status.md).
 
@@ -44,6 +44,6 @@ No accepted exception involves a failed cardinal direction, wrong principal quad
 - Repository package files match their accepted final QA atlases.
 - All 15 Wave 2 packages are installed under `~/.codex/pets/`; installed package files match the repository hashes.
 
-## Release gate
+## Release result
 
-The engineering batch is complete. The next decision is owner animation approval for the 15-pet Wave 2 overview. Until that approval, catalog status remains `wave-review`, public package export remains limited to released pets, and Wave 3 does not start.
+The engineering batch and owner animation review are complete. On 2026-07-21, all 15 catalog entries moved to `released`; public package export and every supported per-pet install route are enabled. The 13 Wave 3 headline entries remain visible as `planned` until their real packages pass the same gate.

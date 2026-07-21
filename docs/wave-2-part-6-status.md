@@ -8,12 +8,12 @@ All six Part 6 pets have complete Codex Pet v2 packages and have passed the full
 
 | Pet | V2 package | Blind direction QA | Final visual QA | Local install | Status |
 | --- | --- | --- | --- | --- | --- |
-| Jolyne Cujoh | Pass | Hard gates pass; near-cardinal horizontal warnings reviewed | Pass | Verified | Wave review |
-| Stone Free | Pass | All 28 blind axis classifications pass | Pass | Verified | Wave review |
-| Enrico Pucci | Pass | Hard gates pass; metric outliers visually reviewed | Pass | Verified | Wave review |
-| Whitesnake | Pass | Hard gates pass; intermediate-axis warnings reviewed | Pass | Verified | Wave review |
-| C-MOON | Pass | Hard gates pass; one split intermediate vertical-axis reading reviewed | Pass | Verified | Wave review |
-| Made in Heaven | Pass | Hard gates pass; intermediate-axis warnings reviewed | Pass | Verified | Wave review |
+| Jolyne Cujoh | Pass | Hard gates pass; near-cardinal horizontal warnings reviewed | Pass | Verified | Released |
+| Stone Free | Pass | All 28 blind axis classifications pass | Pass | Verified | Released |
+| Enrico Pucci | Pass | Hard gates pass; metric outliers visually reviewed | Pass | Verified | Released |
+| Whitesnake | Pass | Hard gates pass; intermediate-axis warnings reviewed | Pass | Verified | Released |
+| C-MOON | Pass | Hard gates pass; one split intermediate vertical-axis reading reviewed | Pass | Verified | Released |
+| Made in Heaven | Pass | Hard gates pass; intermediate-axis warnings reviewed | Pass | Verified | Released |
 
 ## Accepted non-blocking exceptions
 
@@ -31,6 +31,6 @@ All six Part 6 pets have complete Codex Pet v2 packages and have passed the full
 - Repository and `~/.codex/pets/` package files match for all six local installs.
 - The complete review artifacts are in [the Wave 2 animation review](visual/wave-2-animation-review/README.md).
 
-## Release gate
+## Release result
 
-All six pets remain `wave-review`. Public install controls stay disabled until the owner approves the complete Wave 2 animation overview.
+The owner approved the complete Wave 2 animation overview on 2026-07-21. All six pets are `released`, publicly exported, and independently installable.

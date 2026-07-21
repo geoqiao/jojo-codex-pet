@@ -2,9 +2,9 @@
 
 [English](../../README.md)
 
-这是一个非官方、非商业、无广告的 JoJo 主题 Codex 动态宠物合集。每个具名角色与替身都是独立可安装的 Codex 宠物，并按篇章展示在公开目录中。
+这是一个非官方、非商业、无广告的 JoJo 主题 Codex 动态宠物合集。每个具名角色与替身都在按篇章公开的目录中拥有独立宠物身份；完成的 V2 安装包始终一次只安装一只。
 
-> 当前公开开发状态：36 只首发名单已锁定。第一波 8 只与第二波 15 只均已完成并通过 Codex Pet V2 工程 QA。承太郎已经发布；其余 22 只已打包宠物在开放公开安装按钮前仍等待站长最终动画审核。第二波 15 只已全部安装到站长本机 Codex 供体验。
+> 当前公开发布状态：第 1–9 部的 36 只首发宠物已全部展示。其中 23 只拥有完整且通过 QA 的 Codex Pet V2 安装包，现已全部发布并可独立安装；其余 13 只继续以“计划中”公开展示，等真实安装包通过同一质量门后再开放安装。
 
 ## 首发范围
 
@@ -22,9 +22,9 @@
 
 站点只公开累计宠物详情页浏览次数，不统计安装、不创建访客标识、不估算独立访客，也不接入广告分析。
 
-## 安装空条承太郎
+## 安装已发布宠物
 
-每种方式都只安装当前选择的宠物。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择 **Jotaro Kujo**。
+每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://jojo-preview.easytry.shop/zh-CN/install/)选择 23 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
 
 ```bash
 curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jotaro-kujo
@@ -34,7 +34,7 @@ curl -fsSL https://jojo-preview.easytry.shop/install.sh | bash -s -- part-03-jot
 npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet part-03-jotaro-kujo
 ```
 
-Windows PowerShell 与官方 `codex://pets/install` 入口见网站的 Install 页面和承太郎详情页。
+Windows PowerShell 与官方 `codex://pets/install` 入口见网站的安装页和各个已发布宠物详情页。
 
 ## 开发
 
@@ -49,4 +49,4 @@ pnpm dev
 
 ## 贡献与许可
 
-Wave 1 通过质量门后才开放社区宠物 PR。项目代码使用 MIT 许可；JoJo 角色身份与同人素材不在 MIT 授权范围内。使用或投稿前请阅读 [FAN-ASSET-NOTICE.md](../../FAN-ASSET-NOTICE.md)。
+Wave 1 已通过质量门，现已开放仅限 JoJo 的扩展宠物 PR。项目代码使用 MIT 许可；JoJo 角色身份与同人素材不在 MIT 授权范围内。使用或投稿前请阅读 [CONTRIBUTING.md](../../CONTRIBUTING.md) 与 [FAN-ASSET-NOTICE.md](../../FAN-ASSET-NOTICE.md)。

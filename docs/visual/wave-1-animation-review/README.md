@@ -1,6 +1,6 @@
 # Wave 1 Parts 1–2 Animation Review
 
-Status: the owner approved all four base designs on 2026-07-19. All four now pass the complete Codex Pet V2 engineering gate and are installed locally for owner testing. Public release still requires final owner animation approval.
+Status: the owner approved all four base designs on 2026-07-19. All four pass the complete Codex Pet V2 engineering gate and were approved for public release on 2026-07-21.
 
 Each reel below contains all nine standard animation states followed by the complete 16-direction look loop. Every package passed deterministic 1536×2288 V2 validation, three isolated blind direction reviews, continuity review, independent final visual QA, package validation, and local install verification.
 
@@ -36,6 +36,6 @@ Gate result: pass. The corrected single-pass chroma pipeline cleared the origina
 
 Gate result: pass. The corrected single-pass chroma pipeline cleared the original edge findings. Intermediate look-angle uncertainty remains recorded as reviewed warnings, while all hard cardinal gates and the labeled continuous loop pass.
 
-## Release gate
+## Release result
 
-The packages are engineering-approved and available in the repository, but their public install controls remain disabled while catalog status is `wave-review`. The owner can test the local installs now and approve or reject the final animation reels before release.
+The owner approved the final animation reels on 2026-07-21. All four catalog entries are `released`, their packages are publicly exported, and every supported per-pet install route is enabled.

@@ -1,6 +1,6 @@
 # Wave 2 Parts 4–6 Animation Review
 
-Status: all 15 base designs and complete Codex Pet v2 animation packages passed engineering QA on 2026-07-21. Every package is installed locally for owner testing. Public release still requires final owner animation approval.
+Status: all 15 base designs and complete Codex Pet v2 animation packages passed engineering QA and owner final animation approval on 2026-07-21. Every package is publicly released and independently installable.
 
 Each reel contains all nine standard animation states followed by the complete 16-direction look loop. Every package passed deterministic 1536 × 2288 v2 validation, three isolated blind direction reviews, continuity review, independent final visual QA, package validation, and local-install hash verification.
 
@@ -130,6 +130,6 @@ Gate result: pass. The isolated 067.5°/112.5° vertical-axis comparison produce
 
 Gate result: pass. Intermediate-axis warnings remain recorded. The repaired running-right row keeps its amber acceleration band attached through every frame.
 
-## Release gate
+## Release result
 
-All 15 packages are engineering-approved and available in the repository, but their public install controls remain disabled while catalog status is `wave-review`. The owner can test the local installs now and approve or reject the complete Wave 2 animation batch before release.
+The owner approved the complete Wave 2 animation batch on 2026-07-21. All 15 catalog entries are `released`, their packages are publicly exported, and every supported per-pet install route is enabled.
