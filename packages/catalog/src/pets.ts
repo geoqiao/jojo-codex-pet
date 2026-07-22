@@ -45,6 +45,6 @@ export const pets: readonly Pet[] = [
   { id: "part-08-toru", part: 8, name: { en: "Toru", "zh-CN": "透龙" }, type: "character", role: "antagonist", status: "wave-review", source, pairIds: ["part-08-wonder-of-u"], image: "/wave-3-bases/part-08-toru.png", palette: ["#241b30", "#5d7a4b", "#dfc051", "#c96d80", "#ede4cf", "#4c5060"] },
   { id: "part-08-wonder-of-u", part: 8, name: { en: "Wonder of U", "zh-CN": "奇迹于你" }, type: "stand", role: "antagonist", status: "wave-review", source, ownerId: "part-08-toru", lineageStage: 1, image: "/wave-3-bases/part-08-wonder-of-u.png", palette: ["#2b1522", "#1c1c24", "#c9a24c", "#c96d80", "#ede4cf", "#6d7a5c"] },
 
-  { id: "part-09-jodio-joestar", part: 9, name: { en: "Jodio Joestar", "zh-CN": "乔迪奥·乔斯达" }, type: "character", role: "protagonist", status: "planned", source, pairIds: ["part-09-november-rain"] },
-  { id: "part-09-november-rain", part: 9, name: { en: "November Rain", "zh-CN": "十一月雨" }, type: "stand", role: "protagonist", status: "planned", source, ownerId: "part-09-jodio-joestar", lineageStage: 1 }
+  { id: "part-09-jodio-joestar", part: 9, name: { en: "Jodio Joestar", "zh-CN": "乔迪奥·乔斯达" }, type: "character", role: "protagonist", status: "wave-review", source, pairIds: ["part-09-november-rain"], image: "/wave-3-bases/part-09-jodio-joestar.png", palette: ["#141a2e", "#33507d", "#4fb8c9", "#e9e4f0", "#f0cfa8", "#d9756a"] },
+  { id: "part-09-november-rain", part: 9, name: { en: "November Rain", "zh-CN": "十一月雨" }, type: "stand", role: "protagonist", status: "wave-review", source, ownerId: "part-09-jodio-joestar", lineageStage: 1, image: "/wave-3-bases/part-09-november-rain.png", palette: ["#171430", "#2c2a52", "#46689c", "#4fb8c9", "#dfe3ea", "#c9a35c"] }
 ];
