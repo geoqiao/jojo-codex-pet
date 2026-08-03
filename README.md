@@ -77,6 +77,14 @@ pnpm build
 pnpm dev
 ```
 
+Production is built only from a clean `main` that exactly matches `origin/main`:
+
+```bash
+pnpm production:build
+```
+
+See [ADR 0033](docs/adr/0033-deploy-production-only-from-main.md) for the release and rollback boundary.
+
 ## Contributing
 
 Wave 1 passed its quality gate, so JoJo-only Expansion Pet pull requests are now open. See [CONTRIBUTING.md](CONTRIBUTING.md) for the V2 and licensing requirements.

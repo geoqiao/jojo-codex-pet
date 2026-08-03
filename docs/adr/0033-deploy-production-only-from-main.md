@@ -1,0 +1,3 @@
+# ADR 0033: Deploy production only from main
+
+The `pixelstand.pet` production artifact must be built from a clean local `main` whose HEAD exactly matches `origin/main`. Feature, worker, review, and integration branches may generate or validate pets, but their build output must never be uploaded directly to Hostinger. Every production release runs `pnpm production:build`, records the deployed commit and previous production commit, and deploys only the resulting prebuilt `apps/web/dist` contents. Hostinger serves uploaded static files and does not retain a Git branch identity, so this main-only gate keeps GitHub history as the release authority and makes rollback reproducible from the prior recorded commit.
