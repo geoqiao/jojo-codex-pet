@@ -34,7 +34,7 @@ if (existsSync(releasedIdsPath)) {
   const parsedReleasedIds = JSON.parse(readFileSync(releasedIdsPath, "utf8"));
   expect(Array.isArray(parsedReleasedIds), "released-pet action allowlist must be an array");
   if (Array.isArray(parsedReleasedIds)) releasedIds = parsedReleasedIds;
-  expect(releasedIds.length === 24, `expected 24 released action IDs, found ${releasedIds.length}`);
+  expect(releasedIds.length === 36, `expected 36 released action IDs, found ${releasedIds.length}`);
 }
 
 const pilotProfileIds = new Set([
@@ -197,7 +197,7 @@ for (const route of ["/", "/zh-CN/"]) {
 
   const released = [...roster.entries()].filter(([, item]) => item.status === "released");
   expect(roster.size === 36, `${route}: expected 36 unique cards, found ${roster.size}`);
-  expect(released.length === 24, `${route}: expected 24 released cards, found ${released.length}`);
+  expect(released.length === 36, `${route}: expected 36 released cards, found ${released.length}`);
   for (const [id, item] of roster) {
     const src = extract(item.card, /<img src="([^"]+)"/);
     const srcset = extract(item.card, /srcset="([^"]+)"/);
@@ -283,7 +283,7 @@ for (const route of ["/install/", "/zh-CN/install/"]) {
   const file = join(dist, route.replace(/^\//, ""), "index.html");
   const html = readFileSync(file, "utf8");
   const optionIds = [...html.matchAll(/<option value="(part-[^"]+)"/g)].map((match) => match[1]);
-  expect(optionIds.length === 24, `${route}: expected 24 Released pet options, found ${optionIds.length}`);
+  expect(optionIds.length === 36, `${route}: expected 36 Released pet options, found ${optionIds.length}`);
   expect(
     optionIds.length === releasedIds.length && optionIds.every((id, index) => id === releasedIds[index]),
     `${route}: selector IDs do not match the staged Released-pet allowlist`

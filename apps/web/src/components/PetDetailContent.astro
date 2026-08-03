@@ -204,16 +204,15 @@ const content = locale === "en" ? {
   .detail-grid {
     display: grid;
     grid-template-columns: minmax(300px, 0.7fr) minmax(0, 1fr);
-    align-items: start;
+    align-items: stretch;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
     box-shadow: var(--shadow);
   }
 
   .detail-side {
-    position: sticky;
-    top: 104px;
-    align-self: start;
+    display: grid;
+    grid-template-rows: minmax(560px, 1fr) auto;
     min-width: 0;
     border-right: 3px solid var(--ink);
   }
@@ -221,6 +220,7 @@ const content = locale === "en" ? {
   .detail-art {
     display: grid;
     position: relative;
+    height: 100%;
     min-height: 560px;
     place-items: center;
     overflow: hidden;
@@ -636,10 +636,4 @@ const content = locale === "en" ? {
     .editorial-profile article { padding: 18px 16px 20px; }
   }
 
-  @media (max-height: 860px) and (min-width: 761px) {
-    .detail-side {
-      position: relative;
-      top: auto;
-    }
-  }
 </style>
