@@ -11,7 +11,12 @@ const { pet, locale } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
 const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
-const cardImage = pet.image?.replace(/\.png$/, "-card.webp");
+const cardImages = pet.image ? {
+  small: pet.image.replace(/\.png$/, "-card-320.webp"),
+  medium: pet.image.replace(/\.png$/, "-card-480.webp"),
+  large: pet.image.replace(/\.png$/, "-card-640.webp"),
+  fallback: pet.image.replace(/\.png$/, "-card.webp")
+} : undefined;
 const imageAlt = locale === "en"
   ? `${name}, Part ${pet.part} pixel Codex pet`
   : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
@@ -27,8 +32,17 @@ const imageAlt = locale === "en"
 >
   <div class="pet-card-content">
     <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
-      {cardImage ? (
-        <img src={cardImage} alt={imageAlt} width="640" height="640" loading="lazy" decoding="async" />
+      {cardImages ? (
+        <img
+          src={cardImages.fallback}
+          srcset={`${cardImages.small} 320w, ${cardImages.medium} 480w, ${cardImages.large} 640w`}
+          sizes="(max-width: 384px) calc(92vw - 23.92px), (max-width: 540px) 330px, (max-width: 775px) calc(46vw - 26.68px), (max-width: 840px) 330px, (max-width: 1178px) calc(30.6667vw - 31.28px), (max-width: 1180px) 330px, (max-width: 1512px) calc(23vw - 30.82px), 316.94px"
+          alt={imageAlt}
+          width="640"
+          height="640"
+          loading="lazy"
+          decoding="async"
+        />
       ) : (
         <div class="planned-art" aria-hidden="true">
           <span>{initial}</span>
