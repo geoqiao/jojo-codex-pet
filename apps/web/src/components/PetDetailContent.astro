@@ -51,6 +51,7 @@ const content = locale === "en" ? {
   download: "Package files",
   methodsLabel: "Available install methods",
   methods: ["Codex app", "Bash", "PowerShell", "npx"],
+  profileLabel: "Pet dossier",
   copy: "Copy",
   copied: "Copied",
   copyFailed: "Copy failed"
@@ -74,6 +75,7 @@ const content = locale === "en" ? {
   download: "宠物包文件",
   methodsLabel: "可用安装方式",
   methods: ["Codex 应用", "Bash", "PowerShell", "npx"],
+  profileLabel: "宠物档案",
   copy: "复制",
   copied: "已复制",
   copyFailed: "复制失败"
@@ -81,36 +83,42 @@ const content = locale === "en" ? {
 ---
 
 <div class="detail-grid">
-  <div class="detail-art" style={`--accent:${part.accent}`}>
-    {displayImage ? (
-      <img src={displayImage} alt={imageAlt} width="640" height="640" loading="eager" fetchpriority="high" decoding="async" />
-    ) : (
-      <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
-    )}
-    <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
-    {pet.status === "released" && packageUrl && openInCodexUrl && (
-      <div class="detail-art-actions" role="group" aria-label={content.install}>
-        <a
-          class="button"
-          href={openInCodexUrl}
-          data-install-deeplink
-          data-action-pet-id={pet.id}
-          data-action-method="codex"
-          data-action-locale={locale}
-        >
-          {content.openInCodex} ↗
-        </a>
-        <a class="button quick-package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
-        <a class="quick-methods-link" href="#install-this-pet">{content.installAnchor}</a>
-      </div>
-    )}
+  <div class="detail-side">
+    <div class="detail-art" style={`--accent:${part.accent}`}>
+      {displayImage ? (
+        <img src={displayImage} alt={imageAlt} width="640" height="640" loading="eager" fetchpriority="high" decoding="async" />
+      ) : (
+        <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
+      )}
+      <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
+      {pet.status === "released" && packageUrl && openInCodexUrl && (
+        <div class="detail-art-actions" role="group" aria-label={content.install}>
+          <a
+            class="button"
+            href={openInCodexUrl}
+            data-install-deeplink
+            data-action-pet-id={pet.id}
+            data-action-method="codex"
+            data-action-locale={locale}
+          >
+            {content.openInCodex} ↗
+          </a>
+          <a class="button quick-package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
+          <a class="quick-methods-link" href="#install-this-pet">{content.installAnchor}</a>
+        </div>
+      )}
+    </div>
+    <div class="pet-summary">
+      <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
+      <p class="pet-overview">{content.overview}</p>
+      <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
+    </div>
   </div>
   <div class="detail-copy">
-    <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
-    <h1>{name}</h1>
-    <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
-    <p class="pet-overview">{content.overview}</p>
-    <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
+    <div class="detail-heading">
+      <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
+      <h1>{name}</h1>
+    </div>
     <section class="install-box" id="install-this-pet">
       <div class="install-heading">
         <h2>{content.install}</h2>
@@ -162,16 +170,6 @@ const content = locale === "en" ? {
         <><p>{isReview ? content.reviewPending : content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{isReview ? copy.reviewNotInstallable : copy.notInstallable}</button></>
       )}
     </section>
-    {profile && (
-      <section class="editorial-profile" data-editorial-profile={pet.id} aria-label={locale === "en" ? "Pet profile" : "宠物资料"}>
-        {Object.entries(profile).map(([sectionKey, section]) => (
-          <article data-profile-section={sectionKey}>
-            <h2>{section.title[locale]}</h2>
-            <p>{section.body[locale]}</p>
-          </article>
-        ))}
-      </section>
-    )}
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
       <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
@@ -187,6 +185,19 @@ const content = locale === "en" ? {
     </dl>
   </div>
 </div>
+{profile && (
+  <section class="editorial-profile" data-editorial-profile={pet.id} aria-label={locale === "en" ? "Pet profile" : "宠物资料"}>
+    <p class="profile-label">{content.profileLabel}</p>
+    <div class="profile-grid">
+      {Object.entries(profile).map(([sectionKey, section]) => (
+        <article data-profile-section={sectionKey}>
+          <h2>{section.title[locale]}</h2>
+          <p>{section.body[locale]}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
 <InstallActionTracking />
 
 <style>
@@ -199,18 +210,24 @@ const content = locale === "en" ? {
     box-shadow: var(--shadow);
   }
 
-  .detail-art {
-    display: grid;
+  .detail-side {
     position: sticky;
     top: 104px;
     align-self: start;
+    min-width: 0;
+    border-right: 3px solid var(--ink);
+  }
+
+  .detail-art {
+    display: grid;
+    position: relative;
     min-height: 560px;
     place-items: center;
     overflow: hidden;
     background:
       linear-gradient(140deg, rgb(255 255 255 / 38%) 0 14%, transparent 14% 68%, rgb(23 19 30 / 18%) 68%),
       var(--accent);
-    border-right: 3px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
   }
 
   .detail-art::before {
@@ -337,22 +354,46 @@ const content = locale === "en" ? {
   }
 
   .status-note {
-    margin: 18px 0;
+    margin: 18px 0 0;
     padding: 11px 14px;
     border: 2px solid var(--ink);
     background: var(--acid);
     font-weight: 720;
   }
 
+  .pet-summary {
+    padding: 22px 24px 24px;
+    background: var(--paper-bright);
+  }
+
   .editorial-profile {
+    margin-top: clamp(28px, 4vw, 48px);
+    border: 3px solid var(--ink);
+    background: var(--ink);
+    box-shadow: var(--shadow);
+  }
+
+  .profile-label {
+    margin: 0;
+    padding: 12px 16px;
+    color: var(--acid);
+    font-size: 0.66rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .profile-grid {
     display: grid;
-    gap: 16px;
-    margin: 34px 0 28px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3px;
+    background: var(--ink);
   }
 
   .editorial-profile article {
-    padding: 18px 20px;
-    border-left: 5px solid var(--violet);
+    min-width: 0;
+    padding: 22px 24px 24px;
+    border-top: 5px solid var(--violet);
     background: var(--paper);
   }
 
@@ -413,7 +454,7 @@ const content = locale === "en" ? {
   }
 
   .install-box {
-    margin-top: 18px;
+    margin-top: 20px;
     scroll-margin-top: 110px;
     padding: clamp(18px, 2.4vw, 26px);
     color: var(--paper-bright);
@@ -531,28 +572,74 @@ const content = locale === "en" ? {
   }
 
   @media (max-width: 760px) {
-    .detail-grid { grid-template-columns: 1fr; }
+    .detail-grid {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .detail-side,
+    .detail-copy { display: contents; }
+
     .detail-art {
+      order: 1;
       position: relative;
       top: auto;
       min-height: 300px;
       border-right: 0;
       border-bottom: 3px solid var(--ink);
     }
+
+    .detail-heading {
+      order: 2;
+      padding: 24px 20px 0;
+    }
+
+    .pet-summary {
+      order: 3;
+      padding: 16px 20px 22px;
+    }
+
+    .install-box {
+      order: 4;
+      margin: 0 20px 24px;
+    }
+
+    dl {
+      order: 5;
+      padding: 0 20px 26px;
+    }
+
     .detail-art img { height: 278px; }
     .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
     .detail-part { top: 14px; left: 14px; }
   }
 
+  @media (max-width: 980px) {
+    .profile-grid { grid-template-columns: 1fr; }
+  }
+
   @media (max-width: 600px) {
-    .detail-copy { padding: 22px 16px 26px; }
+    .detail-heading { padding: 22px 16px 0; }
     h1 { font-size: clamp(3.2rem, 17vw, 4.5rem); }
+    .pet-summary { padding: 14px 16px 20px; }
     .pet-overview { font-size: 0.9rem; line-height: 1.5; }
-    .status-note { margin: 14px 0; padding: 10px 12px; }
+    .status-note { margin-top: 14px; padding: 10px 12px; }
+    .install-box { margin: 0 16px 20px; }
     .install-heading { grid-template-columns: 1fr; }
     .install-method-overview { justify-content: start; }
+    dl { padding: 0 16px 24px; }
     dl > div { grid-template-columns: 1fr; gap: 5px; }
     .command-row { grid-template-columns: 1fr auto; }
     .command-row code { grid-column: 1 / -1; grid-row: 2; }
+    .editorial-profile { margin-top: 24px; }
+    .editorial-profile article { padding: 18px 16px 20px; }
+  }
+
+  @media (max-height: 860px) and (min-width: 761px) {
+    .detail-side {
+      position: relative;
+      top: auto;
+    }
   }
 </style>
