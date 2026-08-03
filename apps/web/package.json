@@ -10,7 +10,7 @@
     "prebuild": "node scripts/generate-card-images.mjs",
     "build": "astro build",
     "check": "astro check",
-    "test": "tsx src/lib/install-actions.test.ts",
+    "test": "tsx src/lib/install-actions.test.ts && tsx src/content/petProfiles.test.ts",
     "preview": "astro preview",
     "astro": "astro"
   },

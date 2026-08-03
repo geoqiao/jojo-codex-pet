@@ -18,7 +18,7 @@ The approved launch roster contains 36 pets across three quality-gated waves. Se
 
 ## Gallery
 
-The canonical production site is [pixelstand.pet](https://pixelstand.pet/). English is the default language and Simplified Chinese is available.
+The canonical production site is the [JoJo Codex Pet gallery](https://pixelstand.pet/). English is the default language and Simplified Chinese is available.
 
 Primary sections:
 

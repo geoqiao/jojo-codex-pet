@@ -24,6 +24,8 @@ const content = locale === "en" ? {
   imageAlt: `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`
 };
 const pageUrl = new URL(route(locale, `/pets/${pet.id}/`), Astro.site);
+const galleryUrl = new URL(route(locale, "/"), Astro.site);
+const partsUrl = new URL(route(locale, "/parts/"), Astro.site);
 const imageUrl = pet.image ? new URL(pet.image, Astro.site) : new URL("/social/jojo-codex-pet-promo-v1.png", Astro.site);
 const structuredData = {
   "@context": "https://schema.org",
@@ -40,6 +42,14 @@ const structuredData = {
     "@type": "WebSite",
     name: "JoJo Codex Pet",
     url: "https://pixelstand.pet/"
+  },
+  breadcrumb: {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: copy.nav.gallery, item: galleryUrl.href },
+      { "@type": "ListItem", position: 2, name: copy.nav.parts, item: partsUrl.href },
+      { "@type": "ListItem", position: 3, name, item: pageUrl.href }
+    ]
   }
 };
 ---
@@ -54,6 +64,15 @@ const structuredData = {
   structuredData={structuredData}
 >
   <div class="shell detail-shell">
+    <nav class="breadcrumbs" aria-label={locale === "en" ? "Breadcrumb" : "面包屑导航"}>
+      <ol>
+        <li><a href={route(locale, "/")}>{copy.nav.gallery}</a></li>
+        <li aria-hidden="true">›</li>
+        <li><a href={route(locale, "/parts/")}>{copy.nav.parts}</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">{name}</li>
+      </ol>
+    </nav>
     <p class="back-link"><a href={route(locale, "/")}>← {content.back}</a></p>
     <PetDetailContent locale={locale} pet={pet} />
   </div>
@@ -62,6 +81,28 @@ const structuredData = {
 
 <style>
   .detail-shell { padding-top: 38px; }
+
+  .breadcrumbs {
+    margin-bottom: 14px;
+    font-size: 0.72rem;
+    font-weight: 760;
+  }
+
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .breadcrumbs a { text-underline-offset: 4px; }
+
+  .breadcrumbs li[aria-current="page"] {
+    color: var(--muted);
+  }
 
   .back-link {
     margin: 0 0 24px;

@@ -36,6 +36,14 @@ if (existsSync(releasedIdsPath)) {
   expect(releasedIds.length === 24, `expected 24 released action IDs, found ${releasedIds.length}`);
 }
 
+const pilotProfileIds = new Set([
+  "part-03-jotaro-kujo",
+  "part-03-star-platinum",
+  "part-03-dio",
+  "part-03-the-world"
+]);
+const profileBodies = new Map();
+
 const extract = (html, pattern) => html.match(pattern)?.[1]?.trim();
 
 const routeFor = (file) => {
@@ -127,6 +135,10 @@ for (const route of ["/", "/zh-CN/"]) {
   const heroCta = html.match(/<a\b[^>]*\bdata-home-install-cta\b[^>]*>/)?.[0];
   expect(Boolean(heroCta), `${route}: missing homepage hero Install CTA`);
   expect(heroCta?.includes(`href="${expectedCta}"`), `${route}: homepage hero Install CTA is not localized`);
+  const expectedIntentCopy = route === "/"
+    ? "unofficial gallery of animated JoJo character and Stand companions for OpenAI Codex Desktop"
+    : "面向 OpenAI Codex Desktop 的非官方 JoJo 角色与替身动画宠物目录";
+  expect(html.includes(expectedIntentCopy), `${route}: missing natural Codex Desktop search-intent context`);
   const jsonLd = extract(html, /<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
   expect(Boolean(jsonLd), `${route}: missing WebSite JSON-LD`);
   if (jsonLd) {
@@ -176,8 +188,56 @@ for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))
   const route = routeFor(file);
   const html = readFileSync(file, "utf8");
   const isReleased = html.includes('data-status="released"');
+  const petId = route.match(/\/pets\/([^/]+)\//)?.[1];
   expect(html.includes('href="#install-this-pet"') === isReleased, `${route}: Released-only install anchor is inconsistent`);
   expect(/<a[^>]+data-install-deeplink/.test(html) === isReleased, `${route}: Released-only Codex action is inconsistent`);
+
+  const breadcrumb = html.match(/<nav class="breadcrumbs"[\s\S]*?<\/nav>/)?.[0];
+  expect(Boolean(breadcrumb), `${route}: missing visible breadcrumb navigation`);
+  if (breadcrumb) {
+    const prefix = route.startsWith("/zh-CN/") ? "/zh-CN" : "";
+    expect(breadcrumb.includes(`href="${prefix}/"`), `${route}: breadcrumb is missing Gallery target`);
+    expect(breadcrumb.includes(`href="${prefix}/parts/"`), `${route}: breadcrumb is missing Parts target`);
+    expect(breadcrumb.includes('aria-current="page"'), `${route}: breadcrumb is missing current page marker`);
+  }
+
+  const jsonLd = extract(html, /<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
+  if (jsonLd) {
+    try {
+      const data = JSON.parse(jsonLd);
+      const items = data.breadcrumb?.itemListElement;
+      expect(Array.isArray(items) && items.length === 3, `${route}: BreadcrumbList must contain three visible levels`);
+      if (Array.isArray(items) && items.length === 3) {
+        const expectedUrls = [
+          "https://pixelstand.pet" + (route.startsWith("/zh-CN/") ? "/zh-CN/" : "/"),
+          "https://pixelstand.pet" + (route.startsWith("/zh-CN/") ? "/zh-CN/parts/" : "/parts/"),
+          "https://pixelstand.pet" + route
+        ];
+        expect(items.every((item, index) => item.position === index + 1 && item.item === expectedUrls[index]), `${route}: BreadcrumbList does not match visible targets`);
+      }
+    } catch (error) {
+      failures.push(`${route}: invalid detail JSON-LD (${error.message})`);
+    }
+  } else {
+    failures.push(`${route}: missing detail JSON-LD for BreadcrumbList`);
+  }
+
+  const profile = html.match(/<section[^>]*data-editorial-profile="([^"]+)"[\s\S]*?<\/section>/)?.[0];
+  const expectedProfile = Boolean(petId && pilotProfileIds.has(petId));
+  expect(Boolean(profile) === expectedProfile, `${route}: Part 3 editorial profile coverage is inconsistent`);
+  if (profile && petId) {
+    expect(profile.includes(`data-editorial-profile="${petId}"`), `${route}: editorial profile ID does not match route`);
+    for (const section of ["about", "animationQa", "packageCompatibility"]) {
+      const body = profile.match(new RegExp(`<article[^>]*data-profile-section="${section}"[\\s\\S]*?<p[^>]*>([\\s\\S]*?)<\\/p>`))?.[1];
+      expect(Boolean(body), `${route}: missing editorial ${section} content`);
+      if (body) {
+        const normalized = body.replace(/\s+/g, " ").trim();
+        const key = `${section}:${normalized}`;
+        expect(!profileBodies.has(key), `${route}: duplicate editorial ${section} content with ${profileBodies.get(key)}`);
+        profileBodies.set(key, route);
+      }
+    }
+  }
 }
 
 if (failures.length > 0) {

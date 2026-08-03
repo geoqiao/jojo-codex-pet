@@ -1,5 +1,6 @@
 ---
 import { parts, pets, type Locale, type Pet } from "@jojo-codex-pet/catalog";
+import { petProfiles } from "../content/petProfiles";
 import { localize, route, ui } from "../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor, packageUrlFor } from "../lib/install-links";
 import InstallActionTracking from "./InstallActionTracking.astro";
@@ -21,6 +22,7 @@ const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   const match = pets.find((item) => item.id === id);
   return match ? [match] : [];
 });
+const profile = petProfiles[pet.id];
 const packageUrl = pet.packagePath ? packageUrlFor(pet.packagePath) : undefined;
 const openInCodexUrl = pet.packagePath ? openInCodexUrlFor({ nameEn: pet.name.en, packagePath: pet.packagePath }) : undefined;
 const commands = packageUrl ? installCommandsFor(pet.id) : undefined;
@@ -88,6 +90,16 @@ const content = locale === "en" ? {
     <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
     <p class="pet-overview">{content.overview}</p>
     <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
+    {profile && (
+      <section class="editorial-profile" data-editorial-profile={pet.id} aria-label={locale === "en" ? "Pet profile" : "宠物资料"}>
+        {Object.entries(profile).map(([sectionKey, section]) => (
+          <article data-profile-section={sectionKey}>
+            <h2>{section.title[locale]}</h2>
+            <p>{section.body[locale]}</p>
+          </article>
+        ))}
+      </section>
+    )}
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
       <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
@@ -272,6 +284,33 @@ const content = locale === "en" ? {
     border: 2px solid var(--ink);
     background: var(--acid);
     font-weight: 720;
+  }
+
+  .editorial-profile {
+    display: grid;
+    gap: 16px;
+    margin: 30px 0;
+  }
+
+  .editorial-profile article {
+    padding: 18px 20px;
+    border-left: 5px solid var(--violet);
+    background: var(--paper);
+  }
+
+  .editorial-profile h2 {
+    margin: 0 0 8px;
+    font-size: 1.05rem;
+    letter-spacing: 0;
+  }
+
+  .editorial-profile p {
+    max-width: 66ch;
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 560;
+    line-height: 1.65;
   }
 
   dl { margin: 0; }
