@@ -5,6 +5,8 @@ dist/
 node_modules/
 .pnpm-store/
 *.local
+.jojo-codex-pet-views.json
+.jojo-codex-pet-views.lock
 apps/web/public/api/views.php
 apps/web/public/api/catalog-ids.json
 apps/web/public/packages/
