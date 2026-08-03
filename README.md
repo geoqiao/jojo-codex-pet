@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand has an independent pet identity in the public Part-by-Part gallery; completed V2 packages are installed one pet at a time.
 
-> Public release status: all 36 headline pets are visible across Parts 1–9. The 23 pets with complete QA-passed Codex Pet V2 packages are released and independently installable. The remaining 13 headline pets stay visible as planned entries until their real packages pass the same quality gate.
+> Public release status: all 36 headline pets are visible across Parts 1–9. The 24 pets with complete QA-passed Codex Pet V2 packages are released and independently installable. The remaining 12 headline pets stay visible as planned entries until their real packages pass the same quality gate.
 
 ## Headline scope
 
@@ -14,7 +14,7 @@ An unofficial, non-commercial, advertisement-free collection of JoJo-themed anim
 - Ability modes remain animation cues rather than separate pets
 - Part 9's principal-antagonist slot stays unassigned while the story is ongoing
 
-The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md), [Wave 1 progress](docs/wave-1-status.md), the [Wave 1 Parts 1–2 animation review](docs/visual/wave-1-animation-review/README.md), [Wave 2 progress](docs/wave-2-status.md), and the [complete 15-pet Wave 2 animation review](docs/visual/wave-2-animation-review/README.md).
+The approved launch roster contains 36 pets across three quality-gated waves. See [the complete roster](docs/headline-roster.md), [Wave 1 progress](docs/wave-1-status.md), the [Wave 1 Parts 1–2 animation review](docs/visual/wave-1-animation-review/README.md), [Wave 2 progress](docs/wave-2-status.md), the [complete 15-pet Wave 2 animation review](docs/visual/wave-2-animation-review/README.md), and the [Tusk ACT3 release review](docs/visual/wave-3-tusk-act-3-review/README.md).
 
 ## Gallery
 
@@ -32,7 +32,7 @@ The site publishes aggregate pet-page view totals. It does not collect install e
 
 ## Install a released pet
 
-Every method installs only the selected pet. Choose any of the 23 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
+Every method installs only the selected pet. Choose any of the 24 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
 
 ```bash
 curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo

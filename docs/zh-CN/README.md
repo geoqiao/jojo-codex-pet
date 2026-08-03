@@ -4,7 +4,7 @@
 
 这是一个非官方、非商业、无广告的 JoJo 主题 Codex 动态宠物合集。每个具名角色与替身都在按篇章公开的目录中拥有独立宠物身份；完成的 V2 安装包始终一次只安装一只。
 
-> 当前公开发布状态：第 1–9 部的 36 只首发宠物已全部展示。其中 23 只拥有完整且通过 QA 的 Codex Pet V2 安装包，现已全部发布并可独立安装；其余 13 只继续以“计划中”公开展示，等真实安装包通过同一质量门后再开放安装。
+> 当前公开发布状态：第 1–9 部的 36 只首发宠物已全部展示。其中 24 只拥有完整且通过 QA 的 Codex Pet V2 安装包，现已全部发布并可独立安装；其余 12 只继续以“计划中”公开展示，等真实安装包通过同一质量门后再开放安装。
 
 ## 首发范围
 
@@ -14,7 +14,7 @@
 - 能力模式作为动画表现，不单独成为宠物
 - 第 9 部连载期间不指定篇章主反派
 
-首发名单共 36 只，分三波通过质量门发布。详见[完整名单](../headline-roster.md)、[第一波进度](../wave-1-status.md)、[第一波第 1–2 部动画审核](../visual/wave-1-animation-review/README.md)、[第二波进度](../wave-2-status.md)与[完整 15 只第二波动画审核](../visual/wave-2-animation-review/README.md)。
+首发名单共 36 只，分三波通过质量门发布。详见[完整名单](../headline-roster.md)、[第一波进度](../wave-1-status.md)、[第一波第 1–2 部动画审核](../visual/wave-1-animation-review/README.md)、[第二波进度](../wave-2-status.md)、[完整 15 只第二波动画审核](../visual/wave-2-animation-review/README.md)与[Tusk ACT3 发布审核](../visual/wave-3-tusk-act-3-review/README.md)。
 
 ## 网站
 
@@ -24,7 +24,7 @@
 
 ## 安装已发布宠物
 
-每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.pet/zh-CN/install/)选择 23 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
+每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.pet/zh-CN/install/)选择 24 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
 
 ```bash
 curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo

@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
 const publicDirectory = fileURLToPath(new URL("../public/", import.meta.url));
-const assetDirectories = ["pilot-bases", "wave-1-bases", "wave-2-bases"];
+const assetDirectories = ["pilot-bases", "wave-1-bases", "wave-2-bases", "wave-3-bases"];
 
 const sources = (await Promise.all(assetDirectories.map(async (directory) => {
   const absoluteDirectory = join(publicDirectory, directory);

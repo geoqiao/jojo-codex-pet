@@ -93,7 +93,7 @@ for (const route of ["/", "/zh-CN/"]) {
 
   const released = [...roster.entries()].filter(([, item]) => item.status === "released");
   expect(roster.size === 36, `${route}: expected 36 unique cards, found ${roster.size}`);
-  expect(released.length === 23, `${route}: expected 23 released cards, found ${released.length}`);
+  expect(released.length === 24, `${route}: expected 24 released cards, found ${released.length}`);
   for (const [id, item] of released) {
     const src = extract(item.card, /<img src="([^"]+)"/);
     expect(Boolean(src), `${route}: released pet ${id} has no image`);
