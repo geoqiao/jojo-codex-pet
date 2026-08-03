@@ -1,6 +1,8 @@
 ---
 import { parts, pets, type Locale, type Pet } from "@jojo-codex-pet/catalog";
 import { localize, route, ui } from "../lib/i18n";
+import { installCommandsFor, openInCodexUrlFor, packageUrlFor } from "../lib/install-links";
+import InstallActionTracking from "./InstallActionTracking.astro";
 
 interface Props { locale: Locale; pet: Pet }
 const { locale, pet } = Astro.props;
@@ -19,18 +21,13 @@ const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   const match = pets.find((item) => item.id === id);
   return match ? [match] : [];
 });
-const siteOrigin = "https://pixelstand.pet";
-const packageUrl = pet.packagePath ? `${siteOrigin}${pet.packagePath}` : undefined;
-const openInCodexUrl = packageUrl ? `codex://pets/install?${new URLSearchParams({
-  name: pet.name.en,
-  imageUrl: `${packageUrl}/spritesheet.webp`,
-  description: `Unofficial JoJo-themed Codex pet: ${pet.name.en}`,
-  spriteVersionNumber: "2"
-}).toString()}` : undefined;
-const installCommands = packageUrl ? [
-  { label: "Bash · macOS / Linux", command: `curl -fsSL ${siteOrigin}/install.sh | bash -s -- ${pet.id}` },
-  { label: "PowerShell · Windows", command: `& ([scriptblock]::Create((irm ${siteOrigin}/install.ps1))) ${pet.id}` },
-  { label: "npx · cross-platform", command: `npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet ${pet.id}` }
+const packageUrl = pet.packagePath ? packageUrlFor(pet.packagePath) : undefined;
+const openInCodexUrl = pet.packagePath ? openInCodexUrlFor({ nameEn: pet.name.en, packagePath: pet.packagePath }) : undefined;
+const commands = packageUrl ? installCommandsFor(pet.id) : undefined;
+const installCommands = commands ? [
+  { method: "bash", label: "Bash · macOS / Linux", command: commands.bash },
+  { method: "powershell", label: "PowerShell · Windows", command: commands.powershell },
+  { method: "npx", label: "npx · cross-platform", command: commands.npx }
 ] : [];
 const content = locale === "en" ? {
   identity: "Catalog identity",
@@ -39,6 +36,7 @@ const content = locale === "en" ? {
   palette: "Locked signature palette",
   source: "Source",
   install: "Install this pet",
+  installAnchor: "Install this pet ↓",
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
   reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
   ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
@@ -58,6 +56,7 @@ const content = locale === "en" ? {
   palette: "锁定标志配色",
   source: "来源",
   install: "安装这只宠物",
+  installAnchor: "安装这只宠物 ↓",
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
   reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
   ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
@@ -81,6 +80,7 @@ const content = locale === "en" ? {
       <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
     )}
     <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
+    {pet.status === "released" && packageUrl && <a class="button install-anchor" href="#install-this-pet">{content.installAnchor}</a>}
   </div>
   <div class="detail-copy">
     <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
@@ -101,21 +101,40 @@ const content = locale === "en" ? {
       {pet.palette && <div><dt>{content.palette}</dt><dd class="detail-palette">{pet.palette.map((color) => <span style={`--swatch:${color}`}><i>{color}</i></span>)}</dd></div>}
       <div><dt>{content.source}</dt><dd><a href={pet.source}>geoqiao/jojo-codex-pet ↗</a></dd></div>
     </dl>
-    <section class="install-box">
+    <section class="install-box" id="install-this-pet">
       <h2>{content.install}</h2>
       {pet.status === "released" && packageUrl && openInCodexUrl ? (
         <>
           <p>{content.ready}</p>
           <div class="install-primary">
-            <a class="button" href={openInCodexUrl}>{content.openInCodex} ↗</a>
+            <a
+              class="button"
+              href={openInCodexUrl}
+              data-install-deeplink
+              data-action-pet-id={pet.id}
+              data-action-method="codex"
+              data-action-locale={locale}
+            >
+              {content.openInCodex} ↗
+            </a>
             <a class="package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
           </div>
           <div class="command-list">
-            {installCommands.map(({ label, command }) => (
+            {installCommands.map(({ method, label, command }) => (
               <div class="command-row">
                 <span>{label}</span>
                 <code>{command}</code>
-                <button type="button" data-copy-command={command} data-copy-label={content.copy} data-copied-label={content.copied}>{content.copy}</button>
+                <button
+                  type="button"
+                  data-copy-command={command}
+                  data-copy-label={content.copy}
+                  data-copied-label={content.copied}
+                  data-action-pet-id={pet.id}
+                  data-action-method={method}
+                  data-action-locale={locale}
+                >
+                  {content.copy}
+                </button>
               </div>
             ))}
           </div>
@@ -126,6 +145,7 @@ const content = locale === "en" ? {
     </section>
   </div>
 </div>
+<InstallActionTracking />
 
 <style>
   .detail-grid {
@@ -180,6 +200,14 @@ const content = locale === "en" ? {
     font-size: 0.68rem;
     font-weight: 850;
     letter-spacing: 0.13em;
+  }
+
+  .detail-art > .install-anchor {
+    position: absolute;
+    z-index: 3;
+    right: 24px;
+    bottom: 24px;
+    background: var(--acid);
   }
 
   .planned-sigil {
@@ -289,6 +317,7 @@ const content = locale === "en" ? {
 
   .install-box {
     margin-top: 32px;
+    scroll-margin-top: 130px;
     padding: 22px;
     color: var(--paper-bright);
     background: var(--ink);
@@ -351,7 +380,8 @@ const content = locale === "en" ? {
   }
 
   .command-row button {
-    min-height: 34px;
+    min-width: 44px;
+    min-height: 44px;
     padding: 6px 10px;
     border: 1px solid var(--paper-bright);
     color: var(--paper-bright);
@@ -359,6 +389,16 @@ const content = locale === "en" ? {
     font-size: 0.62rem;
     font-weight: 850;
     cursor: pointer;
+  }
+
+  .install-anchor:focus-visible,
+  .install-primary a:focus-visible,
+  .command-row button:focus-visible,
+  dd a:focus-visible {
+    outline: 3px solid var(--paper-bright);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--ink);
+    transition: none;
   }
 
   @media (max-width: 900px) {
@@ -375,15 +415,3 @@ const content = locale === "en" ? {
     .command-row code { grid-column: 1 / -1; grid-row: 2; }
   }
 </style>
-
-<script>
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-command]")) {
-    button.addEventListener("click", async () => {
-      const command = button.dataset.copyCommand;
-      if (!command) return;
-      await navigator.clipboard.writeText(command);
-      button.textContent = button.dataset.copiedLabel ?? "Copied";
-      window.setTimeout(() => { button.textContent = button.dataset.copyLabel ?? "Copy"; }, 1400);
-    });
-  }
-</script>

@@ -3,6 +3,7 @@ import { pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PetCard from "../PetCard.astro";
 import ViewCounts from "../ViewCounts.astro";
+import { route } from "../../lib/i18n";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
@@ -22,6 +23,7 @@ const content = locale === "en" ? {
   overline: "Unofficial · non-commercial · ad-free",
   hero: "A BIZARRE LITTLE COMPANION.",
   intro: "Named JoJo characters and Stands, rebuilt as independent Codex pet v2 companions. The catalog is public from day one; artwork ships only after it survives the quality gate.",
+  installCta: "Install a released pet",
   locked: "Roster locked",
   parts: "Parts",
   contract: "V2 only",
@@ -37,6 +39,7 @@ const content = locale === "en" ? {
   overline: "非官方 · 非商业 · 无广告",
   hero: "一只奇妙的小伙伴。",
   intro: "把具名 JoJo 角色与替身分别做成独立的 Codex Pet V2。目录从第一天起公开，宠物素材通过质量门后才正式发布。",
+  installCta: "安装一只已发布宠物",
   locked: "名单已锁定",
   parts: "篇章",
   contract: "仅 V2",
@@ -56,6 +59,7 @@ const content = locale === "en" ? {
         <p class="eyebrow">{content.overline}</p>
         <h1 class="display">{content.hero}</h1>
         <p class="hero-intro">{content.intro}</p>
+        <a class="button hero-cta" href={route(locale, "/install/")} data-home-install-cta>{content.installCta} ↗</a>
       </div>
       <div class="hero-metrics" aria-label="Project metrics">
         <div><strong>36</strong><span>{content.locked}</span></div>
@@ -162,6 +166,17 @@ const content = locale === "en" ? {
     font-size: clamp(1rem, 1.7vw, 1.35rem);
     font-weight: 600;
     line-height: 1.55;
+  }
+
+  .hero-cta {
+    margin-top: 28px;
+    background: var(--acid);
+    box-shadow: 5px 5px 0 var(--paper-bright);
+  }
+
+  .hero-cta:hover {
+    background: var(--cyan);
+    box-shadow: 2px 2px 0 var(--paper-bright);
   }
 
   .hero-metrics {

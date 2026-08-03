@@ -28,7 +28,7 @@ Primary sections:
 - Install
 - Contribute
 
-The site publishes aggregate pet-page view totals. It does not collect install events, create visitor identifiers, estimate unique users, run advertising analytics, or render ad units. It includes the owner's Google AdSense account-verification metadata only.
+The site publishes aggregate pet-page view totals and records anonymous daily aggregates for successful command copies and `Open in Codex` clicks. These actions are directional install intent—not proof of a completed installation or a unique user. The first-party counters create no visitor identifiers and retain no cookies, IP addresses, User-Agent values, referrers, or query strings. The site sends no installer-completion events, runs no advertising analytics, and renders no ad units. It includes the owner's Google AdSense account-verification metadata only.
 
 ## Install a released pet
 

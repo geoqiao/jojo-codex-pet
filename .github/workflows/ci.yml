@@ -33,11 +33,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate catalog and pet packages
+      - name: Validate catalog, action client, and pet packages
         run: pnpm check
+
+      - name: Test aggregate action endpoint
+        run: pnpm counter:test
 
       - name: Build production site
         run: pnpm build
+
+      - name: Validate built site output
+        run: pnpm site:validate
 
       - name: Verify npm installer package
         run: npm pack --dry-run --cache "$RUNNER_TEMP/npm-cache"

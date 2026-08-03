@@ -2,85 +2,180 @@
 import { pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { localize } from "../../lib/i18n";
+import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
+import InstallActionTracking from "../InstallActionTracking.astro";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packagePath);
 const releasedPet = releasedPets[0]!;
-const siteOrigin = "https://pixelstand.pet";
 const localePrefix = locale === "zh-CN" ? "/zh-CN" : "";
-const packageUrl = `${siteOrigin}${releasedPet.packagePath}`;
 const petName = localize(releasedPet.name, locale);
-const openInCodexUrl = `codex://pets/install?${new URLSearchParams({
-  name: releasedPet.name.en,
-  imageUrl: `${packageUrl}/spritesheet.webp`,
-  description: `Unofficial JoJo-themed Codex pet: ${releasedPet.name.en}`,
-  spriteVersionNumber: "2"
-}).toString()}`;
-
-const commands = {
-  bash: `curl -fsSL ${siteOrigin}/install.sh | bash -s -- ${releasedPet.id}`,
-  powershell: `& ([scriptblock]::Create((irm ${siteOrigin}/install.ps1))) ${releasedPet.id}`,
-  npx: `npx --yes --package=github:geoqiao/jojo-codex-pet jojo-codex-pet ${releasedPet.id}`
-};
+const openInCodexUrl = openInCodexUrlFor({ nameEn: releasedPet.name.en, packagePath: releasedPet.packagePath! });
+const commands = installCommandsFor(releasedPet.id);
 
 const content = locale === "en" ? {
   title: "Install — JoJo Codex Pet",
   description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
   eyebrow: "One pet per primary action",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
-  intro: "Choose any released pet below. Every route installs only the selected Part-scoped pet and never silently adds a Stand Pair or an entire Part.",
-  released: "Featured released pet",
-  gate: `${petName} is the featured install example.`,
-  gateBody: "Its 8 × 11 atlas passed deterministic checks, three blind direction reviews, and independent final visual QA.",
-  availableTitle: `${releasedPets.length} validated pets are live`,
-  availableNote: "Open any pet to use its Codex deep link or copy its Bash, PowerShell, or npx command.",
+  intro: "Choose any released pet. Every route installs only the selected Part-scoped pet and never silently adds a Stand Pair or an entire Part.",
+  jump: "Choose a pet and install",
+  pickerEyebrow: `${releasedPets.length} validated pets are live`,
+  pickerTitle: "Choose your companion.",
+  pickerBody: "The selection below controls Open in Codex and all three command installers.",
+  pickerLabel: "Released pet",
+  selected: "Current selection",
+  actionPrivacy: "We count anonymous aggregate command-copy and Open in Codex actions. These totals show install intent—not completed installations or identifiable visitors.",
+  availableTitle: "Browse every released pet",
+  availableNote: "Each detail page includes the same pet-specific Codex deep link and verified command installers.",
   character: "Character",
   stand: "Stand",
   open: "Open in Codex",
   copy: "Copy",
   copied: "Copied",
   methods: [
-    ["Open in Codex", "Uses the official Codex pet-install deep link and the hosted v2 spritesheet."],
-    ["Bash", "macOS and Linux installer with SHA-256 and manifest validation."],
-    ["PowerShell", "Windows installer with the same package integrity checks."],
-    ["npx", "Cross-platform Node installer using the stable Part-scoped pet ID."]
+    { method: "codex", name: "Open in Codex", detail: "Uses the official Codex pet-install deep link and the selected hosted v2 spritesheet." },
+    { method: "bash", name: "Bash", detail: "macOS and Linux installer with SHA-256 and manifest validation." },
+    { method: "powershell", name: "PowerShell", detail: "Windows installer with the same package integrity checks." },
+    { method: "npx", name: "npx", detail: "Cross-platform Node installer using the selected Part-scoped pet ID." }
+  ],
+  faqEyebrow: "Before you install",
+  faqTitle: "Install FAQ",
+  faqs: [
+    ["Which method should I use?", "Use Open in Codex when your browser can hand the deep link to Codex. Bash is for macOS or Linux, PowerShell is for Windows, and npx works anywhere a current Node.js runtime is available."],
+    ["Where do command installers put the pet?", "They write the selected runtime package to $CODEX_HOME/pets/<pet-id>. Without CODEX_HOME, the default is ~/.codex/pets/<pet-id>."],
+    ["How does Codex discover it?", "After a command finishes, open Codex Settings → Pets, choose Refresh, then select the installed pet."],
+    ["What gets verified?", "Bash, PowerShell, and npx download the checksum list, pet.json, and spritesheet, then verify SHA-256 plus the manifest ID and V2 contract before replacing runtime files."],
+    ["What happens if I install the same pet again?", "A command installer refreshes the files under the same stable pet ID after validation. It does not create a duplicate or add another pet."]
   ]
 } : {
   title: "安装 — JoJo Codex Pet",
   description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
   eyebrow: "主操作一次只安装一只",
   heading: "只安装你选中的宠物。",
-  intro: "从下方选择任意已发布宠物。每条安装路径只安装当前篇章稳定 ID 对应的宠物，不会暗中附带替身配对或整部合集。",
-  released: "推荐安装示例",
-  gate: `${petName}是当前安装示例。`,
-  gateBody: "其 8 × 11 图集已通过确定性检查、三次方向盲测和独立最终视觉 QA。",
-  availableTitle: `${releasedPets.length} 只已验证宠物现已开放`,
-  availableNote: "打开任意宠物详情页，即可使用 Codex 深链，或复制 Bash、PowerShell、npx 安装命令。",
+  intro: "选择任意已发布宠物。每条安装路径只安装当前篇章稳定 ID 对应的宠物，不会暗中附带替身配对或整部合集。",
+  jump: "选择宠物并安装",
+  pickerEyebrow: `${releasedPets.length} 只已验证宠物现已开放`,
+  pickerTitle: "选择你的小伙伴。",
+  pickerBody: "下方选择会同时控制 Codex 深链与三种命令行安装方式。",
+  pickerLabel: "已发布宠物",
+  selected: "当前选择",
+  actionPrivacy: "站点只匿名汇总成功复制命令与点击“在 Codex 中打开”的次数。这些数据表示安装意图，不代表安装完成，也不识别访客。",
+  availableTitle: "浏览全部已发布宠物",
+  availableNote: "每个详情页都提供对应宠物的 Codex 深链与经过校验的命令行安装方式。",
   character: "角色",
   stand: "替身",
   open: "在 Codex 中打开",
   copy: "复制",
   copied: "已复制",
   methods: [
-    ["在 Codex 中打开", "使用 Codex 官方宠物安装深链与托管的 V2 图集。"],
-    ["Bash", "面向 macOS 与 Linux，校验 SHA-256 和宠物清单。"],
-    ["PowerShell", "面向 Windows，执行相同的宠物包完整性校验。"],
-    ["npx", "使用篇章稳定宠物 ID 的跨平台 Node 安装器。"]
+    { method: "codex", name: "在 Codex 中打开", detail: "使用 Codex 官方宠物安装深链与当前选择的托管 V2 图集。" },
+    { method: "bash", name: "Bash", detail: "面向 macOS 与 Linux，校验 SHA-256 和宠物清单。" },
+    { method: "powershell", name: "PowerShell", detail: "面向 Windows，执行相同的宠物包完整性校验。" },
+    { method: "npx", name: "npx", detail: "使用当前篇章稳定宠物 ID 的跨平台 Node 安装器。" }
+  ],
+  faqEyebrow: "安装前须知",
+  faqTitle: "安装常见问题",
+  faqs: [
+    ["应该选择哪种方式？", "浏览器能把官方深链交给 Codex 时，可使用“在 Codex 中打开”。macOS 或 Linux 使用 Bash，Windows 使用 PowerShell；安装了新版 Node.js 的平台也可使用 npx。"],
+    ["命令行安装器会把宠物放在哪里？", "宠物会写入 $CODEX_HOME/pets/<pet-id>。未设置 CODEX_HOME 时，默认位置是 ~/.codex/pets/<pet-id>。"],
+    ["怎样让 Codex 发现新宠物？", "命令执行完成后，打开 Codex Settings → Pets，点击 Refresh，再选择刚安装的宠物。"],
+    ["安装器会校验什么？", "Bash、PowerShell 与 npx 会下载校验清单、pet.json 和 spritesheet，并在替换运行文件前校验 SHA-256、清单 ID 与 V2 合同。"],
+    ["重复安装同一只宠物会怎样？", "命令行安装器通过校验后，会更新同一稳定宠物 ID 下的文件；不会创建重复宠物，也不会附带安装其他宠物。"]
   ]
 };
 ---
 
 <BaseLayout locale={locale} title={content.title} description={content.description} path="/install/">
   <div class="shell">
-    <header class="page-intro">
+    <header class="page-intro install-intro">
       <div><p class="eyebrow">{content.eyebrow}</p><h1 class="display">{content.heading}</h1></div>
-      <p>{content.intro}</p>
+      <div class="intro-copy"><p>{content.intro}</p><a href="#choose-pet">{content.jump} ↓</a></div>
     </header>
-    <section class="gate-card">
-      <span aria-hidden="true">01</span>
-      <div><p class="eyebrow">{content.released}</p><h2>{content.gate}</h2><p>{content.gateBody}</p></div>
+
+    <section class="install-workbench" id="choose-pet" aria-labelledby="pet-picker-title">
+      <header class="picker-card">
+        <div>
+          <p class="eyebrow">{content.pickerEyebrow}</p>
+          <h2 id="pet-picker-title">{content.pickerTitle}</h2>
+          <p>{content.pickerBody}</p>
+        </div>
+        <div class="picker-control">
+          <label for="released-pet-select">{content.pickerLabel}</label>
+          <select id="released-pet-select" data-pet-selector>
+            {releasedPets.map((pet) => (
+              <option
+                value={pet.id}
+                data-pet-name-en={pet.name.en}
+                data-pet-name-localized={localize(pet.name, locale)}
+                data-package-path={pet.packagePath}
+              >
+                {localize(pet.name, locale)} · Part {pet.part}
+              </option>
+            ))}
+          </select>
+          <p class="selected-pet" aria-live="polite">
+            <span>{content.selected}</span>
+            <strong data-selected-pet-name>{petName}</strong>
+            <code data-selected-pet-id>{releasedPet.id}</code>
+          </p>
+          <p class="codex-method-label"><span>01</span> {content.methods[0].name}</p>
+          <a
+            class="button codex-action"
+            href={openInCodexUrl}
+            data-install-deeplink
+            data-action-pet-id={releasedPet.id}
+            data-action-method="codex"
+            data-action-locale={locale}
+          >
+            {content.open} ↗
+          </a>
+        </div>
+      </header>
+
+      <div class="method-grid" id="install-methods">
+        {content.methods.filter(({ method }) => method !== "codex").map(({ method, name, detail }, index) => {
+          const command = method === "bash" ? commands.bash : method === "powershell" ? commands.powershell : commands.npx;
+          return (
+            <article>
+              <span>0{index + 2}</span>
+              <h2>{name}</h2>
+              <p>{detail}</p>
+              <div class="install-command">
+                <code data-command-output={method}>{command}</code>
+                <button
+                  class="button"
+                  type="button"
+                  data-copy-command={command}
+                  data-copy-label={content.copy}
+                  data-copied-label={content.copied}
+                  data-action-pet-id={releasedPet.id}
+                  data-action-method={method}
+                  data-action-locale={locale}
+                >
+                  {content.copy}
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <p class="action-privacy">{content.actionPrivacy}</p>
     </section>
+
+    <section class="faq-section" aria-labelledby="install-faq-title">
+      <header><p class="eyebrow">{content.faqEyebrow}</p><h2 id="install-faq-title">{content.faqTitle}</h2></header>
+      <div class="faq-list">
+        {content.faqs.map(([question, answer], index) => (
+          <details open={index === 0}>
+            <summary>{question}</summary>
+            <p>{answer}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
     <section class="released-section" aria-labelledby="released-pets-title">
       <header>
         <h2 id="released-pets-title">{content.availableTitle}</h2>
@@ -96,79 +191,253 @@ const content = locale === "en" ? {
         ))}
       </div>
     </section>
-    <div class="method-grid">
-      {content.methods.map(([name, detail], index) => {
-        const command = index === 1 ? commands.bash : index === 2 ? commands.powershell : index === 3 ? commands.npx : undefined;
-        return (
-          <article>
-            <span>0{index + 1}</span>
-            <h2>{name}</h2>
-            <p>{detail}</p>
-            {index === 0 ? (
-              <a class="button" href={openInCodexUrl}>{content.open} ↗</a>
-            ) : (
-              <div class="install-command">
-                <code>{command}</code>
-                <button class="button" type="button" data-copy-command={command} data-copy-label={content.copy} data-copied-label={content.copied}>{content.copy}</button>
-              </div>
-            )}
-          </article>
-        );
-      })}
-    </div>
   </div>
+  <InstallActionTracking />
 </BaseLayout>
 
 <script>
-  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy-command]")) {
-    button.addEventListener("click", async () => {
-      const command = button.dataset.copyCommand;
-      if (!command) return;
-      await navigator.clipboard.writeText(command);
-      button.textContent = button.dataset.copiedLabel ?? "Copied";
-      window.setTimeout(() => { button.textContent = button.dataset.copyLabel ?? "Copy"; }, 1400);
-    });
-  }
+  import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
+
+  const selector = document.querySelector<HTMLSelectElement>("[data-pet-selector]");
+
+  const updateSelection = () => {
+    const option = selector?.selectedOptions[0];
+    const petId = option?.value;
+    const petNameEn = option?.dataset.petNameEn;
+    const petNameLocalized = option?.dataset.petNameLocalized;
+    const packagePath = option?.dataset.packagePath;
+    if (!petId || !petNameEn || !petNameLocalized || !packagePath) return;
+
+    const openUrl = openInCodexUrlFor({ nameEn: petNameEn, packagePath });
+    const commands = installCommandsFor(petId);
+
+    const selectedName = document.querySelector<HTMLElement>("[data-selected-pet-name]");
+    const selectedId = document.querySelector<HTMLElement>("[data-selected-pet-id]");
+    if (selectedName) selectedName.textContent = petNameLocalized;
+    if (selectedId) selectedId.textContent = petId;
+
+    const deepLink = document.querySelector<HTMLAnchorElement>("[data-install-deeplink]");
+    if (deepLink) {
+      deepLink.href = openUrl;
+      deepLink.dataset.actionPetId = petId;
+    }
+
+    for (const method of ["bash", "powershell", "npx"] as const) {
+      const output = document.querySelector<HTMLElement>(`[data-command-output="${method}"]`);
+      const button = document.querySelector<HTMLButtonElement>(`[data-action-method="${method}"]`);
+      if (output) output.textContent = commands[method];
+      if (button) {
+        button.dataset.copyCommand = commands[method];
+        button.dataset.actionPetId = petId;
+      }
+    }
+  };
+
+  selector?.addEventListener("change", updateSelection);
+  updateSelection();
 </script>
 
 <style>
-  .gate-card {
+  .install-intro .intro-copy {
     display: grid;
-    grid-template-columns: minmax(180px, 0.35fr) 1fr;
-    overflow: hidden;
+    gap: 18px;
+  }
+
+  .install-intro .intro-copy a {
+    width: fit-content;
+    font-size: 0.72rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-underline-offset: 5px;
+  }
+
+  .install-workbench {
+    scroll-margin-top: 130px;
+  }
+
+  .picker-card {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.7fr);
+    gap: clamp(24px, 5vw, 72px);
+    align-items: center;
+    padding: clamp(24px, 4vw, 52px);
+    color: var(--paper-bright);
+    background: var(--violet);
     border: 3px solid var(--ink);
-    background: var(--acid);
     box-shadow: var(--shadow);
   }
 
-  .gate-card > span {
-    display: grid;
-    min-height: 280px;
-    place-items: center;
-    color: var(--paper-bright);
-    background: var(--violet);
-    border-right: 3px solid var(--ink);
-    font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: 8rem;
-    font-weight: 900;
-  }
-
-  .gate-card > div { padding: clamp(28px, 5vw, 60px); }
-
-  .gate-card h2 {
-    max-width: 18ch;
+  .picker-card h2,
+  .faq-section h2,
+  .released-section h2 {
     margin: 0;
     font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: clamp(2.6rem, 6vw, 5.8rem);
-    letter-spacing: -0.06em;
+    font-size: clamp(2.6rem, 5vw, 5.2rem);
+    letter-spacing: -0.055em;
     line-height: 0.9;
   }
 
-  .gate-card p:last-child { max-width: 65ch; line-height: 1.6; }
-
-  .released-section {
-    margin-top: 64px;
+  .picker-card > div:first-child > p:last-child {
+    max-width: 58ch;
+    margin-bottom: 0;
+    line-height: 1.6;
   }
+
+  .picker-control {
+    display: grid;
+    gap: 10px;
+    padding: 20px;
+    color: var(--ink);
+    background: var(--acid);
+    border: 3px solid var(--ink);
+  }
+
+  .picker-control label,
+  .selected-pet span {
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .picker-control select {
+    width: 100%;
+    min-height: 50px;
+    padding: 10px 42px 10px 12px;
+    color: var(--ink);
+    background: var(--paper-bright);
+    border: 2px solid var(--ink);
+    font-weight: 750;
+    cursor: pointer;
+  }
+
+  .selected-pet {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 5px 14px;
+    margin: 6px 0 0;
+    padding-top: 12px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .selected-pet strong { text-align: right; }
+  .selected-pet code { grid-column: 1 / -1; overflow-wrap: anywhere; font-size: 0.68rem; }
+
+  .codex-method-label {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0 0;
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .codex-method-label span { color: var(--ink); }
+  .codex-action { width: 100%; background: var(--paper-bright); }
+
+  .method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    margin-top: 28px;
+  }
+
+  .method-grid article {
+    display: flex;
+    min-width: 0;
+    padding: 26px;
+    border: 3px solid var(--ink);
+    background: var(--paper-bright);
+    flex-direction: column;
+  }
+
+  .method-grid article > span { color: var(--ink); font-size: 0.72rem; font-weight: 850; }
+
+  .method-grid h2 {
+    min-height: 2em;
+    margin: 18px 0;
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 2.3rem;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  .method-grid p { min-height: 7em; color: var(--muted); line-height: 1.55; }
+
+  .install-command {
+    display: grid;
+    gap: 12px;
+    margin-top: auto;
+  }
+
+  .install-command code {
+    min-height: 92px;
+    padding: 12px;
+    overflow-wrap: anywhere;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    font-size: 0.68rem;
+    line-height: 1.5;
+  }
+
+  .method-grid .button { margin-top: auto; }
+
+  .install-intro .intro-copy a:focus-visible,
+  .picker-control select:focus-visible,
+  .codex-action:focus-visible,
+  .method-grid button:focus-visible,
+  .faq-list summary:focus-visible,
+  .released-grid a:focus-visible {
+    outline: 3px solid var(--paper-bright);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--ink);
+    transition: none;
+  }
+
+  .action-privacy {
+    max-width: 76ch;
+    margin: 18px 0 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+    font-weight: 650;
+    line-height: 1.6;
+  }
+
+  .faq-section {
+    display: grid;
+    grid-template-columns: minmax(230px, 0.5fr) minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 72px);
+    margin-top: 78px;
+    padding-top: 38px;
+    border-top: 3px solid var(--ink);
+  }
+
+  .faq-list {
+    border-top: 2px solid var(--ink);
+  }
+
+  .faq-list details {
+    padding: 18px 4px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .faq-list summary {
+    min-height: 44px;
+    font-weight: 820;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  .faq-list p {
+    max-width: 70ch;
+    margin: 10px 0 0;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .released-section { margin-top: 78px; }
 
   .released-section > header {
     display: grid;
@@ -176,14 +445,6 @@ const content = locale === "en" ? {
     gap: 32px;
     align-items: end;
     margin-bottom: 24px;
-  }
-
-  .released-section h2 {
-    margin: 0;
-    font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: clamp(2.6rem, 5vw, 5.2rem);
-    letter-spacing: -0.055em;
-    line-height: 0.9;
   }
 
   .released-section header p { margin: 0; color: var(--muted); line-height: 1.6; }
@@ -213,63 +474,34 @@ const content = locale === "en" ? {
   .released-grid small { font-size: 0.66rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
 
   .released-grid strong { align-self: center; font-family: "Bodoni Moda Variable", Georgia, serif; font-size: 1.65rem; line-height: 0.95; }
-
   .released-grid small { align-self: end; }
-
-  .method-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 22px;
-    margin-top: 44px;
-  }
-
-  .method-grid article {
-    display: flex;
-    min-width: 0;
-    padding: 26px;
-    border: 3px solid var(--ink);
-    background: var(--paper-bright);
-    flex-direction: column;
-  }
-
-  .method-grid article > span { color: var(--coral); font-size: 0.72rem; font-weight: 850; }
-
-  .method-grid h2 {
-    min-height: 2em;
-    margin: 18px 0;
-    font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: 2.3rem;
-    letter-spacing: -0.04em;
-    line-height: 0.95;
-  }
-
-  .method-grid p { min-height: 7em; color: var(--muted); line-height: 1.55; }
-
-  .install-command {
-    display: grid;
-    gap: 12px;
-    margin-top: auto;
-  }
-
-  .install-command code {
-    min-height: 92px;
-    padding: 12px;
-    overflow-wrap: anywhere;
-    border: 2px solid var(--ink);
-    background: var(--paper);
-    font-size: 0.68rem;
-    line-height: 1.5;
-  }
 
   @media (max-width: 1050px) {
     .released-grid { grid-template-columns: repeat(3, 1fr); }
     .method-grid { grid-template-columns: repeat(2, 1fr); }
   }
-  @media (max-width: 650px) {
+
+  @media (max-width: 700px) {
+    .install-intro {
+      gap: 16px;
+      padding: 34px 0 24px;
+    }
+
+    .install-intro h1 { font-size: 2.75rem; }
+    .install-intro .intro-copy { gap: 8px; }
+    .install-intro .intro-copy p { font-size: 0.88rem; line-height: 1.45; }
+    .picker-card { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+    .picker-card h2 { font-size: 2.15rem; }
+    .picker-card > div:first-child > p:last-child { margin-top: 10px; font-size: 0.86rem; line-height: 1.45; }
+    .picker-control { gap: 8px; padding: 12px; }
+    .selected-pet { padding-top: 9px; }
+    .codex-method-label { margin-top: 4px; }
+    .method-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+    .method-grid article { padding: 20px; }
+    .method-grid h2 { min-height: 0; margin: 12px 0; }
+    .method-grid p { min-height: 0; }
+    .faq-section { grid-template-columns: 1fr; gap: 22px; margin-top: 58px; }
     .released-section > header { grid-template-columns: 1fr; }
     .released-grid { grid-template-columns: 1fr; }
-    .gate-card { grid-template-columns: 1fr; }
-    .gate-card > span { min-height: 170px; border-right: 0; border-bottom: 3px solid var(--ink); }
-    .method-grid { grid-template-columns: 1fr; }
   }
 </style>

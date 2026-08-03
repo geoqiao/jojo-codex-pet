@@ -47,8 +47,14 @@ const content = locale === "en" ? {
               <h2>{localize(part.title, locale)}</h2>
               <p>{localize(part.subtitle, locale)}</p>
               <dl>
-                <div><dt>{content.protagonist}</dt><dd>{heroes.map((pet) => localize(pet.name, locale)).join(" · ")}</dd></div>
-                <div><dt>{content.antagonist}</dt><dd>{antagonists.length > 0 ? antagonists.map((pet) => localize(pet.name, locale)).join(" · ") : content.ongoing}</dd></div>
+                <div>
+                  <dt>{content.protagonist}</dt>
+                  <dd>{heroes.map((pet, index) => <><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>{index < heroes.length - 1 ? " · " : ""}</>)}</dd>
+                </div>
+                <div>
+                  <dt>{content.antagonist}</dt>
+                  <dd>{antagonists.length > 0 ? antagonists.map((pet, index) => <><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>{index < antagonists.length - 1 ? " · " : ""}</>) : content.ongoing}</dd>
+                </div>
               </dl>
               <a class="button" href={`${route(locale, "/")}?part=${part.number}#roster`}>{content.open} ↗</a>
             </div>
@@ -134,6 +140,21 @@ const content = locale === "en" ? {
     margin: 0;
     font-size: 0.86rem;
     font-weight: 650;
+  }
+
+  dd a {
+    font-weight: 760;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  dd a:hover { background: var(--acid); }
+
+  dd a:focus-visible {
+    outline: 3px solid var(--paper-bright);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px var(--ink);
+    transition: none;
   }
 
   @media (max-width: 720px) {

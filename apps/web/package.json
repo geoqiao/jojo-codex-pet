@@ -10,6 +10,7 @@
     "prebuild": "node scripts/generate-card-images.mjs",
     "build": "astro build",
     "check": "astro check",
+    "test": "tsx src/lib/install-actions.test.ts",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.6",
     "sharp": "0.35.3",
+    "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   }
 }

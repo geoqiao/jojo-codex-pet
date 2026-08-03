@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "stage": "node stage.mjs"
+    "stage": "node stage.mjs",
+    "test": "node test-actions.mjs"
   }
 }

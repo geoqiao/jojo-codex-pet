@@ -22,6 +22,20 @@ const expect = (condition, message) => {
   if (!condition) failures.push(message);
 };
 
+expect(htmlFiles.length === 82, `expected 82 HTML files, found ${htmlFiles.length}`);
+expect(existsSync(join(dist, "api/actions.php")), "missing staged action endpoint");
+expect(existsSync(join(dist, "api/views.php")), "missing staged page-view endpoint");
+
+const releasedIdsPath = join(dist, "api/released-pet-ids.json");
+expect(existsSync(releasedIdsPath), "missing released-pet action allowlist");
+let releasedIds = [];
+if (existsSync(releasedIdsPath)) {
+  const parsedReleasedIds = JSON.parse(readFileSync(releasedIdsPath, "utf8"));
+  expect(Array.isArray(parsedReleasedIds), "released-pet action allowlist must be an array");
+  if (Array.isArray(parsedReleasedIds)) releasedIds = parsedReleasedIds;
+  expect(releasedIds.length === 24, `expected 24 released action IDs, found ${releasedIds.length}`);
+}
+
 const extract = (html, pattern) => html.match(pattern)?.[1]?.trim();
 
 const routeFor = (file) => {
@@ -109,6 +123,10 @@ for (const route of ["/", "/zh-CN/"]) {
 for (const route of ["/", "/zh-CN/"]) {
   const file = route === "/" ? join(dist, "index.html") : join(dist, "zh-CN/index.html");
   const html = readFileSync(file, "utf8");
+  const expectedCta = route === "/" ? "/install/" : "/zh-CN/install/";
+  const heroCta = html.match(/<a\b[^>]*\bdata-home-install-cta\b[^>]*>/)?.[0];
+  expect(Boolean(heroCta), `${route}: missing homepage hero Install CTA`);
+  expect(heroCta?.includes(`href="${expectedCta}"`), `${route}: homepage hero Install CTA is not localized`);
   const jsonLd = extract(html, /<script type="application\/ld\+json">([\s\S]*?)<\/script>/);
   expect(Boolean(jsonLd), `${route}: missing WebSite JSON-LD`);
   if (jsonLd) {
@@ -121,6 +139,45 @@ for (const route of ["/", "/zh-CN/"]) {
       failures.push(`${route}: invalid JSON-LD (${error.message})`);
     }
   }
+}
+
+for (const route of ["/install/", "/zh-CN/install/"]) {
+  const file = join(dist, route.replace(/^\//, ""), "index.html");
+  const html = readFileSync(file, "utf8");
+  const optionIds = [...html.matchAll(/<option value="(part-[^"]+)"/g)].map((match) => match[1]);
+  expect(optionIds.length === 24, `${route}: expected 24 Released pet options, found ${optionIds.length}`);
+  expect(
+    optionIds.length === releasedIds.length && optionIds.every((id, index) => id === releasedIds[index]),
+    `${route}: selector IDs do not match the staged Released-pet allowlist`
+  );
+  for (const method of ["codex", "bash", "powershell", "npx"]) {
+    expect(html.includes(`data-action-method="${method}"`), `${route}: missing ${method} install action`);
+  }
+  const methodsIndex = html.indexOf('id="install-methods"');
+  const releasedListIndex = html.indexOf('class="released-section"');
+  expect(methodsIndex >= 0, `${route}: missing install-methods marker`);
+  expect(releasedListIndex >= 0, `${route}: missing Released pet list marker`);
+  if (methodsIndex >= 0 && releasedListIndex >= 0) {
+    expect(methodsIndex < releasedListIndex, `${route}: install methods must precede the Released pet list`);
+  }
+  expect(html.includes('id="install-faq-title"'), `${route}: missing visible install FAQ`);
+}
+
+for (const route of ["/parts/", "/zh-CN/parts/"]) {
+  const file = join(dist, route.replace(/^\//, ""), "index.html");
+  const html = readFileSync(file, "utf8");
+  const prefix = route.startsWith("/zh-CN/") ? "/zh-CN" : "";
+  for (const id of JSON.parse(readFileSync(join(dist, "api/catalog-ids.json"), "utf8"))) {
+    expect(html.includes(`href="${prefix}/pets/${id}/"`), `${route}: missing direct pet link for ${id}`);
+  }
+}
+
+for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))) {
+  const route = routeFor(file);
+  const html = readFileSync(file, "utf8");
+  const isReleased = html.includes('data-status="released"');
+  expect(html.includes('href="#install-this-pet"') === isReleased, `${route}: Released-only install anchor is inconsistent`);
+  expect(/<a[^>]+data-install-deeplink/.test(html) === isReleased, `${route}: Released-only Codex action is inconsistent`);
 }
 
 if (failures.length > 0) {
