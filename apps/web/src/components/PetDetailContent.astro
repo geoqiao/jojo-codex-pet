@@ -38,7 +38,7 @@ const content = locale === "en" ? {
   palette: "Locked signature palette",
   source: "Source",
   install: "Install this pet",
-  installAnchor: "Install this pet ↓",
+  installAnchor: "All install methods ↓",
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
   reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
   ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
@@ -49,8 +49,11 @@ const content = locale === "en" ? {
   views: "Public page views",
   openInCodex: "Open in Codex",
   download: "Package files",
+  methodsLabel: "Available install methods",
+  methods: ["Codex app", "Bash", "PowerShell", "npx"],
   copy: "Copy",
-  copied: "Copied"
+  copied: "Copied",
+  copyFailed: "Copy failed"
 } : {
   identity: "目录身份",
   relationship: "替身关系",
@@ -58,7 +61,7 @@ const content = locale === "en" ? {
   palette: "锁定标志配色",
   source: "来源",
   install: "安装这只宠物",
-  installAnchor: "安装这只宠物 ↓",
+  installAnchor: "全部安装方式 ↓",
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
   reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
   ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
@@ -69,20 +72,38 @@ const content = locale === "en" ? {
   views: "公开页面浏览次数",
   openInCodex: "在 Codex 中打开",
   download: "宠物包文件",
+  methodsLabel: "可用安装方式",
+  methods: ["Codex 应用", "Bash", "PowerShell", "npx"],
   copy: "复制",
-  copied: "已复制"
+  copied: "已复制",
+  copyFailed: "复制失败"
 };
 ---
 
 <div class="detail-grid">
   <div class="detail-art" style={`--accent:${part.accent}`}>
     {displayImage ? (
-      <img src={displayImage} alt={imageAlt} width="640" height="640" />
+      <img src={displayImage} alt={imageAlt} width="640" height="640" loading="eager" fetchpriority="high" decoding="async" />
     ) : (
       <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
     )}
     <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
-    {pet.status === "released" && packageUrl && <a class="button install-anchor" href="#install-this-pet">{content.installAnchor}</a>}
+    {pet.status === "released" && packageUrl && openInCodexUrl && (
+      <div class="detail-art-actions" role="group" aria-label={content.install}>
+        <a
+          class="button"
+          href={openInCodexUrl}
+          data-install-deeplink
+          data-action-pet-id={pet.id}
+          data-action-method="codex"
+          data-action-locale={locale}
+        >
+          {content.openInCodex} ↗
+        </a>
+        <a class="button quick-package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
+        <a class="quick-methods-link" href="#install-this-pet">{content.installAnchor}</a>
+      </div>
+    )}
   </div>
   <div class="detail-copy">
     <div class="detail-pills"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span><span class="type-pill">{copy.type[pet.type]}</span></div>
@@ -90,6 +111,57 @@ const content = locale === "en" ? {
     <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
     <p class="pet-overview">{content.overview}</p>
     <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
+    <section class="install-box" id="install-this-pet">
+      <div class="install-heading">
+        <h2>{content.install}</h2>
+        {pet.status === "released" && packageUrl && (
+          <ul class="install-method-overview" aria-label={content.methodsLabel}>
+            {content.methods.map((method) => <li>{method}</li>)}
+          </ul>
+        )}
+      </div>
+      {pet.status === "released" && packageUrl && openInCodexUrl ? (
+        <>
+          <p>{content.ready}</p>
+          <div class="install-primary">
+            <a
+              class="button"
+              href={openInCodexUrl}
+              data-install-deeplink
+              data-action-pet-id={pet.id}
+              data-action-method="codex"
+              data-action-locale={locale}
+            >
+              {content.openInCodex} ↗
+            </a>
+            <a class="button package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
+          </div>
+          <div class="command-list">
+            {installCommands.map(({ method, label, command }) => (
+              <div class="command-row">
+                <span>{label}</span>
+                <code>{command}</code>
+                <button
+                  type="button"
+                  data-copy-command={command}
+                  data-copy-label={content.copy}
+                  data-copied-label={content.copied}
+                  data-copy-failed-label={content.copyFailed}
+                  data-action-pet-id={pet.id}
+                  data-action-method={method}
+                  data-action-locale={locale}
+                  aria-live="polite"
+                >
+                  {content.copy}
+                </button>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <><p>{isReview ? content.reviewPending : content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{isReview ? copy.reviewNotInstallable : copy.notInstallable}</button></>
+      )}
+    </section>
     {profile && (
       <section class="editorial-profile" data-editorial-profile={pet.id} aria-label={locale === "en" ? "Pet profile" : "宠物资料"}>
         {Object.entries(profile).map(([sectionKey, section]) => (
@@ -113,48 +185,6 @@ const content = locale === "en" ? {
       {pet.palette && <div><dt>{content.palette}</dt><dd class="detail-palette">{pet.palette.map((color) => <span style={`--swatch:${color}`}><i>{color}</i></span>)}</dd></div>}
       <div><dt>{content.source}</dt><dd><a href={pet.source}>geoqiao/jojo-codex-pet ↗</a></dd></div>
     </dl>
-    <section class="install-box" id="install-this-pet">
-      <h2>{content.install}</h2>
-      {pet.status === "released" && packageUrl && openInCodexUrl ? (
-        <>
-          <p>{content.ready}</p>
-          <div class="install-primary">
-            <a
-              class="button"
-              href={openInCodexUrl}
-              data-install-deeplink
-              data-action-pet-id={pet.id}
-              data-action-method="codex"
-              data-action-locale={locale}
-            >
-              {content.openInCodex} ↗
-            </a>
-            <a class="package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
-          </div>
-          <div class="command-list">
-            {installCommands.map(({ method, label, command }) => (
-              <div class="command-row">
-                <span>{label}</span>
-                <code>{command}</code>
-                <button
-                  type="button"
-                  data-copy-command={command}
-                  data-copy-label={content.copy}
-                  data-copied-label={content.copied}
-                  data-action-pet-id={pet.id}
-                  data-action-method={method}
-                  data-action-locale={locale}
-                >
-                  {content.copy}
-                </button>
-              </div>
-            ))}
-          </div>
-        </>
-      ) : (
-        <><p>{isReview ? content.reviewPending : content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{isReview ? copy.reviewNotInstallable : copy.notInstallable}</button></>
-      )}
-    </section>
   </div>
 </div>
 <InstallActionTracking />
@@ -162,17 +192,19 @@ const content = locale === "en" ? {
 <style>
   .detail-grid {
     display: grid;
-    grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1fr);
-    min-height: 720px;
+    grid-template-columns: minmax(300px, 0.7fr) minmax(0, 1fr);
+    align-items: start;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
     box-shadow: var(--shadow);
   }
 
   .detail-art {
-    position: relative;
     display: grid;
-    min-height: 680px;
+    position: sticky;
+    top: 104px;
+    align-self: start;
+    min-height: 560px;
     place-items: center;
     overflow: hidden;
     background:
@@ -195,7 +227,7 @@ const content = locale === "en" ? {
     position: relative;
     z-index: 1;
     width: 88%;
-    height: 620px;
+    height: 510px;
     object-fit: contain;
     image-rendering: pixelated;
     filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
@@ -214,12 +246,38 @@ const content = locale === "en" ? {
     letter-spacing: 0.13em;
   }
 
-  .detail-art > .install-anchor {
+  .detail-art-actions {
     position: absolute;
     z-index: 3;
     right: 24px;
     bottom: 24px;
-    background: var(--acid);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: end;
+  }
+
+  .detail-art-actions .button {
+    padding: 11px 14px;
+    font-size: 0.62rem;
+  }
+
+  .detail-art-actions .quick-package-link {
+    background: var(--paper-bright);
+  }
+
+  .quick-methods-link {
+    flex-basis: 100%;
+    justify-self: end;
+    padding: 4px 7px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.58rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-align: right;
+    text-underline-offset: 3px;
+    text-transform: uppercase;
   }
 
   .planned-sigil {
@@ -249,13 +307,13 @@ const content = locale === "en" ? {
     font-weight: 900;
   }
 
-  .detail-copy { padding: clamp(30px, 5vw, 70px); }
+  .detail-copy { min-width: 0; padding: clamp(28px, 3.8vw, 54px); }
   .detail-pills { display: flex; gap: 8px; }
 
   h1 {
-    margin: 28px 0 24px;
+    margin: 20px 0 14px;
     font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: clamp(4rem, 9vw, 9rem);
+    font-size: clamp(4rem, 7.2vw, 7.4rem);
     letter-spacing: -0.07em;
     line-height: 0.92;
   }
@@ -271,16 +329,16 @@ const content = locale === "en" ? {
 
   .pet-overview {
     max-width: 66ch;
-    margin: 18px 0 0;
+    margin: 14px 0 0;
     color: var(--muted);
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 620;
     line-height: 1.65;
   }
 
   .status-note {
-    margin: 30px 0;
-    padding: 14px 16px;
+    margin: 18px 0;
+    padding: 11px 14px;
     border: 2px solid var(--ink);
     background: var(--acid);
     font-weight: 720;
@@ -289,7 +347,7 @@ const content = locale === "en" ? {
   .editorial-profile {
     display: grid;
     gap: 16px;
-    margin: 30px 0;
+    margin: 34px 0 28px;
   }
 
   .editorial-profile article {
@@ -355,42 +413,74 @@ const content = locale === "en" ? {
   }
 
   .install-box {
-    margin-top: 32px;
-    scroll-margin-top: 130px;
-    padding: 22px;
+    margin-top: 18px;
+    scroll-margin-top: 110px;
+    padding: clamp(18px, 2.4vw, 26px);
     color: var(--paper-bright);
     background: var(--ink);
+  }
+
+  .install-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 16px;
+    align-items: end;
   }
 
   .install-box h2 {
     margin: 0;
     font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: 2.4rem;
+    font-size: clamp(2rem, 3.2vw, 3rem);
+    line-height: 0.95;
   }
 
-  .install-box p { max-width: 58ch; line-height: 1.55; }
+  .install-box p {
+    max-width: 68ch;
+    margin: 14px 0 0;
+    color: #d8d1dd;
+    font-size: 0.84rem;
+    line-height: 1.5;
+  }
+
+  .install-method-overview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: end;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .install-method-overview li {
+    padding: 5px 7px;
+    border: 1px solid rgb(255 255 255 / 45%);
+    color: var(--acid);
+    font-size: 0.58rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 
   .install-primary {
     display: flex;
     flex-wrap: wrap;
     gap: 18px;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 16px;
   }
 
   .package-link {
     color: var(--paper-bright);
-    font-size: 0.72rem;
-    font-weight: 820;
-    letter-spacing: 0.06em;
-    text-underline-offset: 4px;
-    text-transform: uppercase;
+    background: transparent;
+    border-color: var(--paper-bright);
+    box-shadow: 4px 4px 0 var(--paper-bright);
   }
 
   .command-list {
     display: grid;
     gap: 10px;
-    margin-top: 26px;
+    margin-top: 20px;
   }
 
   .command-row {
@@ -430,7 +520,7 @@ const content = locale === "en" ? {
     cursor: pointer;
   }
 
-  .install-anchor:focus-visible,
+  .detail-art-actions a:focus-visible,
   .install-primary a:focus-visible,
   .command-row button:focus-visible,
   dd a:focus-visible {
@@ -440,16 +530,28 @@ const content = locale === "en" ? {
     transition: none;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 760px) {
     .detail-grid { grid-template-columns: 1fr; }
-    .detail-art { min-height: 500px; border-right: 0; border-bottom: 3px solid var(--ink); }
-    .detail-art img { height: 470px; }
+    .detail-art {
+      position: relative;
+      top: auto;
+      min-height: 300px;
+      border-right: 0;
+      border-bottom: 3px solid var(--ink);
+    }
+    .detail-art img { height: 278px; }
+    .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
+    .detail-part { top: 14px; left: 14px; }
   }
 
   @media (max-width: 600px) {
+    .detail-copy { padding: 22px 16px 26px; }
+    h1 { font-size: clamp(3.2rem, 17vw, 4.5rem); }
+    .pet-overview { font-size: 0.9rem; line-height: 1.5; }
+    .status-note { margin: 14px 0; padding: 10px 12px; }
+    .install-heading { grid-template-columns: 1fr; }
+    .install-method-overview { justify-content: start; }
     dl > div { grid-template-columns: 1fr; gap: 5px; }
-    .detail-art { min-height: 410px; }
-    .detail-art img { height: 390px; }
     .command-row { grid-template-columns: 1fr auto; }
     .command-row code { grid-column: 1 / -1; grid-row: 2; }
   }

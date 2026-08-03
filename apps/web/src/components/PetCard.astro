@@ -5,11 +5,13 @@ import { localize, route, ui } from "../lib/i18n";
 interface Props {
   pet: Pet;
   locale: Locale;
+  priority?: boolean;
 }
 
-const { pet, locale } = Astro.props;
+const { pet, locale, priority = false } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
+const detailUrl = route(locale, `/pets/${pet.id}/`);
 const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
 const cardImages = pet.image ? {
   small: pet.image.replace(/\.png$/, "-card-320.webp"),
@@ -20,6 +22,7 @@ const cardImages = pet.image ? {
 const imageAlt = locale === "en"
   ? `${name}, Part ${pet.part} pixel Codex pet`
   : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
+const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标志配色";
 ---
 
 <article
@@ -30,45 +33,48 @@ const imageAlt = locale === "en"
   data-type={pet.type}
   data-status={pet.status}
 >
-  <div class="pet-card-content">
-    <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
-      {cardImages ? (
-        <img
-          src={cardImages.fallback}
-          srcset={`${cardImages.small} 320w, ${cardImages.medium} 480w, ${cardImages.large} 640w`}
-          sizes="(max-width: 384px) calc(92vw - 23.92px), (max-width: 540px) 330px, (max-width: 775px) calc(46vw - 26.68px), (max-width: 840px) 330px, (max-width: 1178px) calc(30.6667vw - 31.28px), (max-width: 1180px) 330px, (max-width: 1512px) calc(23vw - 30.82px), 316.94px"
-          alt={imageAlt}
-          width="640"
-          height="640"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div class="planned-art" aria-hidden="true">
-          <span>{initial}</span>
-          <i>{String(pet.part).padStart(2, "0")}</i>
-        </div>
-      )}
-      <span class="part-tag">PART {String(pet.part).padStart(2, "0")}</span>
-    </div>
-    <div class="pet-copy">
-      <div class="pet-meta">
-        <span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span>
-        <span class="type-pill">{copy.type[pet.type]}</span>
+  <a class="pet-card-link" href={detailUrl} aria-label={`${copy.open}: ${name}`}>
+    <div class="pet-card-content">
+      <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
+        {cardImages ? (
+          <img
+            src={cardImages.fallback}
+            srcset={`${cardImages.small} 320w, ${cardImages.medium} 480w, ${cardImages.large} 640w`}
+            sizes="(max-width: 384px) calc(92vw - 23.92px), (max-width: 540px) 330px, (max-width: 775px) calc(46vw - 26.68px), (max-width: 840px) 330px, (max-width: 1178px) calc(30.6667vw - 31.28px), (max-width: 1180px) 330px, (max-width: 1512px) calc(23vw - 30.82px), 316.94px"
+            alt={imageAlt}
+            width="640"
+            height="640"
+            loading={priority ? "eager" : "lazy"}
+            fetchpriority={priority ? "high" : undefined}
+            decoding="async"
+          />
+        ) : (
+          <div class="planned-art" aria-hidden="true">
+            <span>{initial}</span>
+            <i>{String(pet.part).padStart(2, "0")}</i>
+          </div>
+        )}
+        <span class="part-tag">PART {String(pet.part).padStart(2, "0")}</span>
       </div>
-      <h3>{name}</h3>
-      <p>{copy.role[pet.role]}</p>
-      {pet.palette && (
-        <div class="palette" aria-label="Locked signature palette">
-          {pet.palette.map((color) => <span style={`--swatch:${color}`} title={color}></span>)}
+      <div class="pet-copy">
+        <div class="pet-meta">
+          <span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span>
+          <span class="type-pill">{copy.type[pet.type]}</span>
         </div>
-      )}
-      <div class="pet-actions">
-        <a href={route(locale, `/pets/${pet.id}/`)} aria-label={`${copy.open}: ${name}`}>{copy.open} ↗</a>
-        <span class="view-count" data-view-count={pet.id}>— {copy.view}</span>
+        <h3>{name}</h3>
+        <p>{copy.role[pet.role]}</p>
+        {pet.palette && (
+          <div class="palette" aria-label={paletteLabel}>
+            {pet.palette.map((color) => <span style={`--swatch:${color}`} title={color}></span>)}
+          </div>
+        )}
+        <div class="pet-actions">
+          <span class="open-link" aria-hidden="true">{copy.open} ↗</span>
+          <span class="view-count" data-view-count={pet.id}>— {copy.view}</span>
+        </div>
       </div>
     </div>
-  </div>
+  </a>
 </article>
 
 <style define:vars={{
@@ -89,6 +95,29 @@ const imageAlt = locale === "en"
     border: 3px solid var(--ink);
     background: var(--paper-bright);
     box-shadow: 6px 6px 0 var(--ink);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .pet-card:hover,
+  .pet-card:focus-within {
+    box-shadow: 9px 9px 0 var(--ink);
+    transform: translate(-2px, -2px);
+  }
+
+  .pet-card:focus-within {
+    outline: 4px solid var(--cyan);
+    outline-offset: 4px;
+  }
+
+  .pet-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    touch-action: manipulation;
+  }
+
+  .pet-card-link:focus-visible {
+    outline-color: transparent;
   }
 
   .pet-card[hidden] {
@@ -126,6 +155,12 @@ const imageAlt = locale === "en"
     object-fit: contain;
     image-rendering: pixelated;
     filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
+    transition: transform 180ms ease;
+  }
+
+  .pet-card:hover .pet-art img,
+  .pet-card:focus-within .pet-art img {
+    transform: scale(1.025);
   }
 
   .planned-art {
@@ -223,10 +258,11 @@ const imageAlt = locale === "en"
     border-top: 2px solid var(--ink);
   }
 
-  .pet-actions a {
+  .open-link {
     font-size: 0.7rem;
     font-weight: 850;
     letter-spacing: 0.08em;
+    text-decoration: underline;
     text-underline-offset: 4px;
     text-transform: uppercase;
   }

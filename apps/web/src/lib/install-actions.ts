@@ -52,6 +52,13 @@ const bindCopyButton = (button: HTMLButtonElement) => {
   if (button.dataset.installActionBound === "true") return;
   button.dataset.installActionBound = "true";
 
+  const showTemporaryLabel = (label: string) => {
+    button.textContent = label;
+    window.setTimeout(() => {
+      button.textContent = button.dataset.copyLabel ?? "Copy";
+    }, 1400);
+  };
+
   button.addEventListener("click", async () => {
     const command = button.dataset.copyCommand;
     const payload = payloadFor(button, "install_command_copy_success");
@@ -60,13 +67,11 @@ const bindCopyButton = (button: HTMLButtonElement) => {
     try {
       await navigator.clipboard.writeText(command);
     } catch {
+      showTemporaryLabel(button.dataset.copyFailedLabel ?? "Copy failed");
       return;
     }
 
-    button.textContent = button.dataset.copiedLabel ?? "Copied";
-    window.setTimeout(() => {
-      button.textContent = button.dataset.copyLabel ?? "Copy";
-    }, 1400);
+    showTemporaryLabel(button.dataset.copiedLabel ?? "Copied");
 
     if (payload) send(payload);
   });

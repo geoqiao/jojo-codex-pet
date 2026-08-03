@@ -44,6 +44,12 @@ const content = locale === "en" ? {
             <div><p>PART {part.number}</p><h2>{localize(part.title, locale)}</h2></div>
           </header>
           <div class="roster-table" role="table" aria-label={`${localize(part.title, locale)} roster`}>
+            <div class="roster-row roster-head" role="row">
+              <span role="columnheader">#</span>
+              <span role="columnheader">{content.pet}</span>
+              <span role="columnheader">{content.identity}</span>
+              <span role="columnheader">{content.status}</span>
+            </div>
             {pets.filter((pet) => pet.part === part.number).map((pet, index) => (
               <div class="roster-row" role="row">
                 <span role="cell">{String(index + 1).padStart(2, "0")}</span>
@@ -67,9 +73,11 @@ const content = locale === "en" ? {
   .roster-stack {
     display: grid;
     gap: 42px;
+    min-width: 0;
   }
 
   .roster-part {
+    min-width: 0;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
     box-shadow: var(--shadow);
@@ -77,7 +85,7 @@ const content = locale === "en" ? {
 
   .roster-part > header {
     display: grid;
-    grid-template-columns: 120px 1fr;
+    grid-template-columns: 120px minmax(0, 1fr);
     min-height: 130px;
     color: var(--paper-bright);
     background: var(--ink);
@@ -97,6 +105,7 @@ const content = locale === "en" ? {
   .roster-part header div {
     display: grid;
     align-content: center;
+    min-width: 0;
     padding: 18px 28px;
   }
 
@@ -126,6 +135,26 @@ const content = locale === "en" ? {
     border-top: 2px solid var(--ink);
   }
 
+  .roster-table,
+  .roster-row > * {
+    min-width: 0;
+  }
+
+  .roster-head {
+    min-height: 44px;
+    padding-block: 9px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .roster-head > span:first-child {
+    color: #aaa2b3;
+  }
+
   .roster-row > span:first-child {
     color: var(--muted);
     font-size: 0.7rem;
@@ -144,6 +173,7 @@ const content = locale === "en" ? {
     margin-top: 4px;
     color: var(--muted);
     font-size: 0.68rem;
+    overflow-wrap: anywhere;
   }
 
   .roster-row > span:nth-child(3) {
@@ -162,15 +192,39 @@ const content = locale === "en" ? {
     font-weight: 760;
   }
 
+  .roster-row.roster-head > span {
+    grid-column: auto;
+    justify-self: stretch;
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
   @media (max-width: 760px) {
+    h2 {
+      font-size: clamp(1.75rem, 8.8vw, 2.05rem);
+    }
+
     .roster-row {
-      grid-template-columns: 34px 1fr;
+      grid-template-columns: 34px minmax(0, 1fr);
+      gap: 10px;
+      padding-inline: 14px;
     }
 
     .roster-row > span:nth-child(3),
     .roster-row > span:nth-child(4) {
       grid-column: 2;
       justify-self: start;
+    }
+
+    .roster-head {
+      grid-template-columns: 34px repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .roster-head > span:nth-child(3),
+    .roster-head > span:nth-child(4) {
+      grid-column: auto;
     }
   }
 </style>

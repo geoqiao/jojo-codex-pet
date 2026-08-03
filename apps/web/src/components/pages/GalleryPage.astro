@@ -27,11 +27,13 @@ const content = locale === "en" ? {
   locked: "Roster locked",
   parts: "Parts",
   contract: "V2 only",
+  metrics: "Project metrics",
   pilotTitle: "The Part 3 Pilot Set",
   pilotNote: "All four Part 3 Pilot pets are released and independently installable.",
   allTitle: "The headline roster",
   allNote: `36 pets · ${releasedCount} installable · Parts 1–9`,
   filters: { all: "All", pilot: "Pilot", character: "Characters", stand: "Stands" },
+  filterLabel: "Catalog filters",
   count: "pets shown"
 } : {
   title: "JoJo Codex Pet — 横跨历代篇章的 V2 宠物",
@@ -43,11 +45,13 @@ const content = locale === "en" ? {
   locked: "名单已锁定",
   parts: "篇章",
   contract: "仅 V2",
+  metrics: "项目数据",
   pilotTitle: "第三部 Pilot 合集",
   pilotNote: "第三部 Pilot 四只宠物均已发布，并可分别独立安装。",
   allTitle: "首发完整名单",
   allNote: `36 只 · ${releasedCount} 只可安装 · 第 1–9 部`,
   filters: { all: "全部", pilot: "Pilot", character: "角色", stand: "替身" },
+  filterLabel: "宠物目录筛选",
   count: "只宠物"
 };
 ---
@@ -61,7 +65,7 @@ const content = locale === "en" ? {
         <p class="hero-intro">{content.intro}</p>
         <a class="button hero-cta" href={route(locale, "/install/")} data-home-install-cta>{content.installCta} ↗</a>
       </div>
-      <div class="hero-metrics" aria-label="Project metrics">
+      <div class="hero-metrics" aria-label={content.metrics}>
         <div><strong>36</strong><span>{content.locked}</span></div>
         <div><strong>09</strong><span>{content.parts}</span></div>
         <div><strong>V2</strong><span>{content.contract}</span></div>
@@ -73,23 +77,23 @@ const content = locale === "en" ? {
   <section class="shell catalog-section">
     <div class="section-title"><h2>{content.pilotTitle}</h2><span>{content.pilotNote}</span></div>
     <div class="pet-grid pilot-grid">
-      {pilot.map((pet) => <PetCard pet={pet} locale={locale} />)}
+      {pilot.map((pet, index) => <PetCard pet={pet} locale={locale} priority={index < 2} />)}
     </div>
   </section>
 
   <section class="shell catalog-section" id="roster">
     <div class="section-title"><h2>{content.allTitle}</h2><span>{content.allNote}</span></div>
-    <div class="filter-bar" aria-label="Catalog filters">
+    <div class="filter-bar" aria-label={content.filterLabel}>
       <div class="filter-options">
-        <button type="button" class="active" data-gallery-filter="all">{content.filters.all}</button>
-        <button type="button" data-gallery-filter="pilot">{content.filters.pilot}</button>
-        <button type="button" data-gallery-filter="character">{content.filters.character}</button>
-        <button type="button" data-gallery-filter="stand">{content.filters.stand}</button>
-        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`}>P{part}</button>)}
+        <button type="button" class="active" data-gallery-filter="all" aria-pressed="true" aria-controls="roster-grid">{content.filters.all}</button>
+        <button type="button" data-gallery-filter="pilot" aria-pressed="false" aria-controls="roster-grid">{content.filters.pilot}</button>
+        <button type="button" data-gallery-filter="character" aria-pressed="false" aria-controls="roster-grid">{content.filters.character}</button>
+        <button type="button" data-gallery-filter="stand" aria-pressed="false" aria-controls="roster-grid">{content.filters.stand}</button>
+        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`} aria-pressed="false" aria-controls="roster-grid">P{part}</button>)}
       </div>
       <span aria-live="polite"><strong data-visible-count>36</strong> {content.count}</span>
     </div>
-    <div class="pet-grid full-grid">
+    <div class="pet-grid full-grid" id="roster-grid">
       {pets.map((pet) => <PetCard pet={pet} locale={locale} />)}
     </div>
   </section>
@@ -101,7 +105,7 @@ const content = locale === "en" ? {
   const cards = [...document.querySelectorAll("#roster [data-catalog-card]")];
   const visibleCount = document.querySelector("[data-visible-count]");
 
-  const applyFilter = (filter: string) => {
+  const applyFilter = (filter: string, syncUrl = true) => {
     let visible = 0;
     for (const card of cards) {
       const isPilot = filter === "pilot" && card.getAttribute("data-part") === "part-03" && card.getAttribute("data-status") !== "planned";
@@ -110,15 +114,37 @@ const content = locale === "en" ? {
       if (matches) visible += 1;
     }
     if (visibleCount) visibleCount.textContent = String(visible);
-    for (const button of filterButtons) button.classList.toggle("active", button.getAttribute("data-gallery-filter") === filter);
+    for (const button of filterButtons) {
+      const isActive = button.getAttribute("data-gallery-filter") === filter;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    }
+
+    if (syncUrl) {
+      const url = new URL(window.location.href);
+      if (filter === "all") {
+        url.searchParams.delete("filter");
+        url.searchParams.delete("part");
+      } else if (/^part-0[1-9]$/.test(filter)) {
+        url.searchParams.set("part", String(Number(filter.slice(-2))));
+        url.searchParams.delete("filter");
+      } else {
+        url.searchParams.set("filter", filter);
+        url.searchParams.delete("part");
+      }
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
   };
 
   for (const button of filterButtons) {
     button.addEventListener("click", () => applyFilter(button.getAttribute("data-gallery-filter") ?? "all"));
   }
 
-  const part = new URLSearchParams(window.location.search).get("part");
-  if (part && /^[1-9]$/.test(part)) applyFilter(`part-${part.padStart(2, "0")}`);
+  const params = new URLSearchParams(window.location.search);
+  const part = params.get("part");
+  const requestedFilter = params.get("filter") ?? (part && /^[1-9]$/.test(part) ? `part-${part.padStart(2, "0")}` : "all");
+  const availableFilters = new Set(filterButtons.map((button) => button.getAttribute("data-gallery-filter")));
+  applyFilter(availableFilters.has(requestedFilter) ? requestedFilter : "all", false);
 </script>
 
 <style>
@@ -143,10 +169,10 @@ const content = locale === "en" ? {
     z-index: 1;
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(210px, 0.32fr);
-    gap: 50px;
-    min-height: 720px;
+    gap: 42px;
+    min-height: 560px;
     align-items: center;
-    padding-block: 92px 120px;
+    padding-block: 40px 46px;
   }
 
   .hero-copy {
@@ -157,13 +183,13 @@ const content = locale === "en" ? {
 
   .hero h1 {
     max-width: 1050px;
-    font-size: clamp(5.2rem, 10.2vw, 10.5rem);
+    font-size: clamp(4.4rem, 7vw, 7.2rem);
   }
 
   .hero-intro {
     max-width: 58ch;
-    margin: 38px 0 0;
-    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    margin: 18px 0 0;
+    font-size: clamp(1rem, 1.35vw, 1.2rem);
     font-weight: 600;
     line-height: 1.55;
   }
@@ -183,8 +209,8 @@ const content = locale === "en" ? {
     position: relative;
     z-index: 2;
     display: grid;
-    align-self: end;
-    margin-bottom: 30px;
+    align-self: center;
+    margin-bottom: 0;
     border: 3px solid var(--paper-bright);
     background: var(--ink);
     box-shadow: 8px 8px 0 var(--acid);
@@ -230,7 +256,7 @@ const content = locale === "en" ? {
   }
 
   .catalog-section {
-    padding-top: 90px;
+    padding-top: 46px;
   }
 
   .pet-grid {
@@ -265,7 +291,7 @@ const content = locale === "en" ? {
 
   .filter-options button {
     flex: 0 0 auto;
-    min-height: 36px;
+    min-height: 44px;
     padding: 7px 12px;
     border: 2px solid var(--ink);
     background: transparent;
@@ -299,7 +325,8 @@ const content = locale === "en" ? {
   @media (max-width: 840px) {
     .hero-grid {
       grid-template-columns: 1fr;
-      min-height: 660px;
+      min-height: 0;
+      padding-block: 52px;
     }
 
     .hero-metrics {
@@ -326,17 +353,7 @@ const content = locale === "en" ? {
 
   @media (max-width: 540px) {
     .hero h1 {
-      font-size: clamp(3.1rem, 14vw, 4.1rem);
-    }
-
-    .hero-metrics {
-      grid-template-columns: 1fr;
-    }
-
-    .hero-metrics div {
-      display: flex;
-      border-right: 0;
-      border-bottom: 2px solid var(--paper-bright);
+      font-size: clamp(3.1rem, 14vw, 4.3rem);
     }
 
     .pilot-grid,

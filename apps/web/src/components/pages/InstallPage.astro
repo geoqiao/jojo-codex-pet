@@ -1,5 +1,5 @@
 ---
-import { pets, type Locale } from "@jojo-codex-pet/catalog";
+import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { localize } from "../../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
@@ -11,6 +11,11 @@ const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packa
 const releasedPet = releasedPets[0]!;
 const localePrefix = locale === "zh-CN" ? "/zh-CN" : "";
 const petName = localize(releasedPet.name, locale);
+const releasedPetPart = parts.find((part) => part.number === releasedPet.part)!;
+const releasedPetImage = releasedPet.image?.replace(/\.png$/, "-card.webp");
+const releasedPetImageAlt = locale === "en"
+  ? `${petName}, Part ${releasedPet.part} pixel Codex pet`
+  : `${petName}，JoJo 第 ${releasedPet.part} 部像素 Codex 宠物`;
 const openInCodexUrl = openInCodexUrlFor({ nameEn: releasedPet.name.en, packagePath: releasedPet.packagePath! });
 const commands = installCommandsFor(releasedPet.id);
 
@@ -34,6 +39,7 @@ const content = locale === "en" ? {
   open: "Open in Codex",
   copy: "Copy",
   copied: "Copied",
+  copyFailed: "Copy failed",
   methods: [
     { method: "codex", name: "Open in Codex", detail: "Uses the official Codex pet-install deep link and the selected hosted v2 spritesheet." },
     { method: "bash", name: "Bash", detail: "macOS and Linux installer with SHA-256 and manifest validation." },
@@ -69,6 +75,7 @@ const content = locale === "en" ? {
   open: "在 Codex 中打开",
   copy: "复制",
   copied: "已复制",
+  copyFailed: "复制失败",
   methods: [
     { method: "codex", name: "在 Codex 中打开", detail: "使用 Codex 官方宠物安装深链与当前选择的托管 V2 图集。" },
     { method: "bash", name: "Bash", detail: "面向 macOS 与 Linux，校验 SHA-256 和宠物清单。" },
@@ -96,20 +103,42 @@ const content = locale === "en" ? {
 
     <section class="install-workbench" id="choose-pet" aria-labelledby="pet-picker-title">
       <header class="picker-card">
-        <div>
+        <div class="picker-intro">
           <p class="eyebrow">{content.pickerEyebrow}</p>
           <h2 id="pet-picker-title">{content.pickerTitle}</h2>
           <p>{content.pickerBody}</p>
         </div>
+        <div class="pet-preview" data-selected-pet-preview style={`--selected-accent:${releasedPetPart.accent}`}>
+          <span class="preview-part" data-selected-pet-part>PART {String(releasedPet.part).padStart(2, "0")}</span>
+          {releasedPetImage && (
+            <img
+              src={releasedPetImage}
+              alt={releasedPetImageAlt}
+              width="640"
+              height="640"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+              data-selected-pet-image
+            />
+          )}
+          <strong data-selected-preview-name>{petName}</strong>
+        </div>
         <div class="picker-control">
           <label for="released-pet-select">{content.pickerLabel}</label>
-          <select id="released-pet-select" data-pet-selector>
+          <select id="released-pet-select" name="released-pet" autocomplete="off" data-pet-selector>
             {releasedPets.map((pet) => (
               <option
                 value={pet.id}
                 data-pet-name-en={pet.name.en}
                 data-pet-name-localized={localize(pet.name, locale)}
                 data-package-path={pet.packagePath}
+                data-pet-part={pet.part}
+                data-pet-accent={parts.find((part) => part.number === pet.part)?.accent}
+                data-pet-image={pet.image?.replace(/\.png$/, "-card.webp")}
+                data-pet-image-alt={locale === "en"
+                  ? `${localize(pet.name, locale)}, Part ${pet.part} pixel Codex pet`
+                  : `${localize(pet.name, locale)}，JoJo 第 ${pet.part} 部像素 Codex 宠物`}
               >
                 {localize(pet.name, locale)} · Part {pet.part}
               </option>
@@ -150,9 +179,11 @@ const content = locale === "en" ? {
                   data-copy-command={command}
                   data-copy-label={content.copy}
                   data-copied-label={content.copied}
+                  data-copy-failed-label={content.copyFailed}
                   data-action-pet-id={releasedPet.id}
                   data-action-method={method}
                   data-action-locale={locale}
+                  aria-live="polite"
                 >
                   {content.copy}
                 </button>
@@ -164,6 +195,35 @@ const content = locale === "en" ? {
       <p class="action-privacy">{content.actionPrivacy}</p>
     </section>
 
+    <section class="released-section" aria-labelledby="released-pets-title">
+      <header>
+        <h2 id="released-pets-title">{content.availableTitle}</h2>
+        <p>{content.availableNote}</p>
+      </header>
+      <div class="released-grid">
+        {releasedPets.map((pet) => {
+          const image = pet.image?.replace(/\.png$/, "-card-320.webp");
+          const accent = parts.find((part) => part.number === pet.part)?.accent;
+          const name = localize(pet.name, locale);
+          const alt = locale === "en"
+            ? `${name}, Part ${pet.part} pixel Codex pet`
+            : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
+          return (
+            <a href={`${localePrefix}/pets/${pet.id}/`}>
+              <span class="released-thumb" style={`--released-accent:${accent}`}>
+                {image && <img src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />}
+              </span>
+              <span class="released-copy">
+                <small>PART {String(pet.part).padStart(2, "0")}</small>
+                <strong>{name}</strong>
+                <small>{pet.type === "character" ? content.character : content.stand} ↗</small>
+              </span>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+
     <section class="faq-section" aria-labelledby="install-faq-title">
       <header><p class="eyebrow">{content.faqEyebrow}</p><h2 id="install-faq-title">{content.faqTitle}</h2></header>
       <div class="faq-list">
@@ -172,22 +232,6 @@ const content = locale === "en" ? {
             <summary>{question}</summary>
             <p>{answer}</p>
           </details>
-        ))}
-      </div>
-    </section>
-
-    <section class="released-section" aria-labelledby="released-pets-title">
-      <header>
-        <h2 id="released-pets-title">{content.availableTitle}</h2>
-        <p>{content.availableNote}</p>
-      </header>
-      <div class="released-grid">
-        {releasedPets.map((pet) => (
-          <a href={`${localePrefix}/pets/${pet.id}/`}>
-            <span>PART {String(pet.part).padStart(2, "0")}</span>
-            <strong>{localize(pet.name, locale)}</strong>
-            <small>{pet.type === "character" ? content.character : content.stand} ↗</small>
-          </a>
         ))}
       </div>
     </section>
@@ -206,6 +250,10 @@ const content = locale === "en" ? {
     const petNameEn = option?.dataset.petNameEn;
     const petNameLocalized = option?.dataset.petNameLocalized;
     const packagePath = option?.dataset.packagePath;
+    const petPart = option?.dataset.petPart;
+    const petAccent = option?.dataset.petAccent;
+    const petImage = option?.dataset.petImage;
+    const petImageAlt = option?.dataset.petImageAlt;
     if (!petId || !petNameEn || !petNameLocalized || !packagePath) return;
 
     const openUrl = openInCodexUrlFor({ nameEn: petNameEn, packagePath });
@@ -215,6 +263,18 @@ const content = locale === "en" ? {
     const selectedId = document.querySelector<HTMLElement>("[data-selected-pet-id]");
     if (selectedName) selectedName.textContent = petNameLocalized;
     if (selectedId) selectedId.textContent = petId;
+
+    const preview = document.querySelector<HTMLElement>("[data-selected-pet-preview]");
+    const previewName = document.querySelector<HTMLElement>("[data-selected-preview-name]");
+    const previewPart = document.querySelector<HTMLElement>("[data-selected-pet-part]");
+    const previewImage = document.querySelector<HTMLImageElement>("[data-selected-pet-image]");
+    if (preview && petAccent) preview.style.setProperty("--selected-accent", petAccent);
+    if (previewName) previewName.textContent = petNameLocalized;
+    if (previewPart && petPart) previewPart.textContent = `PART ${petPart.padStart(2, "0")}`;
+    if (previewImage && petImage) {
+      previewImage.src = petImage;
+      previewImage.alt = petImageAlt ?? petNameLocalized;
+    }
 
     const deepLink = document.querySelector<HTMLAnchorElement>("[data-install-deeplink]");
     if (deepLink) {
@@ -238,6 +298,17 @@ const content = locale === "en" ? {
 </script>
 
 <style>
+  .install-intro {
+    grid-template-columns: minmax(0, 0.9fr) minmax(300px, 0.55fr);
+    gap: clamp(28px, 5vw, 72px);
+    padding: clamp(34px, 5vw, 58px) 0 30px;
+  }
+
+  .install-intro h1 {
+    max-width: 760px;
+    font-size: clamp(3.8rem, 6.8vw, 7rem);
+  }
+
   .install-intro .intro-copy {
     display: grid;
     gap: 18px;
@@ -258,10 +329,11 @@ const content = locale === "en" ? {
 
   .picker-card {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 0.7fr);
-    gap: clamp(24px, 5vw, 72px);
+    grid-template-areas: "intro preview control";
+    grid-template-columns: minmax(230px, 0.72fr) minmax(220px, 0.46fr) minmax(330px, 0.72fr);
+    gap: clamp(20px, 3vw, 42px);
     align-items: center;
-    padding: clamp(24px, 4vw, 52px);
+    padding: clamp(22px, 3vw, 38px);
     color: var(--paper-bright);
     background: var(--violet);
     border: 3px solid var(--ink);
@@ -273,15 +345,80 @@ const content = locale === "en" ? {
   .released-section h2 {
     margin: 0;
     font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: clamp(2.6rem, 5vw, 5.2rem);
+    font-size: clamp(2.6rem, 4.4vw, 4.8rem);
     letter-spacing: -0.055em;
     line-height: 0.9;
   }
 
-  .picker-card > div:first-child > p:last-child {
+  .picker-intro {
+    grid-area: intro;
+    min-width: 0;
+  }
+
+  .picker-intro > p:last-child {
     max-width: 58ch;
     margin-bottom: 0;
     line-height: 1.6;
+  }
+
+  .pet-preview {
+    position: relative;
+    display: grid;
+    grid-area: preview;
+    min-height: 310px;
+    place-items: center;
+    overflow: hidden;
+    color: var(--ink);
+    background:
+      linear-gradient(135deg, rgb(255 255 255 / 46%) 0 16%, transparent 16% 72%, rgb(23 19 30 / 16%) 72%),
+      var(--selected-accent);
+    border: 3px solid var(--ink);
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+
+  .pet-preview::after {
+    position: absolute;
+    right: -48px;
+    bottom: -56px;
+    width: 145px;
+    height: 145px;
+    content: "";
+    border: 23px solid rgb(255 255 255 / 25%);
+    border-radius: 50%;
+  }
+
+  .pet-preview img {
+    position: relative;
+    z-index: 1;
+    width: min(92%, 260px);
+    height: 250px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(5px 6px 0 rgb(23 19 30 / 40%));
+  }
+
+  .preview-part,
+  .pet-preview > strong {
+    position: absolute;
+    z-index: 2;
+    left: 12px;
+    padding: 5px 8px;
+    color: var(--paper-bright);
+    background: var(--ink);
+    font-size: 0.62rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .preview-part { top: 12px; }
+
+  .pet-preview > strong {
+    right: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
+    overflow-wrap: anywhere;
+    text-align: center;
   }
 
   .picker-control {
@@ -291,6 +428,7 @@ const content = locale === "en" ? {
     color: var(--ink);
     background: var(--acid);
     border: 3px solid var(--ink);
+    grid-area: control;
   }
 
   .picker-control label,
@@ -458,8 +596,8 @@ const content = locale === "en" ? {
 
   .released-grid a {
     display: grid;
-    min-height: 150px;
-    padding: 18px;
+    grid-template-columns: 112px minmax(0, 1fr);
+    min-height: 152px;
     color: var(--ink);
     background: var(--paper-bright);
     border-right: 3px solid var(--ink);
@@ -470,19 +608,51 @@ const content = locale === "en" ? {
   .released-grid a:hover,
   .released-grid a:focus-visible { background: var(--acid); }
 
-  .released-grid span,
-  .released-grid small { font-size: 0.66rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+  .released-thumb {
+    display: grid;
+    min-width: 0;
+    place-items: center;
+    overflow: hidden;
+    background: var(--released-accent);
+    border-right: 3px solid var(--ink);
+  }
 
-  .released-grid strong { align-self: center; font-family: "Bodoni Moda Variable", Georgia, serif; font-size: 1.65rem; line-height: 0.95; }
-  .released-grid small { align-self: end; }
+  .released-thumb img {
+    width: 104px;
+    height: 112px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    transition: transform 160ms ease;
+  }
+
+  .released-grid a:hover .released-thumb img,
+  .released-grid a:focus-visible .released-thumb img { transform: scale(1.06); }
+
+  .released-copy {
+    display: grid;
+    min-width: 0;
+    padding: 15px;
+  }
+
+  .released-copy small { font-size: 0.62rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .released-copy strong { align-self: center; overflow-wrap: anywhere; font-family: "Bodoni Moda Variable", Georgia, serif; font-size: 1.55rem; line-height: 0.95; }
+  .released-copy small:last-child { align-self: end; }
 
   @media (max-width: 1050px) {
+    .picker-card {
+      grid-template-areas:
+        "intro intro"
+        "preview control";
+      grid-template-columns: minmax(220px, 0.55fr) minmax(320px, 0.8fr);
+    }
     .released-grid { grid-template-columns: repeat(3, 1fr); }
     .method-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 700px) {
     .install-intro {
+      grid-template-columns: 1fr;
       gap: 16px;
       padding: 34px 0 24px;
     }
@@ -490,9 +660,16 @@ const content = locale === "en" ? {
     .install-intro h1 { font-size: 2.75rem; }
     .install-intro .intro-copy { gap: 8px; }
     .install-intro .intro-copy p { font-size: 0.88rem; line-height: 1.45; }
-    .picker-card { grid-template-columns: 1fr; gap: 12px; padding: 16px; }
+    .picker-card {
+      grid-template-areas: "intro" "preview" "control";
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 16px;
+    }
     .picker-card h2 { font-size: 2.15rem; }
-    .picker-card > div:first-child > p:last-child { margin-top: 10px; font-size: 0.86rem; line-height: 1.45; }
+    .picker-intro > p:last-child { margin-top: 10px; font-size: 0.86rem; line-height: 1.45; }
+    .pet-preview { min-height: 260px; }
+    .pet-preview img { height: 215px; }
     .picker-control { gap: 8px; padding: 12px; }
     .selected-pet { padding-top: 9px; }
     .codex-method-label { margin-top: 4px; }
