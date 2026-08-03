@@ -46,6 +46,7 @@ select {
 button,
 a {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 :focus-visible {
@@ -76,19 +77,28 @@ img {
   font-weight: 850;
   letter-spacing: -0.06em;
   line-height: 0.88;
+  text-wrap: balance;
+}
+
+:where(h1, h2, h3)[id] {
+  scroll-margin-top: 120px;
 }
 
 .page-intro {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.55fr);
-  gap: 48px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.48fr);
+  gap: 56px;
   align-items: end;
-  padding: 96px 0 54px;
+  padding: 64px 0 42px;
+}
+
+.page-intro > * {
+  min-width: 0;
 }
 
 .page-intro h1 {
-  max-width: 900px;
-  font-size: clamp(4rem, 11vw, 10rem);
+  max-width: 840px;
+  font-size: clamp(4rem, 8vw, 7.8rem);
 }
 
 .page-intro p {
@@ -114,6 +124,7 @@ img {
   font-size: clamp(2.6rem, 5vw, 5.5rem);
   line-height: 0.95;
   letter-spacing: -0.05em;
+  text-wrap: balance;
 }
 
 .section-title span {
@@ -172,6 +183,11 @@ img {
   background: var(--acid);
 }
 
+.button:active {
+  translate: 3px 3px;
+  box-shadow: 1px 1px 0 var(--ink);
+}
+
 .button[aria-disabled="true"] {
   color: var(--muted);
   box-shadow: none;
@@ -227,11 +243,11 @@ img {
   .page-intro {
     grid-template-columns: 1fr;
     gap: 24px;
-    padding-top: 62px;
+    padding-top: 46px;
   }
 
   .page-intro h1 {
-    font-size: clamp(3.6rem, 20vw, 7rem);
+    font-size: clamp(3.3rem, 17vw, 5.5rem);
   }
 }
 

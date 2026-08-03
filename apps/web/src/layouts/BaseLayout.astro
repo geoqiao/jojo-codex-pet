@@ -33,6 +33,20 @@ const zhCnUrl = new URL(route("zh-CN", path), Astro.site);
 const socialImage = new URL(image, Astro.site);
 const openGraphLocale = locale === "en" ? "en_US" : "zh_CN";
 const alternateOpenGraphLocale = locale === "en" ? "zh_CN" : "en_US";
+const a11y = locale === "en"
+  ? { home: "JoJo Codex Pet home", nav: "Primary navigation", skip: "Skip to content" }
+  : { home: "JoJo Codex Pet 首页", nav: "主要导航", skip: "跳到主要内容" };
+const footer = locale === "en"
+  ? {
+      tagline: "Unofficial · non-commercial · ad-free",
+      code: "Project code: MIT",
+      fan: "Fan materials: separate notice"
+    }
+  : {
+      tagline: "非官方 · 非商业 · 无广告",
+      code: "项目代码：MIT",
+      fan: "同人素材：适用单独声明"
+    };
 const navigation = [
   [copy.nav.gallery, "/"],
   [copy.nav.parts, "/parts/"],
@@ -75,14 +89,14 @@ const navigation = [
     <title>{title}</title>
   </head>
   <body>
-    <a class="skip-link" href="#main">Skip to content</a>
+    <a class="skip-link" href="#main">{a11y.skip}</a>
     <header class="site-header">
       <div class="header-inner shell">
-        <a class="brand" href={route(locale, "/")} aria-label="JoJo Codex Pet home">
+        <a class="brand" href={route(locale, "/")} aria-label={a11y.home}>
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span><strong>JOJO</strong><small>CODEX PET</small></span>
         </a>
-        <nav aria-label="Primary navigation">
+        <nav aria-label={a11y.nav}>
           {navigation.map(([label, href]) => (
             <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
           ))}
@@ -99,8 +113,8 @@ const navigation = [
     </main>
     <footer class="site-footer">
       <div class="shell footer-grid">
-        <p><strong>JoJo Codex Pet</strong><br />Unofficial · non-commercial · ad-free</p>
-        <p>Project code: MIT<br />Fan materials: separate notice</p>
+        <p><strong>JoJo Codex Pet</strong><br />{footer.tagline}</p>
+        <p>{footer.code}<br />{footer.fan}</p>
         <p><a href="https://github.com/geoqiao/jojo-codex-pet">GitHub</a><br /><a href={route(locale, "/contribute/")}>{copy.nav.contribute}</a></p>
       </div>
     </footer>
@@ -120,7 +134,7 @@ const navigation = [
     font-weight: 800;
   }
 
-  .skip-link:focus {
+  .skip-link:focus-visible {
     translate: 0;
   }
 

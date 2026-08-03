@@ -15,12 +15,10 @@ const statusLabel = copy.status[pet.status];
 const content = locale === "en" ? {
   title: `${name} — Part ${pet.part}: ${partTitle} Codex Pet`,
   description: `${name} is the Part ${pet.part} ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} pet for ${partTitle}. Status: ${statusLabel}.`,
-  back: "Back to gallery",
   imageAlt: `${name}, a pixel-art Codex pet from JoJo Part ${pet.part}`
 } : {
   title: `${name} — JoJo 第 ${pet.part} 部《${partTitle}》Codex 宠物`,
   description: `${name}是 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物，当前状态：${statusLabel}。`,
-  back: "返回宠物目录",
   imageAlt: `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`
 };
 const pageUrl = new URL(route(locale, `/pets/${pet.id}/`), Astro.site);
@@ -73,17 +71,16 @@ const structuredData = {
         <li aria-current="page">{name}</li>
       </ol>
     </nav>
-    <p class="back-link"><a href={route(locale, "/")}>← {content.back}</a></p>
     <PetDetailContent locale={locale} pet={pet} />
   </div>
   <ViewCounts locale={locale} incrementId={pet.id} />
 </BaseLayout>
 
 <style>
-  .detail-shell { padding-top: 38px; }
+  .detail-shell { padding-top: 24px; }
 
   .breadcrumbs {
-    margin-bottom: 14px;
+    margin-bottom: 18px;
     font-size: 0.72rem;
     font-weight: 760;
   }
@@ -103,15 +100,5 @@ const structuredData = {
   .breadcrumbs li[aria-current="page"] {
     color: var(--muted);
   }
-
-  .back-link {
-    margin: 0 0 24px;
-    font-size: 0.75rem;
-    font-weight: 850;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .back-link a { text-underline-offset: 4px; }
 
 </style>

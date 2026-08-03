@@ -120,6 +120,7 @@ try {
     copyCommand: "command",
     copyLabel: "Copy",
     copiedLabel: "Copied",
+    copyFailedLabel: "Copy failed",
     actionPetId: "part-03-jotaro-kujo",
     actionMethod: "npx",
     actionLocale: "en"
@@ -128,7 +129,7 @@ try {
   failureButton.dispatchEvent(new Event("click"));
   await waitForImmediate();
   assert.equal(failureRequests, 0, "Clipboard rejection must not count an action");
-  assert.equal(failureButton.textContent, "Copy", "Clipboard rejection must not show success feedback");
+  assert.equal(failureButton.textContent, "Copy failed", "Clipboard rejection must show actionable failure feedback");
 
   setBrowserGlobals({
     writeText: async () => undefined,
@@ -192,7 +193,7 @@ try {
   assert.equal(degradedClick.defaultPrevented, false, "Rejected Deep Link fallback tracking must not prevent navigation");
   assert.equal(deepLinkFallbackRequests, 1, "A declined beacon must attempt one non-blocking fallback request");
 
-  console.log("Install action client OK: all Released links agree, Copy snapshots attribution, failures degrade silently, and Deep Links stay unblocked.");
+  console.log("Install action client OK: all Released links agree, Copy snapshots attribution, Clipboard failures stay visible, and Deep Links stay unblocked.");
 } finally {
   if (originalNavigator) Object.defineProperty(globalThis, "navigator", originalNavigator);
   else delete (globalThis as { navigator?: unknown }).navigator;
