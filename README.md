@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand has an independent pet identity in the public Part-by-Part gallery; completed V2 packages are installed one pet at a time.
 
-> Public release status: all 36 headline pets are visible across Parts 1–9. The 24 pets with complete QA-passed Codex Pet V2 packages are released and independently installable. The remaining 12 headline pets stay visible as planned entries until their real packages pass the same quality gate.
+> Public release status: all 36 headline pets now have validated Codex Pet V2 packages and are visible across Parts 1–9. Of these, 24 are released and independently installable; the remaining 12 stay visible as Wave Review entries until final release approval.
 
 ## Headline scope
 

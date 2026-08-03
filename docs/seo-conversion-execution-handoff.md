@@ -34,7 +34,8 @@ Tusk ACT3 已由本次交付完成，不属于本 handoff 的待办。接收方�
 - 当前工作目录：`/Users/geoqiao/Documents/JOJO-codex-pet`
 - 当前分支：`agent/show-all-pets-and-seo`
 - 进入本轮前 HEAD：`0b3e269`
-- 本 handoff 与 Tusk ACT3 release 变更仍在 working tree、尚未 commit；接收方不得清理或覆盖这些未提交文件。
+- Tusk ACT3 release 与本 handoff 的检查点 commit：`465007d`。
+- 全部 Wave 3 Part 7–9 package 的 merge commit：`1237f9d`；它已把 `origin/main` 的 `3a5bbf9` 完整纳入当前分支。
 - `origin/main` 在 handoff 编写时为 `3a5bbf9`，包含 Wave 3 的 review 资产；其中 Tusk ACT3 原先仍为 `wave-review`，没有公开 `packagePath`。
 - 只读参考 worktree：`/Users/geoqiao/Documents/JOJO-codex-pet-johnny-kimi-k3`（`herdr-worker/wave3-part7`，`e5d6982`）与 `/Users/geoqiao/Documents/JOJO-codex-pet-wave3-integration`（`herdr-worker/wave3-integration`，`3a5bbf9`）。剩余 SEO 工作不应在这两个 worktree 中落改动。
 - 开始工作前必须重新运行 `git status --short`、`git log --oneline --decorate -8`，以实际状态为准。
@@ -59,7 +60,8 @@ Tusk ACT3 已由本次交付完成，不属于本 handoff 的待办。接收方�
 
 已完成：
 
-- Tusk ACT3 V2 atlas、package、站点 base/card 资产、catalog release 填充和 QA 证据；Catalog 当前为 24 Released / 12 Planned。
+- 全部 36 个 headline pet 都已拥有 V2 package 与 base/card 资产；Catalog 当前为 24 Released / 12 Wave Review / 0 Planned。
+- Tusk ACT3 V2 atlas、package、站点 base/card 资产、catalog release 填充和 QA 证据已完成。
 - Tusk ACT3 已按真实 installer HTTP 下载、checksum 校验与原子安装路径完成代表性测试，并已写入当前用户的 `~/.codex/pets/part-07-tusk-act-3`。
 - Tusk ACT3 不再需要 SEO 实验文案。
 - 现有 82 个英文/中文 URL 的 URL 结构保持不变。
@@ -80,9 +82,10 @@ Tusk ACT3 已由本次交付完成，不属于本 handoff 的待办。接收方�
 - `apps/web/public/wave-3-bases/part-07-tusk-act-3.png`
 - `apps/web/public/wave-3-bases/part-07-tusk-act-3-card.webp`
 - `docs/visual/wave-3-tusk-act-3-review/`
+- `pets/` 中完整的 36 个 V2 package；除 Tusk ACT3 外的其余 12 个 Wave 3 entry 保持 `wave-review`，不要擅自发布或退回 `planned`
 - `packages/catalog/src/pets.ts` 中 Tusk ACT3 的 `released`、palette、image 与 `packagePath`
 - `GalleryPage.astro` 中从 catalog 计算 Released 数量的逻辑
-- README 的 24 Released / 12 Planned 现状
+- README 的 24 Released / 12 Wave Review 现状
 
 Tusk ACT3 的 V2 spritesheet SHA-256 为 `b54d175fdfa90878fab77f56b479b10e8040584e482e94835135671a218557e6`。接收方不应重新生成、替换或通过整票 cherry-pick 覆盖这些文件；如后续改动触及它们，必须重新跑完整 package、build 与 local-install hash 验收。
 
