@@ -4,7 +4,7 @@
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand has an independent pet identity in the public Part-by-Part gallery; completed V2 packages are installed one pet at a time.
 
-> Public release status: all 36 headline pets now have validated Codex Pet V2 packages and are visible across Parts 1–9. Of these, 24 are released and independently installable; the remaining 12 stay visible as Wave Review entries until final release approval.
+> Public release status: all 36 headline pets across Parts 1–9 have validated Codex Pet V2 packages and are released for independent installation.
 
 ## Headline scope
 
@@ -32,7 +32,7 @@ The site publishes aggregate pet-page view totals and records anonymous daily ag
 
 ## Install a released pet
 
-Every method installs only the selected pet. Choose any of the 24 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
+Every method installs only the selected pet. Choose any of the 36 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
 
 ```bash
 curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo

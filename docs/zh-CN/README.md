@@ -4,7 +4,7 @@
 
 这是一个非官方、非商业、无广告的 JoJo 主题 Codex 动态宠物合集。每个具名角色与替身都在按篇章公开的目录中拥有独立宠物身份；完成的 V2 安装包始终一次只安装一只。
 
-> 当前公开发布状态：第 1–9 部的 36 只首发宠物现已全部拥有通过验证的 Codex Pet V2 安装包并公开展示。其中 24 只已发布且可独立安装；其余 12 只保持“Wave 审核中”，等待最终发布批准。
+> 当前公开发布状态：第 1–9 部的 36 只首发宠物均已拥有通过验证的 Codex Pet V2 安装包，并全部开放独立安装。
 
 ## 首发范围
 
@@ -24,7 +24,7 @@
 
 ## 安装已发布宠物
 
-每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.pet/zh-CN/install/)选择 24 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
+每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.pet/zh-CN/install/)选择 36 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
 
 ```bash
 curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo

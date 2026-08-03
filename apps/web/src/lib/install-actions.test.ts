@@ -31,7 +31,7 @@ const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
 const originalFetch = globalThis.fetch;
 
 const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packagePath);
-assert.equal(releasedPets.length, 24, "the install contract must cover every Released pet");
+assert.equal(releasedPets.length, 36, "the install contract must cover every Released pet");
 for (const pet of releasedPets) {
   const commands = installCommandsFor(pet.id);
   assert.equal(commands.bash, `curl -fsSL https://pixelstand.pet/install.sh | bash -s -- ${pet.id}`);
