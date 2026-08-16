@@ -37,11 +37,15 @@ if (existsSync(releasedIdsPath)) {
   expect(releasedIds.length === 36, `expected 36 released action IDs, found ${releasedIds.length}`);
 }
 
-const pilotProfileIds = new Set([
+const editorialProfileIds = new Set([
   "part-03-jotaro-kujo",
   "part-03-star-platinum",
   "part-03-dio",
-  "part-03-the-world"
+  "part-03-the-world",
+  "part-07-tusk-act-1",
+  "part-07-tusk-act-2",
+  "part-07-tusk-act-3",
+  "part-07-tusk-act-4"
 ]);
 const profileBodies = new Map();
 
@@ -349,8 +353,8 @@ for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))
   }
 
   const profile = html.match(/<section[^>]*data-editorial-profile="([^"]+)"[\s\S]*?<\/section>/)?.[0];
-  const expectedProfile = Boolean(petId && pilotProfileIds.has(petId));
-  expect(Boolean(profile) === expectedProfile, `${route}: Part 3 editorial profile coverage is inconsistent`);
+  const expectedProfile = Boolean(petId && editorialProfileIds.has(petId));
+  expect(Boolean(profile) === expectedProfile, `${route}: editorial profile coverage is inconsistent`);
   if (profile && petId) {
     expect(profile.includes(`data-editorial-profile="${petId}"`), `${route}: editorial profile ID does not match route`);
     for (const section of ["about", "animationQa", "packageCompatibility"]) {
@@ -363,6 +367,50 @@ for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))
         profileBodies.set(key, route);
       }
     }
+  }
+
+  const tuskMatch = petId?.match(/^part-07-tusk-act-([1-4])$/);
+  if (tuskMatch) {
+    const act = tuskMatch[1];
+    const isChinese = route.startsWith("/zh-CN/");
+    const displayName = isChinese ? `牙 ACT${act}` : `Tusk ACT${act}`;
+    const expectedTitle = isChinese
+      ? `${displayName} — JoJo 第 7 部《飙马野郎》Codex 宠物`
+      : `${displayName} — Part 7: Steel Ball Run Codex Pet`;
+    const h1 = extract(html, /<h1[^>]*>([^<]+)<\/h1>/);
+    const description = extract(html, /<meta name="description" content="([^"]+)"/);
+    expect(h1 === displayName, `${route}: canonical Tusk H1 display name changed`);
+    expect(html.includes(`<title>${expectedTitle}</title>`), `${route}: approved Tusk title changed`);
+    expect(
+      isChinese ? description?.includes("非官方像素动画宠物") : description?.includes("unofficial animated pixel Codex pet"),
+      `${route}: metadata does not qualify the actual animated Codex pet product`
+    );
+
+    const lineage = html.match(/<nav class="lineage-nav" data-stand-lineage="part-07-johnny-joestar"[\s\S]*?<\/nav>/)?.[0];
+    expect(Boolean(lineage), `${route}: missing Tusk lineage navigation`);
+    if (lineage) {
+      const prefix = isChinese ? "/zh-CN" : "";
+      for (let stage = 1; stage <= 4; stage += 1) {
+        const stageName = isChinese ? `牙 ACT${stage}` : `Tusk ACT${stage}`;
+        const anchor = isChinese
+          ? `${stageName} — 像素动画 Codex 宠物`
+          : `${stageName} — animated Codex pet`;
+        expect(
+          lineage.includes(`href="${prefix}/pets/part-07-tusk-act-${stage}/"`) && lineage.includes(anchor),
+          `${route}: missing descriptive crawlable ACT${stage} lineage anchor`
+        );
+      }
+      expect((lineage.match(/→/g) ?? []).length === 3, `${route}: Tusk lineage order is not visibly connected`);
+      expect(lineage.includes(`href="${prefix}/pets/${petId}/" aria-current="page"`), `${route}: current Tusk ACT is not identified in the lineage`);
+    }
+
+    const relationship = html.match(/<dd[^>]*data-relationship-links[\s\S]*?<\/dd>/)?.[0];
+    const ownerName = isChinese ? "乔尼·乔斯达" : "Johnny Joestar";
+    const ownerHref = `${isChinese ? "/zh-CN" : ""}/pets/part-07-johnny-joestar/`;
+    expect(
+      Boolean(relationship?.includes(`href="${ownerHref}"`) && relationship.includes(ownerName)),
+      `${route}: Johnny Joestar relationship link was not preserved`
+    );
   }
 }
 

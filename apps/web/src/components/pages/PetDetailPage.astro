@@ -3,6 +3,7 @@ import { parts, type Locale, type Pet } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PetDetailContent from "../PetDetailContent.astro";
 import ViewCounts from "../ViewCounts.astro";
+import { petProfiles } from "../../content/petProfiles";
 import { localize, route, ui } from "../../lib/i18n";
 
 interface Props { locale: Locale; pet: Pet }
@@ -12,13 +13,14 @@ const name = localize(pet.name, locale);
 const part = parts.find((item) => item.number === pet.part)!;
 const partTitle = localize(part.title, locale);
 const statusLabel = copy.status[pet.status];
+const profileDescription = petProfiles[pet.id]?.seoDescription?.[locale];
 const content = locale === "en" ? {
   title: `${name} — Part ${pet.part}: ${partTitle} Codex Pet`,
-  description: `${name} is the Part ${pet.part} ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} pet for ${partTitle}. Status: ${statusLabel}.`,
+  description: profileDescription ?? `${name} is the Part ${pet.part} ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} pet for ${partTitle}. Status: ${statusLabel}.`,
   imageAlt: `${name}, a pixel-art Codex pet from JoJo Part ${pet.part}`
 } : {
   title: `${name} — JoJo 第 ${pet.part} 部《${partTitle}》Codex 宠物`,
-  description: `${name}是 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物，当前状态：${statusLabel}。`,
+  description: profileDescription ?? `${name}是 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物，当前状态：${statusLabel}。`,
   imageAlt: `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`
 };
 const pageUrl = new URL(route(locale, `/pets/${pet.id}/`), Astro.site);

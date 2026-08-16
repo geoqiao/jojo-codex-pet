@@ -22,7 +22,18 @@ const related = [pet.ownerId, ...(pet.pairIds ?? [])].flatMap((id) => {
   const match = pets.find((item) => item.id === id);
   return match ? [match] : [];
 });
+const lineageOwnerId = pet.type === "stand" ? pet.ownerId : pet.id;
+const lineage = lineageOwnerId
+  ? pets
+      .filter((item) => item.type === "stand" && item.ownerId === lineageOwnerId && item.lineageStage !== undefined)
+      .sort((left, right) => left.lineageStage! - right.lineageStage!)
+  : [];
 const profile = petProfiles[pet.id];
+const profileSections = profile ? [
+  { key: "about", section: profile.about },
+  { key: "animationQa", section: profile.animationQa },
+  { key: "packageCompatibility", section: profile.packageCompatibility }
+] : [];
 const packageUrl = pet.packagePath ? packageUrlFor(pet.packagePath) : undefined;
 const openInCodexUrl = pet.packagePath ? openInCodexUrlFor({ nameEn: pet.name.en, packagePath: pet.packagePath }) : undefined;
 const commands = packageUrl ? installCommandsFor(pet.id) : undefined;
@@ -34,6 +45,9 @@ const installCommands = commands ? [
 const content = locale === "en" ? {
   identity: "Catalog identity",
   relationship: "Stand relationship",
+  lineage: "Stand form lineage",
+  lineageHelp: "Browse each independently installable animated Codex pet in story order.",
+  lineageAnchor: (itemName: string) => `${itemName} — animated Codex pet`,
   ability: "Ability modes inside this pet",
   palette: "Locked signature palette",
   source: "Source",
@@ -58,6 +72,9 @@ const content = locale === "en" ? {
 } : {
   identity: "目录身份",
   relationship: "替身关系",
+  lineage: "替身形态系列",
+  lineageHelp: "按故事顺序浏览每只可独立安装的像素动画 Codex 宠物。",
+  lineageAnchor: (itemName: string) => `${itemName} — 像素动画 Codex 宠物`,
   ability: "包含在本宠物中的能力模式",
   palette: "锁定标志配色",
   source: "来源",
@@ -176,21 +193,40 @@ const content = locale === "en" ? {
       {related.length > 0 && (
         <div>
           <dt>{content.relationship}</dt>
-          <dd>{related.map((item, index) => <><a href={route(locale, `/pets/${item.id}/`)}>{localize(item.name, locale)}</a>{index < related.length - 1 ? " · " : ""}</>)}</dd>
+          <dd data-relationship-links>{related.map((item, index) => <><a href={route(locale, `/pets/${item.id}/`)}>{localize(item.name, locale)}</a>{index < related.length - 1 ? " · " : ""}</>)}</dd>
         </div>
       )}
       {pet.abilityModes && <div><dt>{content.ability}</dt><dd>{pet.abilityModes.map((mode) => localize(mode, locale)).join(" · ")}</dd></div>}
       {pet.palette && <div><dt>{content.palette}</dt><dd class="detail-palette">{pet.palette.map((color) => <span style={`--swatch:${color}`}><i>{color}</i></span>)}</dd></div>}
       <div><dt>{content.source}</dt><dd><a href={pet.source}>geoqiao/jojo-codex-pet ↗</a></dd></div>
     </dl>
+    {lineage.length > 1 && (
+      <nav class="lineage-nav" data-stand-lineage={lineageOwnerId} aria-labelledby={`lineage-title-${pet.id}`}>
+        <h2 id={`lineage-title-${pet.id}`}>{content.lineage}</h2>
+        <p>{content.lineageHelp}</p>
+        <ol>
+          {lineage.map((item, index) => (
+            <li>
+              <a
+                href={route(locale, `/pets/${item.id}/`)}
+                aria-current={item.id === pet.id ? "page" : undefined}
+              >
+                {content.lineageAnchor(localize(item.name, locale))}
+              </a>
+              {index < lineage.length - 1 && <span aria-hidden="true">→</span>}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
   </div>
 </div>
 {profile && (
   <section class="editorial-profile" data-editorial-profile={pet.id} aria-label={locale === "en" ? "Pet profile" : "宠物资料"}>
     <p class="profile-label">{content.profileLabel}</p>
     <div class="profile-grid">
-      {Object.entries(profile).map(([sectionKey, section]) => (
-        <article data-profile-section={sectionKey}>
+      {profileSections.map(({ key, section }) => (
+        <article data-profile-section={key}>
           <h2>{section.title[locale]}</h2>
           <p>{section.body[locale]}</p>
         </article>
@@ -433,6 +469,59 @@ const content = locale === "en" ? {
   dd a { text-underline-offset: 4px; }
   code { font-size: 0.78rem; }
 
+  .lineage-nav {
+    margin-top: 24px;
+    padding: 18px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .lineage-nav h2 {
+    margin: 0;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+  }
+
+  .lineage-nav p {
+    margin: 7px 0 14px;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 620;
+    line-height: 1.45;
+  }
+
+  .lineage-nav ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .lineage-nav li {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .lineage-nav a {
+    padding: 8px 10px;
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    background: var(--paper-bright);
+    font-size: 0.65rem;
+    font-weight: 820;
+    line-height: 1.35;
+    text-underline-offset: 3px;
+  }
+
+  .lineage-nav a[aria-current="page"] {
+    color: var(--paper-bright);
+    background: var(--violet);
+  }
+
   .detail-palette { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .detail-palette span {
@@ -564,7 +653,8 @@ const content = locale === "en" ? {
   .detail-art-actions a:focus-visible,
   .install-primary a:focus-visible,
   .command-row button:focus-visible,
-  dd a:focus-visible {
+  dd a:focus-visible,
+  .lineage-nav a:focus-visible {
     outline: 3px solid var(--paper-bright);
     outline-offset: 2px;
     box-shadow: 0 0 0 6px var(--ink);

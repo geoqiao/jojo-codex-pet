@@ -26,3 +26,11 @@ Run the real local PHP action-contract test with:
 ```bash
 pnpm counter:test
 ```
+
+For a review window, make a read-only copy of the private action JSON outside the repository and summarize only the four Tusk ACT aggregate IDs:
+
+```bash
+node apps/counter-api/report-tusk-actions.mjs /secure/read-only-copy/actions.json YYYY-MM-DD YYYY-MM-DD
+```
+
+The dates are inclusive UTC aggregate days. The report keeps detail-page landings separate from Install-page selections and emits only aggregate counts. It does not attribute actions to Google Search; see [`docs/tusk-seo-measurement.md`](../../docs/tusk-seo-measurement.md) for the comparison boundary.

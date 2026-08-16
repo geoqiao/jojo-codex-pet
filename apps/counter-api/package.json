@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "stage": "node stage.mjs",
-    "test": "node test-actions.mjs"
+    "test": "node test-actions.mjs && node report-tusk-actions.test.mjs",
+    "report:tusk": "node report-tusk-actions.mjs"
   }
 }
