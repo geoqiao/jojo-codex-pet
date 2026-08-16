@@ -29,7 +29,11 @@ const store = {
     count: 4
   }),
   d: entry({ day: "2026-08-01", count: 100 }),
-  e: entry({ pet_id: "part-03-jotaro-kujo", count: 100 })
+  e: entry({
+    pet_id: "part-03-jotaro-kujo",
+    landing_path: "/pets/part-03-jotaro-kujo/",
+    count: 100
+  })
 };
 
 const report = summarizeTuskActions(store, "2026-08-14", "2026-08-27");
@@ -70,7 +74,31 @@ assert.throws(
     "2026-08-14",
     "2026-08-27"
   ),
-  /unexpected canonical landing_path/
+  /invalid entry/
+);
+assert.throws(
+  () => summarizeTuskActions(
+    { bad: entry({ day: "2026-02-31" }) },
+    "2026-08-14",
+    "2026-08-27"
+  ),
+  /invalid entry/
+);
+assert.throws(
+  () => summarizeTuskActions(
+    { bad: entry({ locale: "zh-CN" }) },
+    "2026-08-14",
+    "2026-08-27"
+  ),
+  /invalid entry/
+);
+assert.throws(
+  () => summarizeTuskActions(
+    { bad: entry({ landing_path: "/archive/pets/part-07-tusk-act-1/" }) },
+    "2026-08-14",
+    "2026-08-27"
+  ),
+  /invalid entry/
 );
 
 console.log("Tusk action report OK: UTC windows, pet cohort, landing-page split, event totals, and invalid aggregates are covered.");

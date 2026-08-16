@@ -11,13 +11,27 @@ export const tuskPetIds = Object.freeze([
 const tuskPetIdSet = new Set(tuskPetIds);
 const eventTypes = new Set(["install_command_copy_success", "install_deeplink_click"]);
 const methods = new Set(["bash", "powershell", "npx", "codex"]);
+const locales = new Set(["en", "zh-CN"]);
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 
-const assertDate = (value, label) => {
+const isUtcDate = (value) => {
   const date = new Date(`${value}T00:00:00Z`);
-  if (!datePattern.test(value) || Number.isNaN(date.valueOf()) || date.toISOString().slice(0, 10) !== value) {
+  return datePattern.test(value)
+    && !Number.isNaN(date.valueOf())
+    && date.toISOString().slice(0, 10) === value;
+};
+
+const assertDate = (value, label) => {
+  if (!isUtcDate(value)) {
     throw new Error(`${label} must be a YYYY-MM-DD UTC date`);
   }
+};
+
+const landingKind = (entry) => {
+  const localePrefix = entry.locale === "zh-CN" ? "/zh-CN" : "";
+  if (entry.landing_path === `${localePrefix}/pets/${entry.pet_id}/`) return "detail";
+  if (entry.landing_path === `${localePrefix}/install/`) return "install";
+  return undefined;
 };
 
 const emptyCounts = () => ({
@@ -39,11 +53,13 @@ const validateEntry = (entry) => {
     !entry
     || typeof entry !== "object"
     || Array.isArray(entry)
-    || !datePattern.test(entry.day)
+    || !isUtcDate(entry.day)
     || !eventTypes.has(entry.event_type)
     || typeof entry.pet_id !== "string"
     || !methods.has(entry.method)
+    || !locales.has(entry.locale)
     || typeof entry.landing_path !== "string"
+    || !landingKind(entry)
     || !Number.isInteger(entry.count)
     || entry.count < 1
     || (entry.event_type === "install_deeplink_click" ? entry.method !== "codex" : entry.method === "codex")
@@ -80,15 +96,12 @@ export const summarizeTuskActions = (store, start, end) => {
     addEntry(summary.all_tusk_landing_paths, entry);
     addEntry(summary.by_pet[entry.pet_id].all_landing_paths, entry);
 
-    const detailSuffix = `/pets/${entry.pet_id}/`;
-    if (entry.landing_path.endsWith(detailSuffix)) {
+    if (landingKind(entry) === "detail") {
       addEntry(summary.tusk_detail_page_landings, entry);
       addEntry(summary.by_pet[entry.pet_id].detail_page_landings, entry);
-    } else if (entry.landing_path === "/install/" || entry.landing_path === "/zh-CN/install/") {
+    } else {
       addEntry(summary.install_page_landings, entry);
       addEntry(summary.by_pet[entry.pet_id].install_page_landings, entry);
-    } else {
-      throw new Error(`unexpected canonical landing_path for ${entry.pet_id}`);
     }
   }
 

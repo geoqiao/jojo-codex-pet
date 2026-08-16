@@ -181,8 +181,8 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
     packageCompatibility: {
       title: { en: "Validated ACT3 install paths", "zh-CN": "通过验证的 ACT3 安装路径" },
       body: {
-        en: "Tusk ACT3 is independently available through Open in Codex or the Bash, PowerShell, and npx commands on this page. CLI methods target part-07-tusk-act-3 and validate its manifest and SHA-256 package contract; the recorded spritesheet digest is b54d175fdfa90878fab77f56b479b10e8040584e482e94835135671a218557e6. Installing it does not bundle another Tusk ACT.",
-        "zh-CN": "牙 ACT3 可通过本页的“在 Codex 中打开”、Bash、PowerShell 或 npx 独立安装。命令行方式以 part-07-tusk-act-3 为目标，并校验清单与 SHA-256 包合同；已记录的图集摘要为 b54d175fdfa90878fab77f56b479b10e8040584e482e94835135671a218557e6。安装时不会捆绑其他牙 ACT。"
+        en: "Tusk ACT3 is independently available through Open in Codex or the Bash, PowerShell, and npx commands on this page. CLI methods target part-07-tusk-act-3 and validate its manifest and SHA-256 package contract. Installing it does not bundle another Tusk ACT.",
+        "zh-CN": "牙 ACT3 可通过本页的“在 Codex 中打开”、Bash、PowerShell 或 npx 独立安装。命令行方式以 part-07-tusk-act-3 为目标，并校验清单与 SHA-256 包合同。安装时不会捆绑其他牙 ACT。"
       }
     }
   },

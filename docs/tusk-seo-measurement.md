@@ -4,7 +4,7 @@ Status: implementation baseline for the four existing Tusk ACT detail pages. Thi
 
 ## Verified Google Search Console baseline
 
-GSC property: `https://pixelstand.pet/`
+GSC property: `sc-domain:pixelstand.pet`
 
 Search type: Web
 
@@ -13,7 +13,7 @@ Data range: `2026-07-20..2026-08-13` (inclusive)
 | Cohort | Impressions | Clicks | CTR | Average position |
 | --- | ---: | ---: | ---: | ---: |
 | Entire site | 196 | 6 | 3.1% | 18.9 |
-| Query matches `tusk|牙.*act` | 75 | 0 | 0% | ~20.6 weighted from the exported rows |
+| Query matches `tusk|牙.*act` | 75 | 0 | 0% | ~20.6 weighted from the verified rows |
 
 The Tusk/牙 cohort supplied 38.3% of site impressions and no search clicks in this window.
 
