@@ -48,16 +48,16 @@ const send = (payload: InstallActionPayload, preferBeacon = false) => {
   }
 };
 
+const showTemporaryLabel = (button: HTMLButtonElement, label: string, restoreLabel: string) => {
+  button.textContent = label;
+  window.setTimeout(() => {
+    button.textContent = restoreLabel;
+  }, 1400);
+};
+
 const bindCopyButton = (button: HTMLButtonElement) => {
   if (button.dataset.installActionBound === "true") return;
   button.dataset.installActionBound = "true";
-
-  const showTemporaryLabel = (label: string) => {
-    button.textContent = label;
-    window.setTimeout(() => {
-      button.textContent = button.dataset.copyLabel ?? "Copy";
-    }, 1400);
-  };
 
   button.addEventListener("click", async () => {
     const command = button.dataset.copyCommand;
@@ -67,13 +67,44 @@ const bindCopyButton = (button: HTMLButtonElement) => {
     try {
       await navigator.clipboard.writeText(command);
     } catch {
-      showTemporaryLabel(button.dataset.copyFailedLabel ?? "Copy failed");
+      showTemporaryLabel(button, button.dataset.copyFailedLabel ?? "Copy failed", button.dataset.copyLabel ?? "Copy");
       return;
     }
 
-    showTemporaryLabel(button.dataset.copiedLabel ?? "Copied");
+    showTemporaryLabel(button, button.dataset.copiedLabel ?? "Copied", button.dataset.copyLabel ?? "Copy");
 
     if (payload) send(payload);
+  });
+};
+
+const bindPageLinkCopy = (button: HTMLButtonElement) => {
+  if (button.dataset.installActionBound === "true") return;
+  button.dataset.installActionBound = "true";
+
+  button.addEventListener("click", async () => {
+    const pagePath = button.dataset.copyPageLink;
+    if (!pagePath) return;
+
+    const pageLink = pagePath.startsWith("http")
+      ? pagePath
+      : `${window.location.origin ?? ""}${pagePath}`;
+
+    try {
+      await navigator.clipboard.writeText(pageLink);
+    } catch {
+      showTemporaryLabel(
+        button,
+        button.dataset.pageLinkCopyFailedLabel ?? "Copy failed",
+        button.dataset.pageLinkCopyLabel ?? "Copy page link"
+      );
+      return;
+    }
+
+    showTemporaryLabel(
+      button,
+      button.dataset.pageLinkCopiedLabel ?? "Link copied",
+      button.dataset.pageLinkCopyLabel ?? "Copy page link"
+    );
   });
 };
 
@@ -90,6 +121,10 @@ const bindDeepLink = (link: HTMLAnchorElement) => {
 export const bindInstallActions = (root: ParentNode = document) => {
   for (const button of root.querySelectorAll<HTMLButtonElement>("[data-copy-command][data-action-method]")) {
     bindCopyButton(button);
+  }
+
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-copy-page-link]")) {
+    bindPageLinkCopy(button);
   }
 
   for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-install-deeplink][data-action-method='codex']")) {

@@ -1,7 +1,7 @@
 ---
 import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { localize } from "../../lib/i18n";
+import { localize, route } from "../../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
 import InstallActionTracking from "../InstallActionTracking.astro";
 
@@ -9,8 +9,8 @@ interface Props { locale: Locale }
 const { locale } = Astro.props;
 const releasedPets = pets.filter((pet) => pet.status === "released" && pet.packagePath);
 const releasedPet = releasedPets[0]!;
-const localePrefix = locale === "zh-CN" ? "/zh-CN" : "";
 const petName = localize(releasedPet.name, locale);
+const releasedPetPagePath = route(locale, `/pets/${releasedPet.id}/`);
 const releasedPetPart = parts.find((part) => part.number === releasedPet.part)!;
 const releasedPetImage = releasedPet.image?.replace(/\.png$/, "-card.webp");
 const releasedPetImageAlt = locale === "en"
@@ -24,13 +24,21 @@ const content = locale === "en" ? {
   description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
   eyebrow: "One pet per primary action",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
-  intro: "Choose any released pet. Every route installs only the selected Part-scoped pet and never silently adds a Stand Pair or an entire Part.",
+  intro: "Free, unofficial animated pets for the Codex desktop app—not standalone mobile apps. Choose a released pet; every route installs only that Part-scoped pet.",
   jump: "Choose a pet and install",
   pickerEyebrow: `${releasedPets.length} validated pets are live`,
   pickerTitle: "Choose your companion.",
-  pickerBody: "The selection below controls Open in Codex and all three command installers.",
+  pickerBody: "The selection below controls the one primary Codex action and its verified fallback installers.",
   pickerLabel: "Released pet",
   selected: "Current selection",
+  codexSupport: "Requires the Codex desktop app with Pets support. If the codex:// link does not open, use Other install methods below.",
+  afterInstallLabel: "After install",
+  afterInstall: "open Codex Settings > Pets, select Refresh, then choose the pet.",
+  otherMethods: "Other install methods",
+  desktopTransfer: "On a phone? Copy this pet page link and open it on your computer to continue. Installation stays available here when your Codex desktop app is ready.",
+  copyPageLink: "Copy page link",
+  pageLinkCopied: "Link copied",
+  pageLinkCopyFailed: "Copy failed",
   actionPrivacy: "We count anonymous aggregate command-copy and Open in Codex actions. These totals show install intent—not completed installations or identifiable visitors.",
   availableTitle: "Browse every released pet",
   availableNote: "Each detail page includes the same pet-specific Codex deep link and verified command installers.",
@@ -60,13 +68,21 @@ const content = locale === "en" ? {
   description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
   eyebrow: "主操作一次只安装一只",
   heading: "只安装你选中的宠物。",
-  intro: "选择任意已发布宠物。每条安装路径只安装当前篇章稳定 ID 对应的宠物，不会暗中附带替身配对或整部合集。",
+  intro: "这是给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用。选择一只已发布宠物；每条路径只安装当前篇章稳定 ID 对应的宠物。",
   jump: "选择宠物并安装",
   pickerEyebrow: `${releasedPets.length} 只已验证宠物现已开放`,
   pickerTitle: "选择你的小伙伴。",
-  pickerBody: "下方选择会同时控制 Codex 深链与三种命令行安装方式。",
+  pickerBody: "下方选择会同步更新唯一的 Codex 主操作与经过验证的备用安装器。",
   pickerLabel: "已发布宠物",
   selected: "当前选择",
+  codexSupport: "需要支持 Pets 的 Codex 桌面应用。如果 codex:// 深链没有打开，请使用下方的“其他安装方式”。",
+  afterInstallLabel: "安装后",
+  afterInstall: "打开 Codex Settings > Pets，选择 Refresh，然后选择这只宠物。",
+  otherMethods: "其他安装方式",
+  desktopTransfer: "手机上操作？复制这只宠物的页面链接，在电脑上继续。准备好支持 Pets 的 Codex 桌面应用后，也可以直接在此使用安装入口。",
+  copyPageLink: "复制页面链接",
+  pageLinkCopied: "链接已复制",
+  pageLinkCopyFailed: "复制失败",
   actionPrivacy: "站点只匿名汇总成功复制命令与点击“在 Codex 中打开”的次数。这些数据表示安装意图，不代表安装完成，也不识别访客。",
   availableTitle: "浏览全部已发布宠物",
   availableNote: "每个详情页都提供对应宠物的 Codex 深链与经过校验的命令行安装方式。",
@@ -136,6 +152,7 @@ const content = locale === "en" ? {
                 data-pet-part={pet.part}
                 data-pet-accent={parts.find((part) => part.number === pet.part)?.accent}
                 data-pet-image={pet.image?.replace(/\.png$/, "-card.webp")}
+                data-page-url={route(locale, `/pets/${pet.id}/`)}
                 data-pet-image-alt={locale === "en"
                   ? `${localize(pet.name, locale)}, Part ${pet.part} pixel Codex pet`
                   : `${localize(pet.name, locale)}，JoJo 第 ${pet.part} 部像素 Codex 宠物`}
@@ -150,9 +167,11 @@ const content = locale === "en" ? {
             <code data-selected-pet-id>{releasedPet.id}</code>
           </p>
           <p class="codex-method-label"><span>01</span> {content.methods[0].name}</p>
+          <p class="install-support" id="install-codex-support">{content.codexSupport}</p>
           <a
             class="button codex-action"
             href={openInCodexUrl}
+            aria-describedby="install-codex-support"
             data-install-deeplink
             data-action-pet-id={releasedPet.id}
             data-action-method="codex"
@@ -160,38 +179,58 @@ const content = locale === "en" ? {
           >
             {content.open} ↗
           </a>
+          <p class="after-install-note"><strong>{content.afterInstallLabel}</strong> {content.afterInstall}</p>
+          <div class="page-link-transfer">
+            <p>{content.desktopTransfer}</p>
+            <button
+              class="page-link-button"
+              type="button"
+              data-copy-page-link={releasedPetPagePath}
+              data-page-link-copy-label={content.copyPageLink}
+              data-page-link-copied-label={content.pageLinkCopied}
+              data-page-link-copy-failed-label={content.pageLinkCopyFailed}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {content.copyPageLink}
+            </button>
+          </div>
         </div>
       </header>
 
-      <div class="method-grid" id="install-methods">
-        {content.methods.filter(({ method }) => method !== "codex").map(({ method, name, detail }, index) => {
-          const command = method === "bash" ? commands.bash : method === "powershell" ? commands.powershell : commands.npx;
-          return (
-            <article>
-              <span>0{index + 2}</span>
-              <h2>{name}</h2>
-              <p>{detail}</p>
-              <div class="install-command">
-                <code data-command-output={method}>{command}</code>
-                <button
-                  class="button"
-                  type="button"
-                  data-copy-command={command}
-                  data-copy-label={content.copy}
-                  data-copied-label={content.copied}
-                  data-copy-failed-label={content.copyFailed}
-                  data-action-pet-id={releasedPet.id}
-                  data-action-method={method}
-                  data-action-locale={locale}
-                  aria-live="polite"
-                >
-                  {content.copy}
-                </button>
-              </div>
-            </article>
-          );
-        })}
-      </div>
+      <details class="other-methods" id="install-methods">
+        <summary>{content.otherMethods}</summary>
+        <div class="method-grid">
+          {content.methods.filter(({ method }) => method !== "codex").map(({ method, name, detail }, index) => {
+            const command = method === "bash" ? commands.bash : method === "powershell" ? commands.powershell : commands.npx;
+            return (
+              <article>
+                <span>0{index + 2}</span>
+                <h2>{name}</h2>
+                <p>{detail}</p>
+                <div class="install-command">
+                  <code data-command-output={method}>{command}</code>
+                  <button
+                    class="button"
+                    type="button"
+                    data-copy-command={command}
+                    data-copy-label={content.copy}
+                    data-copied-label={content.copied}
+                    data-copy-failed-label={content.copyFailed}
+                    data-action-pet-id={releasedPet.id}
+                    data-action-method={method}
+                    data-action-locale={locale}
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    {content.copy}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </details>
       <p class="action-privacy">{content.actionPrivacy}</p>
     </section>
 
@@ -209,7 +248,7 @@ const content = locale === "en" ? {
             ? `${name}, Part ${pet.part} pixel Codex pet`
             : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
           return (
-            <a href={`${localePrefix}/pets/${pet.id}/`}>
+            <a href={route(locale, `/pets/${pet.id}/`)}>
               <span class="released-thumb" style={`--released-accent:${accent}`}>
                 {image && <img src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />}
               </span>
@@ -254,6 +293,7 @@ const content = locale === "en" ? {
     const petAccent = option?.dataset.petAccent;
     const petImage = option?.dataset.petImage;
     const petImageAlt = option?.dataset.petImageAlt;
+    const pageUrl = option?.dataset.pageUrl;
     if (!petId || !petNameEn || !petNameLocalized || !packagePath) return;
 
     const openUrl = openInCodexUrlFor({ nameEn: petNameEn, packagePath });
@@ -281,6 +321,9 @@ const content = locale === "en" ? {
       deepLink.href = openUrl;
       deepLink.dataset.actionPetId = petId;
     }
+
+    const pageLinkButton = document.querySelector<HTMLButtonElement>("[data-copy-page-link]");
+    if (pageLinkButton && pageUrl) pageLinkButton.dataset.copyPageLink = pageUrl;
 
     for (const method of ["bash", "powershell", "npx"] as const) {
       const output = document.querySelector<HTMLElement>(`[data-command-output="${method}"]`);
@@ -475,6 +518,59 @@ const content = locale === "en" ? {
   .codex-method-label span { color: var(--ink); }
   .codex-action { width: 100%; background: var(--paper-bright); }
 
+  .install-support,
+  .after-install-note {
+    margin: 0;
+    color: var(--ink);
+    font-size: 0.76rem;
+    font-weight: 650;
+    line-height: 1.45;
+  }
+
+  .after-install-note { padding-top: 8px; border-top: 2px solid var(--ink); }
+  .after-install-note strong { font-weight: 850; }
+
+  .page-link-transfer {
+    display: none;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 2px solid var(--ink);
+  }
+
+  .page-link-transfer p {
+    margin: 0;
+    font-size: 0.74rem;
+    line-height: 1.45;
+  }
+
+  .page-link-button {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    background: var(--paper-bright);
+    font-size: 0.68rem;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .other-methods {
+    margin-top: 28px;
+    border-top: 3px solid var(--ink);
+    border-bottom: 3px solid var(--ink);
+  }
+
+  .other-methods > summary {
+    min-height: 52px;
+    padding: 15px 4px;
+    font-size: 0.78rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
   .method-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -525,6 +621,8 @@ const content = locale === "en" ? {
   .install-intro .intro-copy a:focus-visible,
   .picker-control select:focus-visible,
   .codex-action:focus-visible,
+  .page-link-button:focus-visible,
+  .other-methods > summary:focus-visible,
   .method-grid button:focus-visible,
   .faq-list summary:focus-visible,
   .released-grid a:focus-visible {
@@ -661,7 +759,7 @@ const content = locale === "en" ? {
     .install-intro .intro-copy { gap: 8px; }
     .install-intro .intro-copy p { font-size: 0.88rem; line-height: 1.45; }
     .picker-card {
-      grid-template-areas: "intro" "preview" "control";
+      grid-template-areas: "intro" "control" "preview";
       grid-template-columns: 1fr;
       gap: 14px;
       padding: 16px;
@@ -673,6 +771,7 @@ const content = locale === "en" ? {
     .picker-control { gap: 8px; padding: 12px; }
     .selected-pet { padding-top: 9px; }
     .codex-method-label { margin-top: 4px; }
+    .page-link-transfer { display: grid; }
     .method-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
     .method-grid article { padding: 20px; }
     .method-grid h2 { min-height: 0; margin: 12px 0; }
