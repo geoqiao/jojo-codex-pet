@@ -18,11 +18,14 @@ class FakeActionElement extends EventTarget {
 class FakeRoot {
   constructor(
     private readonly buttons: FakeActionElement[] = [],
-    private readonly links: FakeActionElement[] = []
+    private readonly links: FakeActionElement[] = [],
+    private readonly pageLinkButtons: FakeActionElement[] = []
   ) {}
 
   querySelectorAll(selector: string) {
-    return selector.startsWith("[data-copy-command]") ? this.buttons : this.links;
+    if (selector.startsWith("[data-copy-command]")) return this.buttons;
+    if (selector.startsWith("[data-copy-page-link]")) return this.pageLinkButtons;
+    return this.links;
   }
 }
 
@@ -63,7 +66,7 @@ const setBrowserGlobals = ({
   Object.defineProperty(globalThis, "window", {
     configurable: true,
     value: {
-      location: { pathname: "/install/" },
+      location: { origin: "https://local.test", pathname: "/install/" },
       setTimeout: () => 0
     }
   });
@@ -171,6 +174,48 @@ try {
   const beaconPayload = JSON.parse(await beacons[0].body.text());
   assert.equal(beaconPayload.event_type, "install_deeplink_click");
   assert.equal(beaconPayload.pet_id, "part-03-star-platinum");
+
+  const pageLinks: string[] = [];
+  let pageLinkActionRequests = 0;
+  setBrowserGlobals({
+    writeText: async (value) => { pageLinks.push(value); },
+    fetch: (async () => {
+      pageLinkActionRequests += 1;
+      return new Response(null, { status: 200 });
+    }) as typeof globalThis.fetch
+  });
+  const pageLinkButton = new FakeActionElement({
+    copyPageLink: "/zh-CN/pets/part-03-jotaro-kujo/",
+    pageLinkCopyLabel: "Copy page link",
+    pageLinkCopiedLabel: "Link copied",
+    pageLinkCopyFailedLabel: "Copy failed"
+  }, "Copy page link");
+  bindInstallActions(new FakeRoot([], [], [pageLinkButton]) as unknown as ParentNode);
+  pageLinkButton.dispatchEvent(new Event("click"));
+  await waitForImmediate();
+  assert.deepEqual(pageLinks, ["https://local.test/zh-CN/pets/part-03-jotaro-kujo/"], "Page-link copy must use the current origin");
+  assert.equal(pageLinkActionRequests, 0, "Successful page-link copy must not send an install action");
+  assert.equal(pageLinkButton.textContent, "Link copied");
+
+  let failedPageLinkRequests = 0;
+  setBrowserGlobals({
+    writeText: async () => { throw new Error("clipboard denied"); },
+    fetch: (async () => {
+      failedPageLinkRequests += 1;
+      return new Response(null, { status: 200 });
+    }) as typeof globalThis.fetch
+  });
+  const failedPageLinkButton = new FakeActionElement({
+    copyPageLink: "/zh-CN/pets/part-03-jotaro-kujo/",
+    pageLinkCopyLabel: "Copy page link",
+    pageLinkCopiedLabel: "Link copied",
+    pageLinkCopyFailedLabel: "Copy failed"
+  }, "Copy page link");
+  bindInstallActions(new FakeRoot([], [], [failedPageLinkButton]) as unknown as ParentNode);
+  failedPageLinkButton.dispatchEvent(new Event("click"));
+  await waitForImmediate();
+  assert.equal(failedPageLinkRequests, 0, "Failed page-link copy must not send an install action");
+  assert.equal(failedPageLinkButton.textContent, "Copy failed", "Failed page-link copy must show actionable feedback");
 
   let deepLinkFallbackRequests = 0;
   setBrowserGlobals({

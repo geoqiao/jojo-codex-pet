@@ -303,6 +303,21 @@ for (const route of ["/install/", "/zh-CN/install/"]) {
     expect(methodsIndex < releasedListIndex, `${route}: install methods must precede the Released pet list`);
   }
   expect(html.includes('id="install-faq-title"'), `${route}: missing visible install FAQ`);
+  const isChinese = route.startsWith("/zh-CN/");
+  const expectedProductCopy = isChinese
+    ? "给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用"
+    : "Free, unofficial animated pets for the Codex desktop app—not standalone mobile apps";
+  const expectedCodexSupport = isChinese
+    ? "需要支持 Pets 的 Codex 桌面应用"
+    : "Requires the Codex desktop app with Pets support";
+  expect(html.includes(expectedProductCopy), `${route}: missing desktop-pet product explanation`);
+  expect(html.includes(expectedCodexSupport), `${route}: missing Codex desktop Pets prerequisite`);
+  expect(html.includes("If the codex:// link does not open") || html.includes("codex:// 深链没有打开"), `${route}: missing deep-link fallback guidance`);
+  expect(html.includes("Settings &gt; Pets") && html.includes("Refresh"), `${route}: missing early post-install refresh guidance`);
+  expect(html.includes('<details class="other-methods"'), `${route}: alternative methods are not inside native details`);
+  const expectedMethodSummary = isChinese ? "其他安装方式" : "Other install methods";
+  expect(html.includes("<summary") && html.includes(expectedMethodSummary), `${route}: missing localized alternative-method summary`);
+  expect(html.includes("data-copy-page-link"), `${route}: missing responsive page-link copy action`);
 }
 
 for (const route of ["/parts/", "/zh-CN/parts/"]) {
@@ -320,7 +335,19 @@ for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))
   const isReleased = html.includes('data-status="released"');
   const petId = route.match(/\/pets\/([^/]+)\//)?.[1];
   expect(html.includes('href="#install-this-pet"') === isReleased, `${route}: Released-only install anchor is inconsistent`);
-  expect(/<a[^>]+data-install-deeplink/.test(html) === isReleased, `${route}: Released-only Codex action is inconsistent`);
+  const deepLinkCount = [...html.matchAll(/<a[^>]+data-install-deeplink/g)].length;
+  expect(deepLinkCount === (isReleased ? 1 : 0), `${route}: expected one primary Codex action for Released pets`);
+  if (isReleased) {
+    const isChinese = route.startsWith("/zh-CN/");
+    const expectedProductCopy = isChinese
+      ? "给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用"
+      : "free, unofficial animated pet for the Codex desktop app—not a standalone mobile app";
+    expect(html.includes(expectedProductCopy), `${route}: missing detail desktop-pet product explanation`);
+    expect(html.includes(isChinese ? "需要支持 Pets 的 Codex 桌面应用" : "Requires the Codex desktop app with Pets support"), `${route}: missing detail Codex desktop Pets prerequisite`);
+    expect(html.includes(isChinese ? "其他安装方式" : "Other install methods"), `${route}: missing detail alternative-method summary`);
+    expect(html.includes("data-copy-page-link"), `${route}: missing detail page-link copy action`);
+    expect(html.includes('class="package-link"') && !html.includes('class="button package-link"'), `${route}: Package files must remain an auxiliary link`);
+  }
 
   const breadcrumb = html.match(/<nav class="breadcrumbs"[\s\S]*?<\/nav>/)?.[0];
   expect(Boolean(breadcrumb), `${route}: missing visible breadcrumb navigation`);

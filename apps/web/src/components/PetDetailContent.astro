@@ -35,12 +35,13 @@ const profileSections = profile ? [
   { key: "packageCompatibility", section: profile.packageCompatibility }
 ] : [];
 const packageUrl = pet.packagePath ? packageUrlFor(pet.packagePath) : undefined;
+const pagePath = route(locale, `/pets/${pet.id}/`);
 const openInCodexUrl = pet.packagePath ? openInCodexUrlFor({ nameEn: pet.name.en, packagePath: pet.packagePath }) : undefined;
 const commands = packageUrl ? installCommandsFor(pet.id) : undefined;
 const installCommands = commands ? [
   { method: "bash", label: "Bash · macOS / Linux", command: commands.bash },
   { method: "powershell", label: "PowerShell · Windows", command: commands.powershell },
-  { method: "npx", label: "npx · cross-platform", command: commands.npx }
+  { method: "npx", label: `npx · ${locale === "en" ? "cross-platform" : "跨平台"}`, command: commands.npx }
 ] : [];
 const content = locale === "en" ? {
   identity: "Catalog identity",
@@ -52,7 +53,17 @@ const content = locale === "en" ? {
   palette: "Locked signature palette",
   source: "Source",
   install: "Install this pet",
-  installAnchor: "All install methods ↓",
+  installAnchor: "Install this pet ↓",
+  productNote: "A free, unofficial animated pet for the Codex desktop app—not a standalone mobile app. The preview above is the released pixel artwork.",
+  codexSupport: "Requires the Codex desktop app with Pets support. If the codex:// link does not open, use Other install methods below.",
+  afterInstallLabel: "After install",
+  afterInstall: "open Codex Settings > Pets, select Refresh, then choose the pet.",
+  otherMethods: "Other install methods",
+  developer: "developers",
+  desktopTransfer: "On a phone? Copy this pet page link and open it on your computer to continue. The install actions remain available here when your Codex desktop app is ready.",
+  copyPageLink: "Copy page link",
+  pageLinkCopied: "Link copied",
+  pageLinkCopyFailed: "Copy failed",
   pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
   reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
   ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
@@ -79,7 +90,17 @@ const content = locale === "en" ? {
   palette: "锁定标志配色",
   source: "来源",
   install: "安装这只宠物",
-  installAnchor: "全部安装方式 ↓",
+  installAnchor: "安装这只宠物 ↓",
+  productNote: "这是给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用。上方预览就是已发布的像素素材。",
+  codexSupport: "需要支持 Pets 的 Codex 桌面应用。如果 codex:// 深链没有打开，请使用下方的“其他安装方式”。",
+  afterInstallLabel: "安装后",
+  afterInstall: "打开 Codex Settings > Pets，选择 Refresh，然后选择这只宠物。",
+  otherMethods: "其他安装方式",
+  developer: "开发者辅助",
+  desktopTransfer: "手机上操作？复制这只宠物的页面链接，在电脑上继续。准备好支持 Pets 的 Codex 桌面应用后，这里的安装入口仍然可用。",
+  copyPageLink: "复制页面链接",
+  pageLinkCopied: "链接已复制",
+  pageLinkCopyFailed: "复制失败",
   pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
   reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
   ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
@@ -110,23 +131,13 @@ const content = locale === "en" ? {
       <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
       {pet.status === "released" && packageUrl && openInCodexUrl && (
         <div class="detail-art-actions" role="group" aria-label={content.install}>
-          <a
-            class="button"
-            href={openInCodexUrl}
-            data-install-deeplink
-            data-action-pet-id={pet.id}
-            data-action-method="codex"
-            data-action-locale={locale}
-          >
-            {content.openInCodex} ↗
-          </a>
-          <a class="button quick-package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
           <a class="quick-methods-link" href="#install-this-pet">{content.installAnchor}</a>
         </div>
       )}
     </div>
     <div class="pet-summary">
       <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
+      <p class="pet-product-note">{content.productNote}</p>
       <p class="pet-overview">{content.overview}</p>
       <p class="status-note">{pet.status === "released" ? content.released : isReview ? content.review : content.planned}</p>
     </div>
@@ -152,6 +163,7 @@ const content = locale === "en" ? {
             <a
               class="button"
               href={openInCodexUrl}
+              aria-describedby="detail-codex-support"
               data-install-deeplink
               data-action-pet-id={pet.id}
               data-action-method="codex"
@@ -159,29 +171,50 @@ const content = locale === "en" ? {
             >
               {content.openInCodex} ↗
             </a>
-            <a class="button package-link" href={`${packageUrl}/pet.json`}>{content.download} ↗</a>
+            <a class="package-link" href={`${packageUrl}/pet.json`}>{content.download} <span>({content.developer})</span> ↗</a>
           </div>
-          <div class="command-list">
-            {installCommands.map(({ method, label, command }) => (
-              <div class="command-row">
-                <span>{label}</span>
-                <code>{command}</code>
-                <button
-                  type="button"
-                  data-copy-command={command}
-                  data-copy-label={content.copy}
-                  data-copied-label={content.copied}
-                  data-copy-failed-label={content.copyFailed}
-                  data-action-pet-id={pet.id}
-                  data-action-method={method}
-                  data-action-locale={locale}
-                  aria-live="polite"
-                >
-                  {content.copy}
-                </button>
-              </div>
-            ))}
+          <p class="install-support" id="detail-codex-support">{content.codexSupport}</p>
+          <p class="after-install-note"><strong>{content.afterInstallLabel}</strong> {content.afterInstall}</p>
+          <div class="page-link-transfer">
+            <p>{content.desktopTransfer}</p>
+            <button
+              class="page-link-button"
+              type="button"
+              data-copy-page-link={pagePath}
+              data-page-link-copy-label={content.copyPageLink}
+              data-page-link-copied-label={content.pageLinkCopied}
+              data-page-link-copy-failed-label={content.pageLinkCopyFailed}
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {content.copyPageLink}
+            </button>
           </div>
+          <details class="other-methods">
+            <summary>{content.otherMethods}</summary>
+            <div class="command-list">
+              {installCommands.map(({ method, label, command }) => (
+                <div class="command-row">
+                  <span>{label}</span>
+                  <code>{command}</code>
+                  <button
+                    type="button"
+                    data-copy-command={command}
+                    data-copy-label={content.copy}
+                    data-copied-label={content.copied}
+                    data-copy-failed-label={content.copyFailed}
+                    data-action-pet-id={pet.id}
+                    data-action-method={method}
+                    data-action-locale={locale}
+                    aria-live="polite"
+                    aria-atomic="true"
+                  >
+                    {content.copy}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </details>
         </>
       ) : (
         <><p>{isReview ? content.reviewPending : content.pending}</p><button class="button" type="button" disabled aria-disabled="true">{isReview ? copy.reviewNotInstallable : copy.notInstallable}</button></>
@@ -310,19 +343,9 @@ const content = locale === "en" ? {
     justify-content: end;
   }
 
-  .detail-art-actions .button {
-    padding: 11px 14px;
-    font-size: 0.62rem;
-  }
-
-  .detail-art-actions .quick-package-link {
-    background: var(--paper-bright);
-  }
-
   .quick-methods-link {
-    flex-basis: 100%;
-    justify-self: end;
-    padding: 4px 7px;
+    min-height: 44px;
+    padding: 10px 12px;
     color: var(--paper-bright);
     background: var(--ink);
     font-size: 0.58rem;
@@ -592,6 +615,15 @@ const content = locale === "en" ? {
     text-transform: uppercase;
   }
 
+  .pet-product-note {
+    max-width: 62ch;
+    margin: 14px 0 0;
+    color: var(--ink);
+    font-size: 0.84rem;
+    font-weight: 720;
+    line-height: 1.5;
+  }
+
   .install-primary {
     display: flex;
     flex-wrap: wrap;
@@ -601,10 +633,76 @@ const content = locale === "en" ? {
   }
 
   .package-link {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    color: var(--paper-bright);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-underline-offset: 4px;
+    text-transform: uppercase;
+  }
+
+  .package-link span { color: var(--acid); }
+
+  .install-support,
+  .after-install-note {
+    max-width: 68ch;
+    margin: 12px 0 0;
+    color: #d8d1dd;
+    font-size: 0.78rem;
+    font-weight: 650;
+    line-height: 1.5;
+  }
+
+  .after-install-note {
+    padding-top: 12px;
+    border-top: 1px solid rgb(255 255 255 / 35%);
+  }
+
+  .after-install-note strong { color: var(--acid); font-weight: 850; }
+
+  .page-link-transfer {
+    display: none;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgb(255 255 255 / 35%);
+  }
+
+  .page-link-transfer p {
+    margin: 0;
+    color: #d8d1dd;
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .page-link-button {
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--paper-bright);
     color: var(--paper-bright);
     background: transparent;
-    border-color: var(--paper-bright);
-    box-shadow: 4px 4px 0 var(--paper-bright);
+    font-size: 0.68rem;
+    font-weight: 850;
+    cursor: pointer;
+  }
+
+  .other-methods {
+    margin-top: 20px;
+    border-top: 1px solid rgb(255 255 255 / 35%);
+  }
+
+  .other-methods > summary {
+    min-height: 48px;
+    padding: 14px 0;
+    color: var(--acid);
+    font-size: 0.68rem;
+    font-weight: 850;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
   }
 
   .command-list {
@@ -652,6 +750,8 @@ const content = locale === "en" ? {
 
   .detail-art-actions a:focus-visible,
   .install-primary a:focus-visible,
+  .page-link-button:focus-visible,
+  .other-methods > summary:focus-visible,
   .command-row button:focus-visible,
   dd a:focus-visible,
   .lineage-nav a:focus-visible {
@@ -707,6 +807,7 @@ const content = locale === "en" ? {
 
     .detail-art img { height: 278px; }
     .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
+    .page-link-transfer { display: grid; }
     .detail-part { top: 14px; left: 14px; }
   }
 
