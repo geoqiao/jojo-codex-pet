@@ -11,16 +11,18 @@
 
 ## 浏览器验收
 
-使用 Playwright CLI 真实浏览器访问本地构建产物：
+使用独立 Playwright CLI 浏览器会话 `jojo-followup`，在当前最终 `apps/web/dist` 上覆盖重拍以下六张截图：
 
 | 页面 | 尺寸 | 结果 | 证据 |
 | --- | ---: | --- | --- |
-| English Install | 360×780 | 标题、产品前提、选择器、主 Codex CTA、辅助安装入口均可访问 | [截图](qa-install-en-360.png) |
+| English Install | 360×732 | 选择器/控制面板进入文档流；主 CTA 在首屏以下，未声称首屏可见 | [截图](qa-install-en-360.png) |
 | 中文 Install | 390×844 | 中文前提、选择器、`在 Codex 中打开` 和安装后 Refresh 指引可见 | [截图](qa-install-zh-390.png) |
 | English pet detail | 390×844 | 真实像素预览、桌面端前提、单一主 CTA 和手机复制页面链接可用 | [截图](qa-pet-en-390.png) |
 | 中文 pet detail | 390×844 | 中文详情、真实像素预览、桌面端前提和主 CTA 可用 | [截图](qa-pet-zh-390.png) |
 | English Install | 1440×1000 | 桌面端三栏选择/预览/主 CTA 布局正常 | [截图](qa-install-en-desktop.png) |
 | English pet detail | 1440×1000 | 桌面端详情与安装卡片正常，无横向溢出 | [截图](qa-pet-en-desktop.png) |
+
+360×732 初始滚动位置的实际几何位置：`.picker-control` top `607.39px`，`#released-pet-select` top `642.39px`，主 Codex CTA `.codex-action` top `852.27px`。因此选择器/控制面板已按最终 CSS 排在预览之前，但 CTA 不在 732px 首屏内；六张截图只记录最终候选的实际位置，不声称所有操作都在首屏。
 
 ## 交互步骤与结果
 
