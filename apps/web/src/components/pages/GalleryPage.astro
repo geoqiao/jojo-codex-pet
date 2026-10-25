@@ -2,13 +2,14 @@
 import { pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PetCard from "../PetCard.astro";
-import ViewCounts from "../ViewCounts.astro";
-import { route } from "../../lib/i18n";
+import { localize, route } from "../../lib/i18n";
+import { motionPosterUrl } from "../../lib/pet-motion";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
-const pilot = pets.filter((pet) => pet.part === 3 && pet.status !== "planned");
 const releasedCount = pets.filter((pet) => pet.status === "released").length;
+const heroPet = pets.find((pet) => pet.id === "part-03-jotaro-kujo")!;
+const heroName = localize(heroPet.name, locale);
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -22,17 +23,17 @@ const content = locale === "en" ? {
   description: "An unofficial, non-commercial JoJo-themed Codex pet gallery. Browse the locked 36-pet roster and the Part 3 Pilot Set.",
   overline: "Unofficial · non-commercial · ad-free",
   hero: "A BIZARRE LITTLE COMPANION.",
-  intro: "This is an unofficial gallery of animated JoJo character and Stand companions for OpenAI Codex Desktop. Each named identity is rebuilt as an independent Codex Pet V2 companion; artwork ships only after it survives the quality gate.",
-  installCta: "Install a released pet",
-  locked: "Roster locked",
-  parts: "Parts",
-  contract: "V2 only",
-  metrics: "Project metrics",
-  pilotTitle: "The Part 3 Pilot Set",
-  pilotNote: "All four Part 3 Pilot pets are released and independently installable.",
-  allTitle: "The headline roster",
-  allNote: `36 pets · ${releasedCount} installable · Parts 1–9`,
-  filters: { all: "All", pilot: "Pilot", character: "Characters", stand: "Stands" },
+  intro: "This is an unofficial gallery of animated JoJo character and Stand companions for OpenAI Codex Desktop. Every pet idles, runs, waves, jumps and more in 9 animated actions, and installs with one command.",
+  installCta: "Install a pet",
+  metrics: "Gallery at a glance",
+  metricLabels: ["Pets", "Parts", "Actions each"],
+  heroPetLabel: `${heroName}, a pixel Codex pet from Part ${heroPet.part}`,
+  pauseLabel: "Pause the animation",
+  playLabel: "Play the animation",
+  allTitle: "All 36 pets",
+  allNote: `${releasedCount} ready to install · Parts 1–9`,
+  hoverHint: " · hover a card to watch it move",
+  filters: { all: "All", character: "Characters", stand: "Stands", part: (part: number) => `Part ${part}` },
   filterLabel: "Catalog filters",
   count: "pets shown"
 } : {
@@ -40,17 +41,17 @@ const content = locale === "en" ? {
   description: "非官方、非商业的 JoJo 主题 Codex 宠物目录，展示锁定的 36 只名单与第三部 Pilot 四只。",
   overline: "非官方 · 非商业 · 无广告",
   hero: "一只奇妙的小伙伴。",
-  intro: "这是一个面向 OpenAI Codex Desktop 的非官方 JoJo 角色与替身动画宠物目录。每个具名身份都被分别制作成独立的 Codex Pet V2，宠物素材通过质量门后才正式发布。",
-  installCta: "安装一只已发布宠物",
-  locked: "名单已锁定",
-  parts: "篇章",
-  contract: "仅 V2",
-  metrics: "项目数据",
-  pilotTitle: "第三部 Pilot 合集",
-  pilotNote: "第三部 Pilot 四只宠物均已发布，并可分别独立安装。",
-  allTitle: "首发完整名单",
-  allNote: `36 只 · ${releasedCount} 只可安装 · 第 1–9 部`,
-  filters: { all: "全部", pilot: "Pilot", character: "角色", stand: "替身" },
+  intro: "这是一个面向 OpenAI Codex Desktop 的非官方 JoJo 角色与替身动画宠物目录。每只宠物都有待机、奔跑、挥手、跳跃等 9 种动作，一条命令即可安装。",
+  installCta: "安装一只宠物",
+  metrics: "目录概览",
+  metricLabels: ["只宠物", "个篇章", "种动作"],
+  heroPetLabel: `${heroName}，JoJo 第 ${heroPet.part} 部像素 Codex 宠物`,
+  pauseLabel: "暂停动画",
+  playLabel: "播放动画",
+  allTitle: "全部 36 只宠物",
+  allNote: `${releasedCount} 只可安装 · 第 1–9 部`,
+  hoverHint: " · 鼠标悬停卡片可看它动起来",
+  filters: { all: "全部", character: "角色", stand: "替身", part: (part: number) => `第 ${part} 部` },
   filterLabel: "宠物目录筛选",
   count: "只宠物"
 };
@@ -65,40 +66,91 @@ const content = locale === "en" ? {
         <p class="hero-intro">{content.intro}</p>
         <a class="button hero-cta" href={route(locale, "/install/")} data-home-install-cta>{content.installCta} ↗</a>
       </div>
+      <div class="hero-pet" data-hero-pet={heroPet.id} data-play-label={content.playLabel} data-pause-label={content.pauseLabel}>
+        <a class="hero-pet-link" href={route(locale, `/pets/${heroPet.id}/`)}>
+          <span class="hero-pet-frame motion-frame">
+            <img
+              class="motion-static"
+              src={motionPosterUrl(heroPet.id)}
+              alt={content.heroPetLabel}
+              width="192"
+              height="208"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <span class="motion-layer" data-motion-layer aria-hidden="true"></span>
+          </span>
+          <span class="hero-pet-name">{heroName} ↗</span>
+        </a>
+        <button class="hero-pet-toggle" type="button" data-motion-toggle hidden></button>
+      </div>
       <div class="hero-metrics" aria-label={content.metrics}>
-        <div><strong>36</strong><span>{content.locked}</span></div>
-        <div><strong>09</strong><span>{content.parts}</span></div>
-        <div><strong>V2</strong><span>{content.contract}</span></div>
+        <div><strong>{pets.length}</strong><span>{content.metricLabels[0]}</span></div>
+        <div><strong>09</strong><span>{content.metricLabels[1]}</span></div>
+        <div><strong>09</strong><span>{content.metricLabels[2]}</span></div>
       </div>
       <div class="hero-slash" aria-hidden="true"><span>ORA</span><span>MUDA</span></div>
     </div>
   </section>
 
-  <section class="shell catalog-section">
-    <div class="section-title"><h2>{content.pilotTitle}</h2><span>{content.pilotNote}</span></div>
-    <div class="pet-grid pilot-grid">
-      {pilot.map((pet, index) => <PetCard pet={pet} locale={locale} priority={index < 2} />)}
-    </div>
-  </section>
-
   <section class="shell catalog-section" id="roster">
-    <div class="section-title"><h2>{content.allTitle}</h2><span>{content.allNote}</span></div>
+    <div class="section-title"><h2>{content.allTitle}</h2><span>{content.allNote}<span class="hover-hint">{content.hoverHint}</span></span></div>
     <div class="filter-bar" aria-label={content.filterLabel}>
       <div class="filter-options">
         <button type="button" class="active" data-gallery-filter="all" aria-pressed="true" aria-controls="roster-grid">{content.filters.all}</button>
-        <button type="button" data-gallery-filter="pilot" aria-pressed="false" aria-controls="roster-grid">{content.filters.pilot}</button>
         <button type="button" data-gallery-filter="character" aria-pressed="false" aria-controls="roster-grid">{content.filters.character}</button>
         <button type="button" data-gallery-filter="stand" aria-pressed="false" aria-controls="roster-grid">{content.filters.stand}</button>
-        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`} aria-pressed="false" aria-controls="roster-grid">P{part}</button>)}
+        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`} aria-pressed="false" aria-controls="roster-grid">{content.filters.part(part)}</button>)}
       </div>
-      <span aria-live="polite"><strong data-visible-count>36</strong> {content.count}</span>
+      <span aria-live="polite"><strong data-visible-count>{pets.length}</strong> {content.count}</span>
     </div>
     <div class="pet-grid full-grid" id="roster-grid">
       {pets.map((pet) => <PetCard pet={pet} locale={locale} />)}
     </div>
   </section>
-  <ViewCounts locale={locale} />
 </BaseLayout>
+
+<script>
+  import { MotionPlayer, loadStrip, motionStripUrl, prefersReducedMotion } from "../../lib/pet-motion";
+
+  // The poster is already on screen; the animation strips load after the page settles.
+  const hero = document.querySelector<HTMLElement>("[data-hero-pet]");
+  const layer = hero?.querySelector<HTMLElement>("[data-motion-layer]");
+  const toggle = hero?.querySelector<HTMLButtonElement>("[data-motion-toggle]");
+  const petId = hero?.dataset.heroPet;
+
+  if (hero && layer && toggle && petId) {
+    const player = new MotionPlayer(layer, petId, [{ state: "idle", loops: 3 }, { state: "waving", loops: 2 }]);
+    const render = () => {
+      const label = player.playing ? hero.dataset.pauseLabel : hero.dataset.playLabel;
+      toggle.textContent = player.playing ? "❚❚" : "▶";
+      toggle.setAttribute("aria-label", label ?? "");
+      toggle.hidden = false;
+    };
+    const start = async () => {
+      if (await player.play()) hero.classList.add("is-motion-active");
+      render();
+    };
+
+    player.watchVisibility();
+    toggle.addEventListener("click", () => {
+      if (player.playing) {
+        player.pause();
+        render();
+      } else {
+        void start();
+      }
+    });
+    const prepare = async () => {
+      await Promise.all(["idle", "waving"].map((state) => loadStrip(motionStripUrl(petId, state))));
+      if (prefersReducedMotion()) render();
+      else await start();
+    };
+    const defer = () => (window.requestIdleCallback ? window.requestIdleCallback(() => void prepare()) : window.setTimeout(() => void prepare(), 200));
+    if (document.readyState === "complete") defer();
+    else window.addEventListener("load", defer, { once: true });
+  }
+</script>
 
 <script>
   const filterButtons = [...document.querySelectorAll("[data-gallery-filter]")];
@@ -108,8 +160,7 @@ const content = locale === "en" ? {
   const applyFilter = (filter: string, syncUrl = true) => {
     let visible = 0;
     for (const card of cards) {
-      const isPilot = filter === "pilot" && card.getAttribute("data-part") === "part-03" && card.getAttribute("data-status") !== "planned";
-      const matches = filter === "all" || isPilot || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
+      const matches = filter === "all" || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
       card.toggleAttribute("hidden", !matches);
       if (matches) visible += 1;
     }
@@ -168,9 +219,11 @@ const content = locale === "en" ? {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(210px, 0.32fr);
-    gap: 42px;
-    min-height: 560px;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.46fr);
+    grid-template-areas:
+      "copy pet"
+      "metrics pet";
+    gap: 32px 42px;
     align-items: center;
     padding-block: 40px 46px;
   }
@@ -178,6 +231,7 @@ const content = locale === "en" ? {
   .hero-copy {
     position: relative;
     z-index: 2;
+    grid-area: copy;
     min-width: 0;
   }
 
@@ -205,23 +259,96 @@ const content = locale === "en" ? {
     box-shadow: 2px 2px 0 var(--paper-bright);
   }
 
+  .hero-pet {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-area: pet;
+    gap: 10px;
+    justify-items: center;
+    min-width: 0;
+  }
+
+  .hero-pet-link {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .hero-pet-frame {
+    --motion-height: 100%;
+    width: min(100%, 440px);
+    aspect-ratio: 192 / 208;
+  }
+
+  .hero-pet-frame img,
+  .hero-pet-frame .motion-layer {
+    filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 45%));
+  }
+
+  .hero-pet-frame img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-pet-name {
+    padding: 6px 10px;
+    color: var(--ink);
+    background: var(--acid);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .hero-pet-link:hover .hero-pet-name {
+    background: var(--cyan);
+  }
+
+  .hero-pet-toggle {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 2px solid var(--paper-bright);
+    color: var(--paper-bright);
+    background: rgb(23 19 30 / 70%);
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+
+  .hero-pet-toggle[hidden] {
+    display: none;
+  }
+
+  .hero-pet-toggle:hover {
+    color: var(--ink);
+    background: var(--acid);
+  }
+
   .hero-metrics {
     position: relative;
     z-index: 2;
     display: grid;
-    align-self: center;
-    margin-bottom: 0;
+    grid-area: metrics;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 560px;
     border: 3px solid var(--paper-bright);
     background: var(--ink);
     box-shadow: 8px 8px 0 var(--acid);
   }
 
   .hero-metrics div {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    padding: 18px;
-    border-bottom: 2px solid var(--paper-bright);
+    display: grid;
+    gap: 2px;
+    padding: 12px 16px;
+    border-right: 2px solid var(--paper-bright);
   }
 
   .hero-metrics div:last-child {
@@ -230,14 +357,14 @@ const content = locale === "en" ? {
 
   .hero-metrics strong {
     font-family: "Bodoni Moda Variable", Georgia, serif;
-    font-size: 3rem;
+    font-size: 2.6rem;
     line-height: 1;
   }
 
   .hero-metrics span {
-    font-size: 0.63rem;
+    font-size: 0.75rem;
     font-weight: 850;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
@@ -262,10 +389,6 @@ const content = locale === "en" ? {
   .pet-grid {
     display: grid;
     gap: 26px;
-  }
-
-  .pilot-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .full-grid {
@@ -295,7 +418,7 @@ const content = locale === "en" ? {
     padding: 7px 12px;
     border: 2px solid var(--ink);
     background: transparent;
-    font-size: 0.67rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -310,13 +433,12 @@ const content = locale === "en" ? {
   .filter-bar > span {
     flex: 0 0 auto;
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 760;
     text-transform: uppercase;
   }
 
   @media (max-width: 1180px) {
-    .pilot-grid,
     .full-grid {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -325,22 +447,27 @@ const content = locale === "en" ? {
   @media (max-width: 840px) {
     .hero-grid {
       grid-template-columns: 1fr;
-      min-height: 0;
-      padding-block: 52px;
+      grid-template-areas:
+        "copy"
+        "pet"
+        "metrics";
+      gap: 24px;
+      padding-block: 28px 36px;
+    }
+
+    .hero-pet {
+      width: min(58vw, 300px);
+      justify-self: center;
+    }
+
+    .hero-pet-frame {
+      width: 100%;
     }
 
     .hero-metrics {
-      grid-template-columns: repeat(3, 1fr);
-      margin: 0;
+      max-width: none;
     }
 
-    .hero-metrics div {
-      display: grid;
-      border-right: 2px solid var(--paper-bright);
-      border-bottom: 0;
-    }
-
-    .pilot-grid,
     .full-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -351,14 +478,21 @@ const content = locale === "en" ? {
     }
   }
 
-  @media (max-width: 540px) {
+  @media (max-width: 640px) {
     .hero h1 {
       font-size: clamp(3.1rem, 14vw, 4.3rem);
     }
 
-    .pilot-grid,
     .full-grid {
-      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .hero-metrics strong {
+      font-size: 2.2rem;
+    }
+
+    .hero-metrics div {
+      padding-inline: 12px;
     }
   }
 </style>

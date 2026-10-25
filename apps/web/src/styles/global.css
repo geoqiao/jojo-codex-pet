@@ -65,7 +65,7 @@ img {
 
 .eyebrow {
   margin: 0 0 12px;
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -128,7 +128,7 @@ img {
 }
 
 .section-title span {
-  font-size: 0.74rem;
+  font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -142,7 +142,7 @@ img {
   padding: 5px 10px;
   border: 2px solid var(--ink);
   background: var(--paper-bright);
-  font-size: 0.67rem;
+  font-size: 0.75rem;
   font-weight: 850;
   letter-spacing: 0.1em;
   line-height: 1;
@@ -224,6 +224,49 @@ img {
   background: rgb(255 250 240 / 70%);
 }
 
+/* Pet animation: a static image plus a background-image layer that the motion player fills with strip frames. */
+.motion-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.motion-layer {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  height: var(--motion-height, 100%);
+  aspect-ratio: 192 / 208;
+  translate: -50% -50%;
+  background-repeat: no-repeat;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.is-motion-active .motion-layer {
+  opacity: 1;
+}
+
+.is-motion-active .motion-static {
+  opacity: 0;
+}
+
+/* Same-origin page changes cross-fade; a pet card and its detail image share a view-transition-name and morph. */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-group(*) {
+  animation-duration: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -235,9 +278,20 @@ img {
   border: 0;
 }
 
+@media (hover: none) {
+  .hover-hint {
+    display: none;
+  }
+}
+
 @media (max-width: 800px) {
   .shell {
     width: min(100% - 20px, 1480px);
+  }
+
+  .section-title {
+    flex-direction: column;
+    gap: 10px;
   }
 
   .page-intro {
@@ -247,7 +301,7 @@ img {
   }
 
   .page-intro h1 {
-    font-size: clamp(3.3rem, 17vw, 5.5rem);
+    font-size: clamp(3rem, 15vw, 5.5rem);
   }
 }
 

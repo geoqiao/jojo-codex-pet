@@ -5,10 +5,9 @@ import { localize, route, ui } from "../lib/i18n";
 interface Props {
   pet: Pet;
   locale: Locale;
-  priority?: boolean;
 }
 
-const { pet, locale, priority = false } = Astro.props;
+const { pet, locale } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
 const detailUrl = route(locale, `/pets/${pet.id}/`);
@@ -22,7 +21,7 @@ const cardImages = pet.image ? {
 const imageAlt = locale === "en"
   ? `${name}, Part ${pet.part} pixel Codex pet`
   : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
-const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标志配色";
+const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
 ---
 
 <article
@@ -33,20 +32,21 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
   data-type={pet.type}
   data-status={pet.status}
 >
-  <a class="pet-card-link" href={detailUrl} aria-label={`${copy.open}: ${name}`}>
+  <a class="pet-card-link" href={detailUrl} aria-label={`${copy.open}: ${name}`} data-motion-hover={pet.id}>
     <div class="pet-card-content">
-      <div class="pet-art" style={`--part-accent: var(--part-${pet.part})`}>
+      <div class="pet-art motion-frame" style={`--part-accent: var(--part-${pet.part})`}>
         {cardImages ? (
           <img
             src={cardImages.fallback}
+            class="motion-static"
             srcset={`${cardImages.small} 320w, ${cardImages.medium} 480w, ${cardImages.large} 640w`}
-            sizes="(max-width: 384px) calc(92vw - 23.92px), (max-width: 540px) 330px, (max-width: 775px) calc(46vw - 26.68px), (max-width: 840px) 330px, (max-width: 1178px) calc(30.6667vw - 31.28px), (max-width: 1180px) 330px, (max-width: 1512px) calc(23vw - 30.82px), 316.94px"
+            sizes="(max-width: 640px) calc(45vw - 19.8px), (max-width: 775px) calc(46vw - 26.68px), (max-width: 840px) 330px, (max-width: 1178px) calc(30.6667vw - 31.28px), (max-width: 1180px) 330px, (max-width: 1512px) calc(23vw - 30.82px), 316.94px"
             alt={imageAlt}
             width="640"
             height="640"
-            loading={priority ? "eager" : "lazy"}
-            fetchpriority={priority ? "high" : undefined}
+            loading="lazy"
             decoding="async"
+            style={`view-transition-name: pet-${pet.id}`}
           />
         ) : (
           <div class="planned-art" aria-hidden="true">
@@ -54,23 +54,22 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
             <i>{String(pet.part).padStart(2, "0")}</i>
           </div>
         )}
+        {cardImages && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
         <span class="part-tag">PART {String(pet.part).padStart(2, "0")}</span>
       </div>
       <div class="pet-copy">
         <div class="pet-meta">
-          <span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span>
+          {pet.status !== "released" && <span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span>}
           <span class="type-pill">{copy.type[pet.type]}</span>
         </div>
         <h3>{name}</h3>
-        <p>{copy.role[pet.role]}</p>
-        {pet.palette && (
-          <div class="palette" aria-label={paletteLabel}>
-            {pet.palette.map((color) => <span style={`--swatch:${color}`} title={color}></span>)}
-          </div>
-        )}
         <div class="pet-actions">
-          <span class="open-link" aria-hidden="true">{copy.open} ↗</span>
-          <span class="view-count" data-view-count={pet.id}>— {copy.view}</span>
+          {pet.palette && (
+            <div class="palette" aria-label={paletteLabel}>
+              {pet.palette.map((color) => <span style={`--swatch:${color}`} title={color}></span>)}
+            </div>
+          )}
+          <span class="open-link" aria-hidden="true">↗</span>
         </div>
       </div>
     </div>
@@ -112,6 +111,7 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
   .pet-card-link {
     display: block;
     color: inherit;
+    cursor: pointer;
     text-decoration: none;
     touch-action: manipulation;
   }
@@ -125,6 +125,7 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
   }
 
   .pet-art {
+    --motion-height: 89%;
     position: relative;
     display: grid;
     min-height: 290px;
@@ -158,9 +159,19 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
     transition: transform 180ms ease;
   }
 
+  .pet-art .motion-layer {
+    filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
+    transition: scale 180ms ease;
+  }
+
   .pet-card:hover .pet-art img,
   .pet-card:focus-within .pet-art img {
     transform: scale(1.025);
+  }
+
+  .pet-card:hover .motion-layer,
+  .pet-card:focus-within .motion-layer {
+    scale: 1.025;
   }
 
   .planned-art {
@@ -187,7 +198,7 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
     right: 24px;
     bottom: 18px;
     color: var(--acid);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-style: normal;
     font-weight: 850;
     letter-spacing: 0.16em;
@@ -195,15 +206,15 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
 
   .part-tag {
     position: absolute;
-    z-index: 2;
+    z-index: 3;
     top: 14px;
     left: 14px;
     padding: 5px 8px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.62rem;
+    font-size: 0.75rem;
     font-weight: 850;
-    letter-spacing: 0.13em;
+    letter-spacing: 0.1em;
   }
 
   .pet-copy {
@@ -225,19 +236,9 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
     line-height: 0.96;
   }
 
-  p {
-    margin: 0;
-    color: var(--muted);
-    font-size: 0.75rem;
-    font-weight: 750;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-  }
-
   .palette {
     display: flex;
     gap: 5px;
-    margin-top: 16px;
   }
 
   .palette span {
@@ -250,28 +251,66 @@ const paletteLabel = locale === "en" ? "Locked signature palette" : "锁定标�
   .pet-actions {
     display: flex;
     gap: 12px;
-    align-items: end;
+    align-items: center;
     justify-content: space-between;
     min-height: 38px;
-    margin-top: 18px;
+    margin-top: 10px;
     padding-top: 14px;
     border-top: 2px solid var(--ink);
   }
 
   .open-link {
-    font-size: 0.7rem;
+    margin-inline-start: auto;
+    font-size: 1.25rem;
     font-weight: 850;
-    letter-spacing: 0.08em;
-    text-decoration: underline;
-    text-underline-offset: 4px;
-    text-transform: uppercase;
+    line-height: 1;
   }
 
-  .view-count {
-    color: var(--muted);
-    font-size: 0.66rem;
-    font-weight: 760;
-    white-space: nowrap;
-  }
+  /* Compact two-column cards: art, name and Part only; the rest lives on the detail page. */
+  @media (max-width: 640px) {
+    .pet-card {
+      box-shadow: 4px 4px 0 var(--ink);
+    }
 
+    .pet-card:hover,
+    .pet-card:focus-within {
+      box-shadow: 4px 4px 0 var(--ink);
+      transform: none;
+    }
+
+    .pet-art {
+      --motion-height: 83%;
+      min-height: 0;
+      aspect-ratio: 1;
+    }
+
+    .pet-art img {
+      width: 90%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+
+    .part-tag {
+      top: 8px;
+      left: 8px;
+      padding: 4px 6px;
+      font-size: 0.75rem;
+    }
+
+    .pet-copy {
+      padding: 10px 10px 12px;
+    }
+
+    .pet-meta,
+    .pet-actions {
+      display: none;
+    }
+
+    h3 {
+      min-height: 2em;
+      margin: 0;
+      font-size: 1.25rem;
+      letter-spacing: -0.04em;
+    }
+  }
 </style>
