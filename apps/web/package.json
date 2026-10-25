@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node scripts/generate-card-images.mjs",
+    "prebuild": "node scripts/generate-card-images.mjs && node scripts/generate-pet-motion.mjs",
     "build": "astro build",
     "check": "astro check",
     "test": "tsx src/lib/install-actions.test.ts && tsx src/content/petProfiles.test.ts",

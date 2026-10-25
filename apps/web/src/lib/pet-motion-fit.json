@@ -1,0 +1,218 @@
+{
+  "part-01-dio-brando": {
+    "left": 3.86,
+    "top": 0.1,
+    "width": 92.27,
+    "height": 99.96
+  },
+  "part-01-jonathan-joestar": {
+    "left": 3.86,
+    "top": 0.1,
+    "width": 92.27,
+    "height": 99.96
+  },
+  "part-02-joseph-joestar": {
+    "left": 3.87,
+    "top": 0.1,
+    "width": 92.27,
+    "height": 99.96
+  },
+  "part-02-kars": {
+    "left": 3.86,
+    "top": 0.1,
+    "width": 92.27,
+    "height": 99.96
+  },
+  "part-03-dio": {
+    "left": 5.73,
+    "top": 2.26,
+    "width": 87.12,
+    "height": 94.38
+  },
+  "part-03-jotaro-kujo": {
+    "left": 8.7,
+    "top": 5.22,
+    "width": 81.52,
+    "height": 88.31
+  },
+  "part-03-star-platinum": {
+    "left": 5.34,
+    "top": 2.11,
+    "width": 87.12,
+    "height": 94.38
+  },
+  "part-03-the-world": {
+    "left": 8.86,
+    "top": 5.53,
+    "width": 81.82,
+    "height": 88.64
+  },
+  "part-04-crazy-diamond": {
+    "left": 4.04,
+    "top": 3.23,
+    "width": 87.06,
+    "height": 94.32
+  },
+  "part-04-josuke-higashikata": {
+    "left": 3.85,
+    "top": 0.07,
+    "width": 92.31,
+    "height": 100
+  },
+  "part-04-killer-queen": {
+    "left": 3.02,
+    "top": 3.06,
+    "width": 87.08,
+    "height": 94.33
+  },
+  "part-04-yoshikage-kira": {
+    "left": 4.01,
+    "top": 0.58,
+    "width": 91.67,
+    "height": 99.31
+  },
+  "part-05-diavolo": {
+    "left": 6.25,
+    "top": 0.77,
+    "width": 90.31,
+    "height": 97.83
+  },
+  "part-05-giorno-giovanna": {
+    "left": 5.67,
+    "top": 2.23,
+    "width": 88.33,
+    "height": 95.69
+  },
+  "part-05-gold-experience": {
+    "left": 5.96,
+    "top": 3.37,
+    "width": 86.52,
+    "height": 93.72
+  },
+  "part-05-gold-experience-requiem": {
+    "left": 6.69,
+    "top": 1.62,
+    "width": 87.88,
+    "height": 95.2
+  },
+  "part-05-king-crimson": {
+    "left": 7.48,
+    "top": 3.43,
+    "width": 84.39,
+    "height": 91.43
+  },
+  "part-06-c-moon": {
+    "left": 6.77,
+    "top": 7.17,
+    "width": 81.96,
+    "height": 88.79
+  },
+  "part-06-enrico-pucci": {
+    "left": 6.6,
+    "top": 2.43,
+    "width": 87.24,
+    "height": 94.52
+  },
+  "part-06-jolyne-cujoh": {
+    "left": 0.62,
+    "top": 1.41,
+    "width": 89.85,
+    "height": 97.33
+  },
+  "part-06-made-in-heaven": {
+    "left": 3.32,
+    "top": -0.55,
+    "width": 92.76,
+    "height": 100.48
+  },
+  "part-06-stone-free": {
+    "left": 3.71,
+    "top": 3.78,
+    "width": 84.9,
+    "height": 91.97
+  },
+  "part-06-whitesnake": {
+    "left": 7.89,
+    "top": 3.78,
+    "width": 84.18,
+    "height": 91.2
+  },
+  "part-07-d4c": {
+    "left": 5.3,
+    "top": -0.46,
+    "width": 89.55,
+    "height": 97.01
+  },
+  "part-07-funny-valentine": {
+    "left": 4.6,
+    "top": 1.74,
+    "width": 89.24,
+    "height": 96.68
+  },
+  "part-07-johnny-joestar": {
+    "left": 11.36,
+    "top": 4.98,
+    "width": 78.64,
+    "height": 85.19
+  },
+  "part-07-tusk-act-1": {
+    "left": 10.17,
+    "top": 8.02,
+    "width": 75.91,
+    "height": 82.23
+  },
+  "part-07-tusk-act-2": {
+    "left": 20.27,
+    "top": 11.08,
+    "width": 66.36,
+    "height": 71.89
+  },
+  "part-07-tusk-act-3": {
+    "left": 9.7,
+    "top": 8.4,
+    "width": 78.19,
+    "height": 84.7
+  },
+  "part-07-tusk-act-4": {
+    "left": 9.08,
+    "top": 3.67,
+    "width": 81.21,
+    "height": 87.98
+  },
+  "part-08-josuke-higashikata": {
+    "left": 8.49,
+    "top": 5.95,
+    "width": 83.33,
+    "height": 90.28
+  },
+  "part-08-soft-and-wet": {
+    "left": 8.2,
+    "top": 5.85,
+    "width": 81.52,
+    "height": 88.31
+  },
+  "part-08-toru": {
+    "left": 7.24,
+    "top": 2.07,
+    "width": 88.33,
+    "height": 95.69
+  },
+  "part-08-wonder-of-u": {
+    "left": 6.65,
+    "top": 7.71,
+    "width": 81.97,
+    "height": 88.8
+  },
+  "part-09-jodio-joestar": {
+    "left": 10.19,
+    "top": 7.94,
+    "width": 79.09,
+    "height": 85.68
+  },
+  "part-09-november-rain": {
+    "left": 5.38,
+    "top": 6.8,
+    "width": 80.91,
+    "height": 87.65
+  }
+}

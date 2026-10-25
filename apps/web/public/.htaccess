@@ -1,3 +1,6 @@
+# Show the custom page for every missing URL.
+ErrorDocument 404 /404.html
+
 RewriteEngine On
 
 # Keep one canonical hostname for users and search engines.

@@ -1,6 +1,7 @@
 ---
 import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PetThumb from "../PetThumb.astro";
 import { localize, route, ui } from "../../lib/i18n";
 
 interface Props { locale: Locale }
@@ -8,24 +9,24 @@ const { locale } = Astro.props;
 const copy = ui[locale];
 const content = locale === "en" ? {
   title: "Roster — JoJo Codex Pet",
-  description: "The approved 36-pet JoJo Codex Pet headline roster.",
-  eyebrow: "Approved before generation",
-  heading: "THE LOCKED 36.",
-  intro: "Stable IDs define each independently installable subject. Every named character, Stand, and evolved form is shown directly.",
+  description: "The full list of 36 JoJo Codex pets, by Part, with each pet's type.",
+  eyebrow: "Parts 1–9",
+  heading: "EVERY PET, ONE LIST.",
+  intro: "Every named character and Stand from Parts 1–9, and each one installs on its own.",
   pet: "Pet",
-  identity: "Identity",
+  identity: "Type",
   status: "Status",
-  part9: "Part 9 remains at two pets while its principal antagonist is unassigned."
+  part9: "Part 9 has two pets while its story is still running."
 } : {
   title: "名单 — JoJo Codex Pet",
-  description: "已确认的 36 只 JoJo Codex Pet 首发名单。",
-  eyebrow: "生成前已完成确认",
-  heading: "锁定的 36 只。",
-  intro: "稳定 ID 对应每一只可独立安装的宠物。所有具名角色、替身与进化形态都会直接展示。",
+  description: "36 只 JoJo Codex 宠物的完整名单，按篇章排列，并标明类型。",
+  eyebrow: "第 1–9 部",
+  heading: "36 只，一份名单。",
+  intro: "第 1–9 部的所有具名角色与替身，每一只都可以单独安装。",
   pet: "宠物",
-  identity: "身份",
+  identity: "类型",
   status: "状态",
-  part9: "第 9 部连载期间保持两只，篇章主反派暂不指定。"
+  part9: "第 9 部仍在连载，目前只有两只宠物。"
 };
 ---
 
@@ -51,11 +52,14 @@ const content = locale === "en" ? {
               <span role="columnheader">{content.status}</span>
             </div>
             {pets.filter((pet) => pet.part === part.number).map((pet, index) => (
-              <div class="roster-row" role="row">
+              <div class="roster-row" role="row" data-motion-hover={pet.id}>
                 <span role="cell">{String(index + 1).padStart(2, "0")}</span>
-                <div role="cell">
-                  <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
-                  <code>{pet.id}</code>
+                <div class="roster-name" role="cell">
+                  <PetThumb petId={pet.id} />
+                  <div>
+                    <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
+                    <code>{pet.id}</code>
+                  </div>
                 </div>
                 <span role="cell">{copy.type[pet.type]} · {copy.role[pet.role]}</span>
                 <span class="status-pill" data-status={pet.status} role="cell">{copy.status[pet.status]}</span>
@@ -112,7 +116,7 @@ const content = locale === "en" ? {
   .roster-part header p {
     margin: 0 0 5px;
     color: var(--acid);
-    font-size: 0.67rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.12em;
   }
@@ -126,6 +130,7 @@ const content = locale === "en" ? {
   }
 
   .roster-row {
+    position: relative;
     display: grid;
     grid-template-columns: 48px minmax(240px, 1.5fr) minmax(180px, 0.8fr) auto;
     gap: 18px;
@@ -145,7 +150,7 @@ const content = locale === "en" ? {
     padding-block: 9px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.62rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.09em;
     text-transform: uppercase;
@@ -157,28 +162,55 @@ const content = locale === "en" ? {
 
   .roster-row > span:first-child {
     color: var(--muted);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     font-weight: 800;
   }
 
-  .roster-row > div > a {
+  .roster-name {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    --thumb-height: 64px;
+  }
+
+  .roster-row > .roster-name a {
     font-family: "Bodoni Moda Variable", Georgia, serif;
     font-size: 1.7rem;
     font-weight: 760;
     letter-spacing: -0.03em;
   }
 
+  /* The whole row opens the pet page. */
+  .roster-name a::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+  }
+
+  .roster-row:not(.roster-head):hover {
+    background: var(--acid);
+  }
+
+  .roster-name a:focus-visible {
+    outline: none;
+  }
+
+  .roster-row:has(a:focus-visible) {
+    outline: 3px solid var(--ink);
+    outline-offset: -3px;
+  }
+
   code {
     display: block;
     margin-top: 4px;
     color: var(--muted);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     overflow-wrap: anywhere;
   }
 
   .roster-row > span:nth-child(3) {
     color: var(--muted);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 750;
     text-transform: uppercase;
   }
@@ -188,7 +220,7 @@ const content = locale === "en" ? {
     padding: 18px 22px;
     border-top: 2px solid var(--ink);
     background: var(--acid);
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     font-weight: 760;
   }
 

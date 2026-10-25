@@ -13,6 +13,7 @@ interface Props {
   image?: string;
   imageAlt?: string;
   structuredData?: Record<string, unknown>;
+  noindex?: boolean;
 }
 
 const {
@@ -22,11 +23,12 @@ const {
   path,
   image = "/social/jojo-codex-pet-promo-v1.png",
   imageAlt = "JoJo Codex Pet pixel companion gallery",
-  structuredData
+  structuredData,
+  noindex = false
 } = Astro.props;
 const copy = ui[locale];
 const alternateLocale: Locale = locale === "en" ? "zh-CN" : "en";
-const alternatePath = route(alternateLocale, path);
+const alternatePath = route(alternateLocale, noindex ? "/" : path);
 const canonical = new URL(route(locale, path), Astro.site);
 const enUrl = new URL(route("en", path), Astro.site);
 const zhCnUrl = new URL(route("zh-CN", path), Astro.site);
@@ -34,8 +36,8 @@ const socialImage = new URL(image, Astro.site);
 const openGraphLocale = locale === "en" ? "en_US" : "zh_CN";
 const alternateOpenGraphLocale = locale === "en" ? "zh_CN" : "en_US";
 const a11y = locale === "en"
-  ? { home: "JoJo Codex Pet home", nav: "Primary navigation", skip: "Skip to content" }
-  : { home: "JoJo Codex Pet 首页", nav: "主要导航", skip: "跳到主要内容" };
+  ? { home: "JoJo Codex Pet home", nav: "Primary navigation", skip: "Skip to content", menu: "Menu" }
+  : { home: "JoJo Codex Pet 首页", nav: "主要导航", skip: "跳到主要内容", menu: "菜单" };
 const footer = locale === "en"
   ? {
       tagline: "Unofficial · non-commercial · ad-free",
@@ -65,19 +67,23 @@ const navigation = [
     <meta name="google-site-verification" content="tfvOJaUir_p6nethyb3vLwlTubhjqdMXfPyPLjA71_s" />
     <meta name="google-adsense-account" content="ca-pub-3369430294552960" />
     <meta name="description" content={description} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noindex ? "noindex, follow" : "index, follow"} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="en" href={enUrl} />
-    <link rel="alternate" hreflang="zh-CN" href={zhCnUrl} />
-    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    {!noindex && (
+      <>
+        <link rel="canonical" href={canonical} />
+        <link rel="alternate" hreflang="en" href={enUrl} />
+        <link rel="alternate" hreflang="zh-CN" href={zhCnUrl} />
+        <link rel="alternate" hreflang="x-default" href={enUrl} />
+      </>
+    )}
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="JoJo Codex Pet" />
     <meta property="og:locale" content={openGraphLocale} />
     <meta property="og:locale:alternate" content={alternateOpenGraphLocale} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
+    {!noindex && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={socialImage} />
     <meta property="og:image:alt" content={imageAlt} />
     <meta name="twitter:card" content="summary_large_image" />
@@ -96,7 +102,7 @@ const navigation = [
           <span class="brand-mark" aria-hidden="true">✦</span>
           <span><strong>JOJO</strong><small>CODEX PET</small></span>
         </a>
-        <nav aria-label={a11y.nav}>
+        <nav class="primary-nav" aria-label={a11y.nav}>
           {navigation.map(([label, href]) => (
             <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
           ))}
@@ -106,6 +112,21 @@ const navigation = [
           <a href={alternatePath} lang={alternateLocale} hreflang={alternateLocale}>{copy.language}</a>
           <a href="https://github.com/geoqiao/jojo-codex-pet" rel="noreferrer">GitHub ↗</a>
         </div>
+        <a class="header-install" href={route(locale, "/install/")}>{copy.nav.install}</a>
+        <details class="menu" data-nav-menu>
+          <summary>{a11y.menu}</summary>
+          <div class="menu-panel">
+            <nav aria-label={a11y.nav}>
+              {navigation.map(([label, href]) => (
+                <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
+              ))}
+            </nav>
+            <div class="menu-tools">
+              <a href={alternatePath} lang={alternateLocale} hreflang={alternateLocale}>{copy.language}</a>
+              <a href="https://github.com/geoqiao/jojo-codex-pet" rel="noreferrer">GitHub ↗</a>
+            </div>
+          </div>
+        </details>
       </div>
     </header>
     <main id="main">
@@ -120,6 +141,24 @@ const navigation = [
     </footer>
   </body>
 </html>
+
+
+<script>
+  import { bindHoverMotion } from "../lib/pet-motion";
+
+  bindHoverMotion();
+
+  // Close the mobile menu on Escape or when tapping outside it.
+  const menu = document.querySelector<HTMLDetailsElement>("[data-nav-menu]");
+  document.addEventListener("click", (event) => {
+    if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+  });
+  menu?.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    menu.open = false;
+    menu.querySelector("summary")?.focus();
+  });
+</script>
 
 <style>
   .skip-link {
@@ -145,6 +184,7 @@ const navigation = [
     color: var(--paper-bright);
     background: var(--ink);
     border-bottom: 3px solid var(--ink);
+    view-transition-name: site-header;
   }
 
   .header-inner {
@@ -158,7 +198,8 @@ const navigation = [
     display: flex;
     gap: 10px;
     align-items: center;
-    min-width: 190px;
+    min-width: 0;
+    padding-inline-end: 24px;
     color: inherit;
     text-decoration: none;
   }
@@ -182,58 +223,69 @@ const navigation = [
 
   .brand small {
     margin-top: 5px;
-    font-size: 0.58rem;
+    font-size: 0.75rem;
     font-weight: 850;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.18em;
   }
 
-  nav {
+  .primary-nav {
     display: flex;
     justify-content: center;
   }
 
-  nav a {
+  .primary-nav a {
     display: grid;
     place-items: center;
     padding: 0 16px;
     color: inherit;
     border-inline-start: 1px solid rgb(255 255 255 / 16%);
-    font-size: 0.72rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-decoration: none;
     text-transform: uppercase;
   }
 
-  nav a:last-child {
+  .primary-nav a:last-child {
     border-inline-end: 1px solid rgb(255 255 255 / 16%);
   }
 
-  nav a:hover,
-  nav a.active {
+  .primary-nav a:hover,
+  .primary-nav a.active {
     color: var(--ink);
     background: var(--acid);
   }
 
   .header-tools {
     display: flex;
-    gap: 15px;
+    gap: 6px;
     align-items: center;
     justify-content: end;
     padding-inline-start: 16px;
-    font-size: 0.66rem;
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   .header-tools a {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 8px;
     color: inherit;
     text-underline-offset: 4px;
   }
 
   .header-tools span {
     color: #aaa2b3;
+  }
+
+  .header-install,
+  .menu {
+    display: none;
   }
 
   .site-footer {
@@ -251,68 +303,129 @@ const navigation = [
 
   .footer-grid p {
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
     line-height: 1.7;
   }
 
-  @media (max-width: 1040px) {
-    .header-inner {
-      grid-template-columns: auto 1fr;
-    }
+  .footer-grid a {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+  }
 
+  @media (max-width: 1040px) {
     .header-tools span {
       display: none;
     }
 
-    nav {
-      grid-row: 2;
-      grid-column: 1 / -1;
-      justify-content: flex-start;
-      overflow-x: auto;
-      scrollbar-width: none;
-      border-top: 1px solid rgb(255 255 255 / 16%);
-    }
-
-    nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    nav a {
-      min-height: 44px;
-      white-space: nowrap;
-    }
-
-    .header-tools {
-      min-height: 72px;
+    .primary-nav a {
+      padding-inline: 12px;
     }
   }
 
-  @media (max-width: 680px) {
-    .brand {
-      min-width: 0;
+  /* One compact row on small screens: brand, primary action and a menu for everything else. */
+  @media (max-width: 860px) {
+    .header-inner {
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      min-height: 61px;
     }
 
+    .primary-nav,
     .header-tools {
-      gap: 10px;
-      padding-left: 8px;
+      display: none;
     }
 
-    .header-tools a {
-      font-size: 0.6rem;
+    .brand {
+      padding-inline-end: 0;
     }
 
-    nav {
+    .brand-mark {
+      font-size: 1.9rem;
+    }
+
+    .header-install {
+      display: inline-flex;
+      min-height: 44px;
+      align-items: center;
+      padding-inline: 16px;
+      color: var(--ink);
+      background: var(--acid);
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .menu {
+      display: block;
+    }
+
+    .menu summary {
+      display: inline-flex;
+      min-width: 44px;
+      min-height: 44px;
+      align-items: center;
+      justify-content: center;
+      padding-inline: 14px;
+      border: 2px solid var(--paper-bright);
+      font-size: 0.75rem;
+      font-weight: 850;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .menu summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .menu[open] summary {
+      color: var(--ink);
+      background: var(--paper-bright);
+    }
+
+    .menu-panel {
+      position: absolute;
+      z-index: 30;
+      top: 100%;
+      right: 0;
+      left: 0;
+      padding: 8px 10px 16px;
+      background: var(--ink);
+      border-top: 1px solid rgb(255 255 255 / 20%);
+      box-shadow: 0 12px 0 rgb(23 19 30 / 25%);
+    }
+
+    .menu-panel nav,
+    .menu-tools {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      width: 100%;
-      overflow: visible;
     }
 
-    nav a {
-      min-width: 0;
+    .menu-panel a {
+      display: flex;
+      min-height: 48px;
+      align-items: center;
       padding-inline: 4px;
-      font-size: 0.56rem;
-      letter-spacing: 0.04em;
+      color: inherit;
+      border-bottom: 1px solid rgb(255 255 255 / 14%);
+      font-size: 0.875rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .menu-panel a.active {
+      color: var(--acid);
+    }
+
+    .menu-tools {
+      grid-template-columns: 1fr 1fr;
+      gap: 0 12px;
     }
 
     .footer-grid {

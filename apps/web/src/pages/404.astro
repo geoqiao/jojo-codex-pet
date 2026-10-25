@@ -1,0 +1,114 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { motionPosterUrl } from "../lib/pet-motion";
+
+// Apache serves this one file for every missing URL, so it carries both languages.
+const petId = "part-03-jotaro-kujo";
+const pages = {
+  en: {
+    lang: "en",
+    heading: "NO PET HERE.",
+    body: "This page does not exist, or it has moved. Pick a place to go next.",
+    links: [["Gallery", "/"], ["Roster", "/roster/"], ["Install", "/install/"]]
+  },
+  "zh-CN": {
+    lang: "zh-CN",
+    heading: "这里没有宠物。",
+    body: "这个页面不存在，或者已经搬走了。从下面选一个去处吧。",
+    links: [["宠物目录", "/zh-CN/"], ["名单", "/zh-CN/roster/"], ["安装", "/zh-CN/install/"]]
+  }
+} as const;
+---
+
+<BaseLayout locale="en" title="Page not found — JoJo Codex Pet" description="This page could not be found." path="/404/" noindex>
+  <div class="shell not-found">
+    <span class="not-found-pet motion-frame" data-not-found-pet={petId}>
+      <img class="motion-static" src={motionPosterUrl(petId)} alt="" width="192" height="208" decoding="async" />
+      <span class="motion-layer" data-motion-layer aria-hidden="true"></span>
+    </span>
+    <p class="eyebrow">404</p>
+    {Object.values(pages).map((page) => (
+      <section lang={page.lang} data-not-found-copy={page.lang}>
+        <h1 class="display">{page.heading}</h1>
+        <p>{page.body}</p>
+        <nav aria-label={page.lang === "en" ? "Where to go next" : "接下来去哪里"}>
+          {page.links.map(([label, href]) => (
+            <a class="button" href={href}>{label}</a>
+          ))}
+        </nav>
+      </section>
+    ))}
+  </div>
+</BaseLayout>
+
+<script>
+  import { MotionPlayer, loadStrip, motionStripUrl, prefersReducedMotion } from "../lib/pet-motion";
+
+  // Show one language when the visitor was on a /zh-CN/ URL; otherwise both stay visible.
+  if (location.pathname.startsWith("/zh-CN/")) {
+    document.querySelector("[data-not-found-copy='en']")?.setAttribute("hidden", "");
+  }
+
+  const pet = document.querySelector<HTMLElement>("[data-not-found-pet]");
+  const layer = pet?.querySelector<HTMLElement>("[data-motion-layer]");
+  if (pet && layer && !prefersReducedMotion()) {
+    const petId = pet.dataset.notFoundPet!;
+    void loadStrip(motionStripUrl(petId, "failed")).then(async (ready) => {
+      if (ready && (await new MotionPlayer(layer, petId, [{ state: "failed" }]).play())) pet.classList.add("is-motion-active");
+    });
+  }
+</script>
+
+<style>
+  .not-found {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+    padding-block: clamp(36px, 8vw, 96px);
+  }
+
+  .not-found > section + section {
+    margin-top: 28px;
+  }
+
+  .not-found-pet {
+    height: clamp(180px, 30vw, 260px);
+    aspect-ratio: 192 / 208;
+    --motion-height: 100%;
+  }
+
+  .not-found-pet img {
+    width: 100%;
+    height: 100%;
+  }
+
+  section {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+  }
+
+  section[hidden] {
+    display: none;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(3rem, 9vw, 7rem);
+  }
+
+  p {
+    max-width: 52ch;
+    margin: 0;
+  }
+
+  .eyebrow {
+    margin: 0;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>

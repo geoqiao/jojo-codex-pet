@@ -3,6 +3,7 @@ import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { localize, route } from "../../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
+import { motionFitStyle } from "../../lib/pet-motion";
 import InstallActionTracking from "../InstallActionTracking.astro";
 
 interface Props { locale: Locale }
@@ -21,15 +22,15 @@ const commands = installCommandsFor(releasedPet.id);
 
 const content = locale === "en" ? {
   title: "Install — JoJo Codex Pet",
-  description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
-  eyebrow: "One pet per primary action",
+  description: "Install a JoJo Codex pet with the Codex app link, Bash, PowerShell or npx. Each method installs only the pet you choose.",
+  eyebrow: "One pet at a time",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
-  intro: "Free, unofficial animated pets for the Codex desktop app—not standalone mobile apps. Choose a released pet; every route installs only that Part-scoped pet.",
+  intro: "Free, unofficial animated pets for the Codex desktop app—not standalone mobile apps. Choose a pet; every method installs only that one pet.",
   jump: "Choose a pet and install",
-  pickerEyebrow: `${releasedPets.length} validated pets are live`,
+  pickerEyebrow: `${releasedPets.length} pets ready to install`,
   pickerTitle: "Choose your companion.",
-  pickerBody: "The selection below controls the one primary Codex action and its verified fallback installers.",
-  pickerLabel: "Released pet",
+  pickerBody: "Your choice below sets the Codex link and the other install methods.",
+  pickerLabel: "Pet",
   selected: "Current selection",
   codexSupport: "Requires the Codex desktop app with Pets support. If the codex:// link does not open, use Other install methods below.",
   afterInstallLabel: "After install",
@@ -40,8 +41,8 @@ const content = locale === "en" ? {
   pageLinkCopied: "Link copied",
   pageLinkCopyFailed: "Copy failed",
   actionPrivacy: "We count anonymous aggregate command-copy and Open in Codex actions. These totals show install intent—not completed installations or identifiable visitors.",
-  availableTitle: "Browse every released pet",
-  availableNote: "Each detail page includes the same pet-specific Codex deep link and verified command installers.",
+  availableTitle: "Browse all pets",
+  availableNote: "Each pet page has its own Codex link and install commands.",
   character: "Character",
   stand: "Stand",
   open: "Open in Codex",
@@ -49,10 +50,10 @@ const content = locale === "en" ? {
   copied: "Copied",
   copyFailed: "Copy failed",
   methods: [
-    { method: "codex", name: "Open in Codex", detail: "Uses the official Codex pet-install deep link and the selected hosted v2 spritesheet." },
-    { method: "bash", name: "Bash", detail: "macOS and Linux installer with SHA-256 and manifest validation." },
-    { method: "powershell", name: "PowerShell", detail: "Windows installer with the same package integrity checks." },
-    { method: "npx", name: "npx", detail: "Cross-platform Node installer using the selected Part-scoped pet ID." }
+    { method: "codex", name: "Open in Codex", detail: "Opens the official Codex install link for the selected pet." },
+    { method: "bash", name: "Bash", detail: "For macOS and Linux. Checks the download before installing." },
+    { method: "powershell", name: "PowerShell", detail: "For Windows. Runs the same download checks." },
+    { method: "npx", name: "npx", detail: "Works on any system with Node.js." }
   ],
   faqEyebrow: "Before you install",
   faqTitle: "Install FAQ",
@@ -60,20 +61,20 @@ const content = locale === "en" ? {
     ["Which method should I use?", "Use Open in Codex when your browser can hand the deep link to Codex. Bash is for macOS or Linux, PowerShell is for Windows, and npx works anywhere a current Node.js runtime is available."],
     ["Where do command installers put the pet?", "They write the selected runtime package to $CODEX_HOME/pets/<pet-id>. Without CODEX_HOME, the default is ~/.codex/pets/<pet-id>."],
     ["How does Codex discover it?", "After a command finishes, open Codex Settings → Pets, choose Refresh, then select the installed pet."],
-    ["What gets verified?", "Bash, PowerShell, and npx download the checksum list, pet.json, and spritesheet, then verify SHA-256 plus the manifest ID and V2 contract before replacing runtime files."],
+    ["What gets verified?", "Bash, PowerShell and npx download the pet files and check them against a SHA-256 checksum list before replacing anything on your computer."],
     ["What happens if I install the same pet again?", "A command installer refreshes the files under the same stable pet ID after validation. It does not create a duplicate or add another pet."]
   ]
 } : {
   title: "安装 — JoJo Codex Pet",
-  description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
-  eyebrow: "主操作一次只安装一只",
+  description: "通过 Codex 应用链接、Bash、PowerShell 或 npx 安装 JoJo Codex 宠物，每种方式只安装你选的那一只。",
+  eyebrow: "一次只装一只",
   heading: "只安装你选中的宠物。",
-  intro: "这是给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用。选择一只已发布宠物；每条路径只安装当前篇章稳定 ID 对应的宠物。",
+  intro: "这是给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用。选择一只宠物；每种方式都只安装这一只。",
   jump: "选择宠物并安装",
-  pickerEyebrow: `${releasedPets.length} 只已验证宠物现已开放`,
+  pickerEyebrow: `${releasedPets.length} 只宠物可以安装`,
   pickerTitle: "选择你的小伙伴。",
-  pickerBody: "下方选择会同步更新唯一的 Codex 主操作与经过验证的备用安装器。",
-  pickerLabel: "已发布宠物",
+  pickerBody: "下方的选择会决定 Codex 链接和其他安装方式。",
+  pickerLabel: "宠物",
   selected: "当前选择",
   codexSupport: "需要支持 Pets 的 Codex 桌面应用。如果 codex:// 深链没有打开，请使用下方的“其他安装方式”。",
   afterInstallLabel: "安装后",
@@ -84,8 +85,8 @@ const content = locale === "en" ? {
   pageLinkCopied: "链接已复制",
   pageLinkCopyFailed: "复制失败",
   actionPrivacy: "站点只匿名汇总成功复制命令与点击“在 Codex 中打开”的次数。这些数据表示安装意图，不代表安装完成，也不识别访客。",
-  availableTitle: "浏览全部已发布宠物",
-  availableNote: "每个详情页都提供对应宠物的 Codex 深链与经过校验的命令行安装方式。",
+  availableTitle: "浏览全部宠物",
+  availableNote: "每只宠物的页面都有它自己的 Codex 链接和安装命令。",
   character: "角色",
   stand: "替身",
   open: "在 Codex 中打开",
@@ -93,10 +94,10 @@ const content = locale === "en" ? {
   copied: "已复制",
   copyFailed: "复制失败",
   methods: [
-    { method: "codex", name: "在 Codex 中打开", detail: "使用 Codex 官方宠物安装深链与当前选择的托管 V2 图集。" },
-    { method: "bash", name: "Bash", detail: "面向 macOS 与 Linux，校验 SHA-256 和宠物清单。" },
-    { method: "powershell", name: "PowerShell", detail: "面向 Windows，执行相同的宠物包完整性校验。" },
-    { method: "npx", name: "npx", detail: "使用当前篇章稳定宠物 ID 的跨平台 Node 安装器。" }
+    { method: "codex", name: "在 Codex 中打开", detail: "打开 Codex 官方安装链接，安装当前选择的宠物。" },
+    { method: "bash", name: "Bash", detail: "适用于 macOS 与 Linux。安装前先校验下载内容。" },
+    { method: "powershell", name: "PowerShell", detail: "适用于 Windows。执行同样的下载校验。" },
+    { method: "npx", name: "npx", detail: "任何装有 Node.js 的系统都能用。" }
   ],
   faqEyebrow: "安装前须知",
   faqTitle: "安装常见问题",
@@ -104,7 +105,7 @@ const content = locale === "en" ? {
     ["应该选择哪种方式？", "浏览器能把官方深链交给 Codex 时，可使用“在 Codex 中打开”。macOS 或 Linux 使用 Bash，Windows 使用 PowerShell；安装了新版 Node.js 的平台也可使用 npx。"],
     ["命令行安装器会把宠物放在哪里？", "宠物会写入 $CODEX_HOME/pets/<pet-id>。未设置 CODEX_HOME 时，默认位置是 ~/.codex/pets/<pet-id>。"],
     ["怎样让 Codex 发现新宠物？", "命令执行完成后，打开 Codex Settings → Pets，点击 Refresh，再选择刚安装的宠物。"],
-    ["安装器会校验什么？", "Bash、PowerShell 与 npx 会下载校验清单、pet.json 和 spritesheet，并在替换运行文件前校验 SHA-256、清单 ID 与 V2 合同。"],
+    ["安装器会校验什么？", "Bash、PowerShell 与 npx 会下载宠物文件，并用 SHA-256 校验清单核对后，才会替换你电脑上的文件。"],
     ["重复安装同一只宠物会怎样？", "命令行安装器通过校验后，会更新同一稳定宠物 ID 下的文件；不会创建重复宠物，也不会附带安装其他宠物。"]
   ]
 };
@@ -248,9 +249,14 @@ const content = locale === "en" ? {
             ? `${name}, Part ${pet.part} pixel Codex pet`
             : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
           return (
-            <a href={route(locale, `/pets/${pet.id}/`)}>
-              <span class="released-thumb" style={`--released-accent:${accent}`}>
-                {image && <img src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />}
+            <a href={route(locale, `/pets/${pet.id}/`)} data-motion-hover={pet.id}>
+              <span class="released-thumb motion-frame" style={`--released-accent:${accent}`}>
+                {image && (
+                  <span class="motion-stage" style={motionFitStyle(pet.id)}>
+                    <img class="motion-static" src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />
+                    <span class="motion-layer" data-motion-layer aria-hidden="true"></span>
+                  </span>
+                )}
               </span>
               <span class="released-copy">
                 <small>PART {String(pet.part).padStart(2, "0")}</small>
@@ -358,8 +364,11 @@ const content = locale === "en" ? {
   }
 
   .install-intro .intro-copy a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
     width: fit-content;
-    font-size: 0.72rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -448,7 +457,7 @@ const content = locale === "en" ? {
     padding: 5px 8px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.62rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -476,7 +485,7 @@ const content = locale === "en" ? {
 
   .picker-control label,
   .selected-pet span {
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -503,13 +512,13 @@ const content = locale === "en" ? {
   }
 
   .selected-pet strong { text-align: right; }
-  .selected-pet code { grid-column: 1 / -1; overflow-wrap: anywhere; font-size: 0.68rem; }
+  .selected-pet code { grid-column: 1 / -1; overflow-wrap: anywhere; font-size: 0.8125rem; }
 
   .codex-method-label {
     display: flex;
     gap: 8px;
     margin: 8px 0 0;
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -522,7 +531,7 @@ const content = locale === "en" ? {
   .after-install-note {
     margin: 0;
     color: var(--ink);
-    font-size: 0.76rem;
+    font-size: 0.8125rem;
     font-weight: 650;
     line-height: 1.45;
   }
@@ -540,7 +549,7 @@ const content = locale === "en" ? {
 
   .page-link-transfer p {
     margin: 0;
-    font-size: 0.74rem;
+    font-size: 0.8125rem;
     line-height: 1.45;
   }
 
@@ -550,7 +559,7 @@ const content = locale === "en" ? {
     border: 2px solid var(--ink);
     color: var(--ink);
     background: var(--paper-bright);
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     cursor: pointer;
   }
@@ -564,7 +573,7 @@ const content = locale === "en" ? {
   .other-methods > summary {
     min-height: 52px;
     padding: 15px 4px;
-    font-size: 0.78rem;
+    font-size: 0.8125rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -587,7 +596,7 @@ const content = locale === "en" ? {
     flex-direction: column;
   }
 
-  .method-grid article > span { color: var(--ink); font-size: 0.72rem; font-weight: 850; }
+  .method-grid article > span { color: var(--ink); font-size: 0.8125rem; font-weight: 850; }
 
   .method-grid h2 {
     min-height: 2em;
@@ -612,7 +621,7 @@ const content = locale === "en" ? {
     overflow-wrap: anywhere;
     border: 2px solid var(--ink);
     background: var(--paper);
-    font-size: 0.68rem;
+    font-size: 0.8125rem;
     line-height: 1.5;
   }
 
@@ -636,7 +645,7 @@ const content = locale === "en" ? {
     max-width: 76ch;
     margin: 18px 0 0;
     color: var(--muted);
-    font-size: 0.76rem;
+    font-size: 0.8125rem;
     font-weight: 650;
     line-height: 1.6;
   }
@@ -715,16 +724,13 @@ const content = locale === "en" ? {
     border-right: 3px solid var(--ink);
   }
 
-  .released-thumb img {
+  .released-thumb .motion-stage {
     width: 104px;
-    height: 112px;
-    object-fit: contain;
-    image-rendering: pixelated;
     transition: transform 160ms ease;
   }
 
-  .released-grid a:hover .released-thumb img,
-  .released-grid a:focus-visible .released-thumb img { transform: scale(1.06); }
+  .released-grid a:hover .motion-stage,
+  .released-grid a:focus-visible .motion-stage { transform: scale(1.06); }
 
   .released-copy {
     display: grid;
@@ -732,7 +738,7 @@ const content = locale === "en" ? {
     padding: 15px;
   }
 
-  .released-copy small { font-size: 0.62rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+  .released-copy small { font-size: 0.8125rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
 
   .released-copy strong { align-self: center; overflow-wrap: anywhere; font-family: "Bodoni Moda Variable", Georgia, serif; font-size: 1.55rem; line-height: 0.95; }
   .released-copy small:last-child { align-self: end; }

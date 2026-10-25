@@ -1,0 +1,11 @@
+[
+  { "id": "idle", "durations": [280, 110, 110, 140, 140, 320] },
+  { "id": "running-right", "durations": [120, 120, 120, 120, 120, 120, 120, 220] },
+  { "id": "running-left", "durations": [120, 120, 120, 120, 120, 120, 120, 220] },
+  { "id": "waving", "durations": [140, 140, 140, 280] },
+  { "id": "jumping", "durations": [140, 140, 140, 140, 280] },
+  { "id": "failed", "durations": [140, 140, 140, 140, 140, 140, 140, 240] },
+  { "id": "waiting", "durations": [150, 150, 150, 150, 150, 260] },
+  { "id": "running", "durations": [120, 120, 120, 120, 120, 220] },
+  { "id": "review", "durations": [150, 150, 150, 150, 150, 280] }
+]

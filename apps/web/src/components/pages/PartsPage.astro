@@ -1,30 +1,31 @@
 ---
 import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import PetThumb from "../PetThumb.astro";
 import { localize, route } from "../../lib/i18n";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 const content = locale === "en" ? {
   title: "Parts — JoJo Codex Pet",
-  description: "Browse the JoJo Codex Pet headline roster Part by Part.",
+  description: "Browse the 36 animated JoJo Codex pets Part by Part, from Part 1 to Part 9.",
   eyebrow: "Nine chronological collections",
   heading: "EVERY PART. ONE BLOODLINE.",
-  intro: "Each Part groups its headline character pets, Stand pairs, and persistent Stand lineages. Release waves are quality gates—not new identities.",
+  intro: "Each Part groups its main characters, Stand pairs and recurring Stands.",
   protagonist: "Protagonist side",
   antagonist: "Antagonist side",
   open: "Open collection",
-  ongoing: "Ongoing · antagonist unassigned"
+  ongoing: "Ongoing · no antagonist pet yet"
 } : {
   title: "篇章 — JoJo Codex Pet",
-  description: "按篇章浏览 JoJo Codex Pet 的首发名单。",
+  description: "按篇章浏览 36 只 JoJo Codex 动画宠物，从第 1 部到第 9 部。",
   eyebrow: "九个按时间排列的篇章合集",
   heading: "每一部，同一条血脉。",
-  intro: "每个篇章收录主角与篇章主反派的角色宠物、替身配对和持久替身谱系。发布波次只是质量门，不改变宠物身份。",
+  intro: "每个篇章收录主要角色、替身配对和反复出现的替身。",
   protagonist: "主角侧",
   antagonist: "主反派侧",
   open: "打开篇章",
-  ongoing: "连载中 · 主反派暂不指定"
+  ongoing: "连载中 · 暂无反派宠物"
 };
 ---
 
@@ -49,11 +50,21 @@ const content = locale === "en" ? {
               <dl>
                 <div>
                   <dt>{content.protagonist}</dt>
-                  <dd>{heroes.map((pet, index) => <><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>{index < heroes.length - 1 ? " · " : ""}</>)}</dd>
+                  <dd>{heroes.map((pet) => (
+                    <a class="pet-chip" href={route(locale, `/pets/${pet.id}/`)} data-motion-hover={pet.id}>
+                      <PetThumb petId={pet.id} />
+                      <span>{localize(pet.name, locale)}</span>
+                    </a>
+                  ))}</dd>
                 </div>
                 <div>
                   <dt>{content.antagonist}</dt>
-                  <dd>{antagonists.length > 0 ? antagonists.map((pet, index) => <><a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>{index < antagonists.length - 1 ? " · " : ""}</>) : content.ongoing}</dd>
+                  <dd>{antagonists.length > 0 ? antagonists.map((pet) => (
+                    <a class="pet-chip" href={route(locale, `/pets/${pet.id}/`)} data-motion-hover={pet.id}>
+                      <PetThumb petId={pet.id} />
+                      <span>{localize(pet.name, locale)}</span>
+                    </a>
+                  )) : content.ongoing}</dd>
                 </div>
               </dl>
               <a class="button" href={`${route(locale, "/")}?part=${part.number}#roster`}>{content.open} ↗</a>
@@ -130,27 +141,38 @@ const content = locale === "en" ? {
   }
 
   dt {
-    font-size: 0.67rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
   dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
     margin: 0;
-    font-size: 0.86rem;
+    font-size: 0.9375rem;
     font-weight: 650;
   }
 
-  dd a {
+  .pet-chip {
+    display: inline-flex;
+    gap: 8px;
+    min-height: 48px;
+    align-items: center;
+    padding: 2px 12px 2px 4px;
+    border: 2px solid var(--ink);
+    background: var(--paper);
     font-weight: 760;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 4px;
+    text-decoration: none;
+    --thumb-height: 42px;
   }
 
-  dd a:hover { background: var(--acid); }
+  .pet-chip:hover { background: var(--acid); }
 
-  dd a:focus-visible {
+  .pet-chip:focus-visible {
     outline: 3px solid var(--paper-bright);
     outline-offset: 2px;
     box-shadow: 0 0 0 6px var(--ink);
