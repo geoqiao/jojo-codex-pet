@@ -3,6 +3,7 @@ import { parts, pets, type Locale, type Pet } from "@jojo-codex-pet/catalog";
 import { petProfiles } from "../content/petProfiles";
 import { localize, route, ui } from "../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor, packageUrlFor } from "../lib/install-links";
+import { motionLabels, motionStates } from "../lib/pet-motion";
 import InstallActionTracking from "./InstallActionTracking.astro";
 
 interface Props { locale: Locale; pet: Pet }
@@ -12,8 +13,8 @@ const name = localize(pet.name, locale);
 const isReview = pet.status === "pilot-review" || pet.status === "wave-review";
 const part = parts.find((item) => item.number === pet.part)!;
 const partTitle = localize(part.title, locale);
-const wave = pet.part <= 3 ? 1 : pet.part <= 6 ? 2 : 3;
 const displayImage = pet.image?.replace(/\.png$/, "-card.webp");
+const hasMotion = pet.status === "released" && Boolean(displayImage);
 const imageAlt = locale === "en"
   ? `${name}, Part ${pet.part} pixel Codex pet`
   : `${name}，JoJo 第 ${pet.part} 部像素 Codex 宠物`;
@@ -44,13 +45,13 @@ const installCommands = commands ? [
   { method: "npx", label: `npx · ${locale === "en" ? "cross-platform" : "跨平台"}`, command: commands.npx }
 ] : [];
 const content = locale === "en" ? {
-  identity: "Catalog identity",
+  identity: "Pet ID",
   relationship: "Stand relationship",
   lineage: "Stand form lineage",
   lineageHelp: "Browse each independently installable animated Codex pet in story order.",
   lineageAnchor: (itemName: string) => `${itemName} — animated Codex pet`,
   ability: "Ability modes inside this pet",
-  palette: "Locked signature palette",
+  palette: "Signature palette",
   source: "Source",
   install: "Install this pet",
   installAnchor: "Install this pet ↓",
@@ -64,15 +65,19 @@ const content = locale === "en" ? {
   copyPageLink: "Copy page link",
   pageLinkCopied: "Link copied",
   pageLinkCopyFailed: "Copy failed",
-  pending: "This pet is not installable yet. Its complete v2 animation and QA package must pass before installation is enabled.",
-  reviewPending: "Engineering QA is complete. Public installation remains disabled until final owner animation approval.",
-  ready: "The complete v2 atlas passed deterministic validation, three blind direction reviews, and independent visual QA. Every method below installs only this pet.",
-  overview: `${name} is the ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} entry for Part ${pet.part}, ${partTitle}, in the 36-pet headline roster.`,
-  released: `${name} is released as a validated Codex Pet V2 package from Wave ${wave}.`,
-  review: `${name}'s complete V2 atlas passed engineering QA and is waiting for final owner animation approval before release.`,
-  planned: `${name} is assigned to Wave ${wave}. Its base art, complete V2 animation, package validation, and visual QA are not published yet.`,
-  views: "Public page views",
+  pending: "This pet is not ready yet. Installation opens once its animations are finished.",
+  reviewPending: "This pet is in final review. Installation opens once it is approved.",
+  ready: "Installs only this pet, with all 9 animations. Use the Codex app link, or pick another method below.",
+  overview: `${name} is the ${copy.role[pet.role].toLowerCase()} ${copy.type[pet.type].toLowerCase()} entry for Part ${pet.part}, ${partTitle}, one of 36 JoJo pets.`,
+  released: `${name} is ready to install and includes all 9 animations.`,
+  review: `${name} is in final review and cannot be installed yet.`,
+  planned: `${name} is planned. Its artwork and animations are not published yet.`,
   openInCodex: "Open in Codex",
+  motionLabel: "Animation preview",
+  motionNow: "Now showing",
+  motionStates: "Animation state",
+  motionPause: "Pause",
+  motionPlay: "Play",
   download: "Package files",
   methodsLabel: "Available install methods",
   methods: ["Codex app", "Bash", "PowerShell", "npx"],
@@ -81,13 +86,13 @@ const content = locale === "en" ? {
   copied: "Copied",
   copyFailed: "Copy failed"
 } : {
-  identity: "目录身份",
+  identity: "宠物 ID",
   relationship: "替身关系",
   lineage: "替身形态系列",
   lineageHelp: "按故事顺序浏览每只可独立安装的像素动画 Codex 宠物。",
   lineageAnchor: (itemName: string) => `${itemName} — 像素动画 Codex 宠物`,
   ability: "包含在本宠物中的能力模式",
-  palette: "锁定标志配色",
+  palette: "标志配色",
   source: "来源",
   install: "安装这只宠物",
   installAnchor: "安装这只宠物 ↓",
@@ -101,15 +106,19 @@ const content = locale === "en" ? {
   copyPageLink: "复制页面链接",
   pageLinkCopied: "链接已复制",
   pageLinkCopyFailed: "复制失败",
-  pending: "这只宠物暂不可安装。完整 V2 动画和 QA 包通过后才会启用安装。",
-  reviewPending: "工程 QA 已完成；公开安装仍保持关闭，等待站长最终动画审核通过。",
-  ready: "完整 V2 图集已通过确定性校验、三次盲测方向审核和独立视觉 QA。以下每种方式都只安装当前这只宠物。",
-  overview: `${name}是 36 只首发名单中 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物。`,
-  released: `${name}已在第 ${wave} 波次作为通过验证的 Codex Pet V2 包发布。`,
-  review: `${name}的完整 V2 图集已通过工程 QA，正在等待站长最终动画审核后发布。`,
-  planned: `${name}属于第 ${wave} 波次，基础造型、完整 V2 动画、宠物包验证与视觉 QA 尚未发布。`,
-  views: "公开页面浏览次数",
+  pending: "这只宠物还没有准备好。动画完成后才会开放安装。",
+  reviewPending: "这只宠物正在做最终审核。通过后即可安装。",
+  ready: "只安装这只宠物，包含全部 9 种动作。可使用 Codex 应用链接，或选择下方其他安装方式。",
+  overview: `${name}是 JoJo 第 ${pet.part} 部《${partTitle}》的${copy.role[pet.role]}${copy.type[pet.type]}宠物，36 只 JoJo 宠物之一。`,
+  released: `${name}可以安装，包含全部 9 种动作。`,
+  review: `${name}正在做最终审核，暂时不能安装。`,
+  planned: `${name}在计划中，美术与动画尚未发布。`,
   openInCodex: "在 Codex 中打开",
+  motionLabel: "动画预览",
+  motionNow: "当前动作",
+  motionStates: "动画状态",
+  motionPause: "暂停",
+  motionPlay: "播放",
   download: "宠物包文件",
   methodsLabel: "可用安装方式",
   methods: ["Codex 应用", "Bash", "PowerShell", "npx"],
@@ -121,13 +130,24 @@ const content = locale === "en" ? {
 ---
 
 <div class="detail-grid">
-  <div class="detail-side">
+  <div class="detail-side" data-pet-motion={hasMotion ? pet.id : undefined}>
     <div class="detail-art" style={`--accent:${part.accent}`}>
       {displayImage ? (
-        <img src={displayImage} alt={imageAlt} width="640" height="640" loading="eager" fetchpriority="high" decoding="async" />
+        <img
+          class="motion-static"
+          src={displayImage}
+          alt={imageAlt}
+          width="640"
+          height="640"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+          style={`view-transition-name: pet-${pet.id}`}
+        />
       ) : (
         <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
       )}
+      {hasMotion && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
       <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
       {pet.status === "released" && packageUrl && openInCodexUrl && (
         <div class="detail-art-actions" role="group" aria-label={content.install}>
@@ -135,6 +155,22 @@ const content = locale === "en" ? {
         </div>
       )}
     </div>
+    {hasMotion && (
+      <section class="motion-controls" data-motion-controls aria-label={content.motionLabel} hidden>
+        <p class="motion-now" aria-live="polite" aria-atomic="true">
+          <span>{content.motionNow}</span>
+          <strong data-motion-now>{motionLabels[locale].idle}</strong>
+        </p>
+        <div class="motion-states" role="group" aria-label={content.motionStates}>
+          {motionStates.map((state, index) => (
+            <button type="button" aria-pressed={index === 0 ? "true" : "false"} data-motion-state={state.id} data-motion-label={motionLabels[locale][state.id]}>
+              {motionLabels[locale][state.id]}
+            </button>
+          ))}
+        </div>
+        <button class="motion-play" type="button" data-motion-play data-pause-label={content.motionPause} data-play-label={content.motionPlay}>{content.motionPause}</button>
+      </section>
+    )}
     <div class="pet-summary">
       <p class="part-title">{localize(part.title, locale)} · {copy.role[pet.role]}</p>
       <p class="pet-product-note">{content.productNote}</p>
@@ -222,7 +258,6 @@ const content = locale === "en" ? {
     </section>
     <dl>
       <div><dt>{content.identity}</dt><dd><code>{pet.id}</code></dd></div>
-      <div><dt>{content.views}</dt><dd><span data-view-count={pet.id}>— {copy.view}</span></dd></div>
       {related.length > 0 && (
         <div>
           <dt>{content.relationship}</dt>
@@ -269,6 +304,61 @@ const content = locale === "en" ? {
 )}
 <InstallActionTracking />
 
+<script>
+  import { MotionPlayer, loadStrip, motionStripUrl, prefersReducedMotion } from "../lib/pet-motion";
+
+  const root = document.querySelector<HTMLElement>("[data-pet-motion]");
+  const stage = root?.querySelector<HTMLElement>(".detail-art");
+  const layer = root?.querySelector<HTMLElement>("[data-motion-layer]");
+  const controls = root?.querySelector<HTMLElement>("[data-motion-controls]");
+  const playButton = root?.querySelector<HTMLButtonElement>("[data-motion-play]");
+  const now = root?.querySelector<HTMLElement>("[data-motion-now]");
+  const petId = root?.dataset.petMotion;
+
+  if (stage && layer && controls && playButton && now && petId) {
+    const buttons = [...controls.querySelectorAll<HTMLButtonElement>("[data-motion-state]")];
+    const player = new MotionPlayer(layer, petId, [{ state: "idle" }]);
+    player.watchVisibility();
+
+    const renderPlay = () => {
+      playButton.textContent = (player.playing ? playButton.dataset.pauseLabel : playButton.dataset.playLabel) ?? "";
+    };
+    const activate = (ready: boolean) => {
+      if (ready) stage.classList.add("is-motion-active");
+      return ready;
+    };
+
+    for (const button of buttons) {
+      button.addEventListener("click", async () => {
+        const state = button.dataset.motionState!;
+        if (!activate(await player.set([{ state }]))) return;
+        for (const other of buttons) other.setAttribute("aria-pressed", String(other === button));
+        now.textContent = button.dataset.motionLabel ?? state;
+      });
+      const prefetch = () => void loadStrip(motionStripUrl(petId, button.dataset.motionState!));
+      button.addEventListener("pointerenter", prefetch);
+      button.addEventListener("focus", prefetch);
+    }
+
+    playButton.addEventListener("click", async () => {
+      if (player.playing) player.pause();
+      else activate(await player.play());
+      renderPlay();
+    });
+
+    // The static art stays until the idle strip is ready; reduced-motion visitors start paused.
+    const start = async () => {
+      if (!(await loadStrip(motionStripUrl(petId, "idle")))) return;
+      controls.hidden = false;
+      if (!prefersReducedMotion()) activate(await player.play());
+      renderPlay();
+    };
+    const defer = () => (window.requestIdleCallback ? window.requestIdleCallback(() => void start()) : window.setTimeout(() => void start(), 200));
+    if (document.readyState === "complete") defer();
+    else window.addEventListener("load", defer, { once: true });
+  }
+</script>
+
 <style>
   .detail-grid {
     display: grid;
@@ -281,7 +371,7 @@ const content = locale === "en" ? {
 
   .detail-side {
     display: grid;
-    grid-template-rows: minmax(560px, 1fr) auto;
+    grid-template-rows: minmax(560px, 1fr) auto auto;
     min-width: 0;
     border-right: 3px solid var(--ink);
   }
@@ -289,6 +379,7 @@ const content = locale === "en" ? {
   .detail-art {
     display: grid;
     position: relative;
+    container-type: inline-size;
     height: 100%;
     min-height: 560px;
     place-items: center;
@@ -319,6 +410,76 @@ const content = locale === "en" ? {
     filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
   }
 
+  .detail-art .motion-layer {
+    height: min(81cqw, 469px);
+    filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
+  }
+
+  .motion-controls {
+    display: grid;
+    gap: 12px;
+    padding: 16px 20px 18px;
+    border-bottom: 3px solid var(--ink);
+    background: var(--paper);
+  }
+
+  .motion-controls[hidden] {
+    display: none;
+  }
+
+  .motion-now {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .motion-now strong {
+    font-family: "Bodoni Moda Variable", Georgia, serif;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    text-transform: none;
+  }
+
+  .motion-states {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .motion-states button,
+  .motion-play {
+    min-height: 44px;
+    padding: 6px 8px;
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    background: var(--paper-bright);
+    font-size: 0.75rem;
+    font-weight: 850;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .motion-states button:hover,
+  .motion-play:hover {
+    background: var(--acid);
+  }
+
+  .motion-states button[aria-pressed="true"] {
+    color: var(--paper-bright);
+    background: var(--ink);
+  }
+
+  .motion-play {
+    justify-self: start;
+    min-width: 120px;
+  }
+
   .detail-part {
     position: absolute;
     z-index: 2;
@@ -327,7 +488,7 @@ const content = locale === "en" ? {
     padding: 7px 11px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.13em;
   }
@@ -348,7 +509,7 @@ const content = locale === "en" ? {
     padding: 10px 12px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.58rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-align: right;
@@ -436,7 +597,7 @@ const content = locale === "en" ? {
     margin: 0;
     padding: 12px 16px;
     color: var(--acid);
-    font-size: 0.66rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -482,7 +643,7 @@ const content = locale === "en" ? {
   }
 
   dt {
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -534,7 +695,7 @@ const content = locale === "en" ? {
     border: 2px solid var(--ink);
     color: var(--ink);
     background: var(--paper-bright);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 820;
     line-height: 1.35;
     text-underline-offset: 3px;
@@ -561,7 +722,7 @@ const content = locale === "en" ? {
     padding: 2px 4px;
     color: var(--paper-bright);
     background: var(--ink);
-    font-size: 0.55rem;
+    font-size: 0.75rem;
     font-style: normal;
   }
 
@@ -609,7 +770,7 @@ const content = locale === "en" ? {
     padding: 5px 7px;
     border: 1px solid rgb(255 255 255 / 45%);
     color: var(--acid);
-    font-size: 0.58rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -637,7 +798,7 @@ const content = locale === "en" ? {
     min-height: 44px;
     align-items: center;
     color: var(--paper-bright);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.06em;
     text-underline-offset: 4px;
@@ -684,7 +845,7 @@ const content = locale === "en" ? {
     border: 1px solid var(--paper-bright);
     color: var(--paper-bright);
     background: transparent;
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 850;
     cursor: pointer;
   }
@@ -698,7 +859,7 @@ const content = locale === "en" ? {
     min-height: 48px;
     padding: 14px 0;
     color: var(--acid);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -722,7 +883,7 @@ const content = locale === "en" ? {
 
   .command-row > span {
     color: var(--acid);
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     font-weight: 850;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -732,7 +893,7 @@ const content = locale === "en" ? {
     min-width: 0;
     overflow-x: auto;
     color: var(--paper-bright);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     white-space: nowrap;
   }
 
@@ -743,7 +904,7 @@ const content = locale === "en" ? {
     border: 1px solid var(--paper-bright);
     color: var(--paper-bright);
     background: transparent;
-    font-size: 0.62rem;
+    font-size: 0.75rem;
     font-weight: 850;
     cursor: pointer;
   }
@@ -806,6 +967,8 @@ const content = locale === "en" ? {
     }
 
     .detail-art img { height: 278px; }
+    .detail-art .motion-layer { height: min(81cqw, 256px); }
+    .motion-controls { order: 1; border-bottom: 3px solid var(--ink); }
     .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
     .page-link-transfer { display: grid; }
     .detail-part { top: 14px; left: 14px; }
