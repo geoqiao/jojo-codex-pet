@@ -14,7 +14,10 @@ const walk = (directory) => readdirSync(directory, { withFileTypes: true }).flat
 });
 
 const outputFiles = walk(dist);
-const htmlFiles = outputFiles.filter((path) => path.endsWith(".html"));
+const allHtmlFiles = outputFiles.filter((path) => path.endsWith(".html"));
+const notFoundFile = join(dist, "404.html");
+// 404.html is a custom error page: it is validated separately and never listed in the sitemap.
+const htmlFiles = allHtmlFiles.filter((path) => path !== notFoundFile);
 const failures = [];
 const titles = new Map();
 const descriptions = new Map();
@@ -24,6 +27,7 @@ const expect = (condition, message) => {
 };
 
 expect(htmlFiles.length === 82, `expected 82 HTML files, found ${htmlFiles.length}`);
+expect(existsSync(notFoundFile), "missing 404.html");
 expect(existsSync(join(dist, "api/actions.php")), "missing staged action endpoint");
 expect(existsSync(join(dist, "api/views.php")), "missing staged page-view endpoint");
 
@@ -95,15 +99,18 @@ const sourceSizeAt = (sizes, viewport) => {
   return Number.NaN;
 };
 
+// Up to 640px the gallery shows compact two-column cards whose art fills 90% of the card.
 const renderedCardImageWidth = (viewport) => {
   const shellWidth = viewport <= 800 ? viewport - 20 : Math.min(1480, viewport - 32);
-  const columns = viewport <= 540 ? 1 : viewport <= 840 ? 2 : viewport <= 1180 ? 3 : 4;
-  const cardWidth = (shellWidth - 26 * (columns - 1)) / columns;
-  return Math.min(330, 0.92 * (cardWidth - 6));
+  const compact = viewport <= 640;
+  const columns = viewport <= 840 ? 2 : viewport <= 1180 ? 3 : 4;
+  const gap = compact ? 12 : 26;
+  const cardWidth = (shellWidth - gap * (columns - 1)) / columns;
+  return compact ? 0.9 * (cardWidth - 6) : Math.min(330, 0.92 * (cardWidth - 6));
 };
 
 const responsiveViewports = [
-  320, 384, 385, 390, 539, 540, 541, 600, 775, 776, 799, 800, 801,
+  320, 360, 384, 385, 390, 539, 540, 541, 600, 639, 640, 641, 775, 776, 799, 800, 801,
   839, 840, 841, 900, 1178, 1179, 1180, 1181, 1456, 1512, 1513, 1600
 ];
 
@@ -445,6 +452,18 @@ if (failures.length > 0) {
   console.error(`Web output validation failed with ${failures.length} issue(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
+}
+
+if (existsSync(notFoundFile)) {
+  const html = readFileSync(notFoundFile, "utf8");
+  expect(html.includes('<meta name="robots" content="noindex, follow">'), "404.html: missing noindex");
+  expect(!html.includes('rel="canonical"'), "404.html: must not declare a canonical URL");
+  expect(html.includes("这里没有宠物") && html.includes("NO PET HERE"), "404.html: missing English or zh-CN copy");
+  for (const href of ["/", "/roster/", "/install/", "/zh-CN/", "/zh-CN/roster/", "/zh-CN/install/"]) {
+    expect(html.includes(`href="${href}"`), `404.html: missing link to ${href}`);
+  }
+  const htaccess = join(dist, ".htaccess");
+  expect(existsSync(htaccess) && /^ErrorDocument 404 \/404\.html$/m.test(readFileSync(htaccess, "utf8")), ".htaccess: missing ErrorDocument 404 /404.html");
 }
 
 console.log(`Validated ${htmlFiles.length} HTML files: released pets are visible and SEO metadata is consistent.`);
