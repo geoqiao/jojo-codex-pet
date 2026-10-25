@@ -1,0 +1,25 @@
+---
+import { motionPosterUrl } from "../lib/pet-motion";
+
+interface Props { petId: string }
+const { petId } = Astro.props;
+---
+
+<span class="pet-thumb motion-frame" aria-hidden="true">
+  <img class="motion-static" src={motionPosterUrl(petId)} alt="" width="192" height="208" loading="lazy" decoding="async" />
+  <span class="motion-layer" data-motion-layer></span>
+</span>
+
+<style>
+  .pet-thumb {
+    --motion-height: 100%;
+    flex: none;
+    height: var(--thumb-height, 56px);
+    aspect-ratio: 192 / 208;
+  }
+
+  .pet-thumb img {
+    width: 100%;
+    height: 100%;
+  }
+</style>
