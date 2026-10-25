@@ -22,10 +22,10 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
       }
     },
     animationQa: {
-      title: { en: "Animation and QA", "zh-CN": "动画与 QA" },
+      title: { en: "Animation", "zh-CN": "动画" },
       body: {
-        en: "The Jotaro V2 reel contains the nine standard state rows and 16 clockwise look directions. Its active cue follows the Pilot brief: seafoam focus blocks stay attached to the hand or eyes, with antique-gold resolve ticks integrated into the coat chain or collar. The final 8×11 atlas passed deterministic validation, blind direction review, continuity review, and independent visual QA.",
-        "zh-CN": "承太郎的 V2 动画包含九个标准状态行和 16 个顺时针视角。主动状态遵循 Pilot brief：海沫绿色的专注方块贴在手部或眼部，古金色的决意刻线融入衣链或衣领。最终 8×11 图集通过确定性校验、盲测方向审核、连续性审核和独立视觉 QA。"
+        en: "The Jotaro V2 reel contains the nine standard state rows and 16 clockwise look directions. Its active cue follows the design notes: seafoam focus blocks stay attached to the hand or eyes, with antique-gold resolve ticks integrated into the coat chain or collar. All nine actions and 16 look directions were checked before release.",
+        "zh-CN": "承太郎的 V2 动画包含九个标准状态行和 16 个顺时针视角。主动状态遵循设计规范：海沫绿色的专注方块贴在手部或眼部，古金色的决意刻线融入衣链或衣领。所有动作与视角都在发布前检查过。"
       }
     },
     packageCompatibility: {
@@ -45,10 +45,10 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
       }
     },
     animationQa: {
-      title: { en: "Animation and QA", "zh-CN": "动画与 QA" },
+      title: { en: "Animation", "zh-CN": "动画" },
       body: {
-        en: "The Star Platinum V2 reel covers all nine standard states and the complete 16-direction look loop. Its Pilot animation language keeps cyan and coral impact blocks attached to the fists, with gold precision ticks attached to the eyes, shoulders, or gauntlets; no detached punch trail is used. The 1536×2288 atlas passed deterministic, blind-direction, continuity, and independent visual QA gates.",
-        "zh-CN": "白金之星的 V2 动画覆盖九个标准状态和完整的 16 方向视角循环。Pilot 动画规范要求青色与珊瑚色冲击方块贴在拳部，金色精准刻线贴在眼睛、肩部或护腕，不使用脱离主体的拳风轨迹。1536×2288 图集通过确定性、盲测方向、连续性和独立视觉 QA 门槛。"
+        en: "The Star Platinum V2 reel covers all nine standard states and the complete 16-direction look loop. Its animation style keeps cyan and coral impact blocks attached to the fists, with gold precision ticks attached to the eyes, shoulders, or gauntlets; no detached punch trail is used. All nine actions and 16 look directions were checked before release.",
+        "zh-CN": "白金之星的 V2 动画覆盖九个标准状态和完整的 16 方向视角循环。动画规范要求青色与珊瑚色冲击方块贴在拳部，金色精准刻线贴在眼睛、肩部或护腕，不使用脱离主体的拳风轨迹。所有动作与视角都在发布前检查过。"
       }
     },
     packageCompatibility: {
@@ -68,10 +68,10 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
       }
     },
     animationQa: {
-      title: { en: "Animation and QA", "zh-CN": "动画与 QA" },
+      title: { en: "Animation", "zh-CN": "动画" },
       body: {
-        en: "DIO's V2 reel presents the nine standard state rows followed by 16 clockwise look directions. The approved effect language uses oxblood and cyan pressure blocks attached to the eyes or active hand, with antique-gold fracture accents integrated into the heart ornament or cuffs; The World is never drawn inside DIO's rows. The final atlas cleared deterministic, blind-direction, continuity, and independent visual QA.",
-        "zh-CN": "DIO 的 V2 动画按顺序呈现九个标准状态行和 16 个顺时针视角。获批的效果语言使用贴在眼睛或主动手部的酒红与青色压力方块，并把古金色裂纹点缀融入心形饰件或袖口；DIO 的动画行中不会画入世界。最终图集通过确定性、盲测方向、连续性和独立视觉 QA。"
+        en: "DIO's V2 reel presents the nine standard state rows followed by 16 clockwise look directions. The approved effect language uses oxblood and cyan pressure blocks attached to the eyes or active hand, with antique-gold fracture accents integrated into the heart ornament or cuffs; The World is never drawn inside DIO's rows. All nine actions and 16 look directions were checked before release.",
+        "zh-CN": "DIO 的 V2 动画按顺序呈现九个标准状态行和 16 个顺时针视角。获批的效果语言使用贴在眼睛或主动手部的酒红与青色压力方块，并把古金色裂纹点缀融入心形饰件或袖口；DIO 的动画行中不会画入世界。所有动作与视角都在发布前检查过。"
       }
     },
     packageCompatibility: {
@@ -91,10 +91,10 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
       }
     },
     animationQa: {
-      title: { en: "Animation and QA", "zh-CN": "动画与 QA" },
+      title: { en: "Animation", "zh-CN": "动画" },
       body: {
-        en: "The World V2 reel contains the nine standard state rows and all 16 look directions. Its effect language uses turquoise time-lock plates attached to the gauntlets or torso, with oxblood and gold clock-slice accents integrated into the armor; the brief disallows a detached clock face, numerals, or environment-wide field. The 8×11 atlas passed deterministic, blind-direction, continuity, and independent visual QA.",
-        "zh-CN": "世界的 V2 动画包含九个标准状态行和全部 16 个视角。它的效果语言使用贴在护腕或躯干上的绿松石色停时板块，并将酒红与金色的时钟切片融入装甲；规范禁止脱离主体的钟面、数字或覆盖环境的停时场。8×11 图集通过确定性、盲测方向、连续性和独立视觉 QA。"
+        en: "The World V2 reel contains the nine standard state rows and all 16 look directions. Its effect language uses turquoise time-lock plates attached to the gauntlets or torso, with oxblood and gold clock-slice accents integrated into the armor; the brief disallows a detached clock face, numerals, or environment-wide field. All nine actions and 16 look directions were checked before release.",
+        "zh-CN": "世界的 V2 动画包含九个标准状态行和全部 16 个视角。它的效果语言使用贴在护腕或躯干上的绿松石色停时板块，并将酒红与金色的时钟切片融入装甲；规范禁止脱离主体的钟面、数字或覆盖环境的停时场。所有动作与视角都在发布前检查过。"
       }
     },
     packageCompatibility: {
@@ -174,8 +174,8 @@ export const petProfiles: Readonly<Record<string, PetProfile>> = {
     animationQa: {
       title: { en: "Spiral-disc motion and recorded QA", "zh-CN": "螺旋圆盘动画与 QA 记录" },
       body: {
-        en: "ACT3 emerges from an integrated spiral-disc base in its pixel design. Its 1536×2288 V2 atlas contains the nine required animation states and full 16-direction look loop; the release review records deterministic validation, three cardinal-direction blind reviews, and independent visual QA, while retaining the accepted secondary-axis and continuity warnings instead of hiding them.",
-        "zh-CN": "ACT3 的像素设计从一体化螺旋圆盘底座中探出。1536×2288 V2 图集包含规定的九种动画状态和完整 16 方向视角循环；发布审核记录了确定性校验、三轮主方向盲审与独立视觉 QA，并如实保留已接受的次轴方向和连续性警告。"
+        en: "ACT3 emerges from an integrated spiral-disc base in its pixel design. It has all nine animation states and a full 16-direction look loop, and each one was checked before release.",
+        "zh-CN": "ACT3 的像素设计从一体化螺旋圆盘底座中探出。它包含九种动画状态和完整的 16 方向视角循环，发布前都已逐项检查。"
       }
     },
     packageCompatibility: {
