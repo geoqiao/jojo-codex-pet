@@ -242,14 +242,41 @@ img {
   background-repeat: no-repeat;
   opacity: 0;
   pointer-events: none;
+  transition: opacity 150ms ease;
 }
 
+/* The layer fades in over the static art, which only disappears once the fade has finished; leaving shows it again at once. */
 .is-motion-active .motion-layer {
   opacity: 1;
 }
 
 .is-motion-active .motion-static {
   opacity: 0;
+  transition: opacity 0s linear 150ms;
+}
+
+/* A square box exactly as large as the drawn card art, so the layer can sit on it in percentages (see motionFitStyle). */
+.motion-stage {
+  position: relative;
+  aspect-ratio: 1;
+  filter: var(--stage-filter, none);
+}
+
+.motion-stage .motion-static {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.motion-stage .motion-layer {
+  top: var(--fit-top);
+  left: var(--fit-left);
+  width: var(--fit-width);
+  height: var(--fit-height);
+  aspect-ratio: auto;
+  translate: none;
+  image-rendering: pixelated;
 }
 
 /* Same-origin page changes cross-fade; a pet card and its detail image share a view-transition-name and morph. */
@@ -308,6 +335,10 @@ img {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .is-motion-active .motion-static {
+    transition: none;
   }
 
   *,

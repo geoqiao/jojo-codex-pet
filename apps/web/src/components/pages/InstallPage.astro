@@ -3,6 +3,7 @@ import { parts, pets, type Locale } from "@jojo-codex-pet/catalog";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { localize, route } from "../../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor } from "../../lib/install-links";
+import { motionFitStyle } from "../../lib/pet-motion";
 import InstallActionTracking from "../InstallActionTracking.astro";
 
 interface Props { locale: Locale }
@@ -21,7 +22,7 @@ const commands = installCommandsFor(releasedPet.id);
 
 const content = locale === "en" ? {
   title: "Install — JoJo Codex Pet",
-  description: "Install validated JoJo Codex Pet v2 companions through official Codex, Bash, PowerShell, or npx flows.",
+  description: "Install a JoJo Codex pet with the Codex app link, Bash, PowerShell or npx. Each method installs only the pet you choose.",
   eyebrow: "One pet at a time",
   heading: "INSTALL ONLY WHAT YOU CHOOSE.",
   intro: "Free, unofficial animated pets for the Codex desktop app—not standalone mobile apps. Choose a pet; every method installs only that one pet.",
@@ -65,7 +66,7 @@ const content = locale === "en" ? {
   ]
 } : {
   title: "安装 — JoJo Codex Pet",
-  description: "通过 Codex 官方深链、Bash、PowerShell 或 npx 安装已验证的 JoJo Codex Pet V2。",
+  description: "通过 Codex 应用链接、Bash、PowerShell 或 npx 安装 JoJo Codex 宠物，每种方式只安装你选的那一只。",
   eyebrow: "一次只装一只",
   heading: "只安装你选中的宠物。",
   intro: "这是给 Codex 桌面应用使用的免费、非官方动画宠物，不是独立手机应用。选择一只宠物；每种方式都只安装这一只。",
@@ -250,8 +251,12 @@ const content = locale === "en" ? {
           return (
             <a href={route(locale, `/pets/${pet.id}/`)} data-motion-hover={pet.id}>
               <span class="released-thumb motion-frame" style={`--released-accent:${accent}`}>
-                {image && <img class="motion-static" src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />}
-                {image && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
+                {image && (
+                  <span class="motion-stage" style={motionFitStyle(pet.id)}>
+                    <img class="motion-static" src={image} alt={alt} width="320" height="320" loading="lazy" decoding="async" />
+                    <span class="motion-layer" data-motion-layer aria-hidden="true"></span>
+                  </span>
+                )}
               </span>
               <span class="released-copy">
                 <small>PART {String(pet.part).padStart(2, "0")}</small>
@@ -711,7 +716,6 @@ const content = locale === "en" ? {
   .released-grid a:focus-visible { background: var(--acid); }
 
   .released-thumb {
-    --motion-height: 84px;
     display: grid;
     min-width: 0;
     place-items: center;
@@ -720,16 +724,13 @@ const content = locale === "en" ? {
     border-right: 3px solid var(--ink);
   }
 
-  .released-thumb img {
+  .released-thumb .motion-stage {
     width: 104px;
-    height: 112px;
-    object-fit: contain;
-    image-rendering: pixelated;
     transition: transform 160ms ease;
   }
 
-  .released-grid a:hover .released-thumb img,
-  .released-grid a:focus-visible .released-thumb img { transform: scale(1.06); }
+  .released-grid a:hover .motion-stage,
+  .released-grid a:focus-visible .motion-stage { transform: scale(1.06); }
 
   .released-copy {
     display: grid;

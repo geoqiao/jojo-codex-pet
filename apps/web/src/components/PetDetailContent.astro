@@ -3,7 +3,7 @@ import { parts, pets, type Locale, type Pet } from "@jojo-codex-pet/catalog";
 import { petProfiles } from "../content/petProfiles";
 import { localize, route, ui } from "../lib/i18n";
 import { installCommandsFor, openInCodexUrlFor, packageUrlFor } from "../lib/install-links";
-import { motionLabels, motionStates } from "../lib/pet-motion";
+import { motionFitStyle, motionLabels, motionStates } from "../lib/pet-motion";
 import InstallActionTracking from "./InstallActionTracking.astro";
 
 interface Props { locale: Locale; pet: Pet }
@@ -13,7 +13,7 @@ const name = localize(pet.name, locale);
 const isReview = pet.status === "pilot-review" || pet.status === "wave-review";
 const part = parts.find((item) => item.number === pet.part)!;
 const partTitle = localize(part.title, locale);
-const displayImage = pet.image?.replace(/\.png$/, "-card.webp");
+const displayImage = pet.image?.replace(/\.png$/, "-card-640.webp");
 const hasMotion = pet.status === "released" && Boolean(displayImage);
 const imageAlt = locale === "en"
   ? `${name}, Part ${pet.part} pixel Codex pet`
@@ -133,6 +133,7 @@ const content = locale === "en" ? {
   <div class="detail-side" data-pet-motion={hasMotion ? pet.id : undefined}>
     <div class="detail-art" style={`--accent:${part.accent}`}>
       {displayImage ? (
+        <span class="motion-stage" style={motionFitStyle(pet.id)}>
         <img
           class="motion-static"
           src={displayImage}
@@ -144,10 +145,11 @@ const content = locale === "en" ? {
           decoding="async"
           style={`view-transition-name: pet-${pet.id}`}
         />
+        {hasMotion && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
+        </span>
       ) : (
         <div class="planned-sigil" aria-hidden="true"><span>{String(pet.part).padStart(2, "0")}</span><i>{pet.type === "character" ? "C" : "S"}</i></div>
       )}
-      {hasMotion && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
       <span class="detail-part">PART {String(pet.part).padStart(2, "0")}</span>
       {pet.status === "released" && packageUrl && openInCodexUrl && (
         <div class="detail-art-actions" role="group" aria-label={content.install}>
@@ -207,7 +209,7 @@ const content = locale === "en" ? {
             >
               {content.openInCodex} ↗
             </a>
-            <a class="package-link" href={`${packageUrl}/pet.json`}>{content.download} <span>({content.developer})</span> ↗</a>
+            <a class="package-link" href={`${packageUrl}/pet.json`}><span>{content.download} <span>({content.developer})</span> ↗</span></a>
           </div>
           <p class="install-support" id="detail-codex-support">{content.codexSupport}</p>
           <p class="after-install-note"><strong>{content.afterInstallLabel}</strong> {content.afterInstall}</p>
@@ -400,19 +402,10 @@ const content = locale === "en" ? {
     rotate: -14deg;
   }
 
-  .detail-art img {
-    position: relative;
+  .detail-art .motion-stage {
+    --stage-filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
     z-index: 1;
-    width: 88%;
-    height: 510px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
-  }
-
-  .detail-art .motion-layer {
-    height: min(81cqw, 469px);
-    filter: drop-shadow(8px 9px 0 rgb(23 19 30 / 42%));
+    width: min(88%, 510px);
   }
 
   .motion-controls {
@@ -736,9 +729,7 @@ const content = locale === "en" ? {
 
   .install-heading {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: 16px;
-    align-items: end;
+    gap: 12px;
   }
 
   .install-box h2 {
@@ -760,7 +751,6 @@ const content = locale === "en" ? {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    justify-content: end;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -805,7 +795,7 @@ const content = locale === "en" ? {
     text-transform: uppercase;
   }
 
-  .package-link span { color: var(--acid); }
+  .package-link span span { color: var(--acid); }
 
   .install-support,
   .after-install-note {
@@ -966,8 +956,7 @@ const content = locale === "en" ? {
       margin: 0 20px 24px;
     }
 
-    .detail-art img { height: 278px; }
-    .detail-art .motion-layer { height: min(81cqw, 256px); }
+    .detail-art .motion-stage { width: min(88%, 278px); }
     .motion-controls { order: 1; border-bottom: 3px solid var(--ink); }
     .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
     .page-link-transfer { display: grid; }
@@ -985,7 +974,6 @@ const content = locale === "en" ? {
     .pet-overview { font-size: 0.9rem; line-height: 1.5; }
     .status-note { margin-top: 14px; padding: 10px 12px; }
     .install-box { margin: 0 16px 20px; }
-    .install-heading { grid-template-columns: 1fr; }
     .install-method-overview { justify-content: start; }
     dl { padding: 0 16px 24px; }
     .lineage-nav { margin: 0 16px 20px; }

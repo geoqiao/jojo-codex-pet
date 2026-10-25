@@ -1,3 +1,4 @@
+import fit from "./pet-motion-fit.json";
 import states from "./pet-motion-states.json";
 
 export const motionStates = states;
@@ -29,6 +30,12 @@ export const motionLabels: Record<"en" | "zh-CN", Record<string, string>> = {
     running: "工作中",
     review: "审阅"
   }
+};
+
+/** Inline custom properties that place the animation layer over the pet's static card art. */
+export const motionFitStyle = (petId: string) => {
+  const box = (fit as Record<string, { left: number; top: number; width: number; height: number } | undefined>)[petId];
+  return box ? `--fit-left:${box.left}%;--fit-top:${box.top}%;--fit-width:${box.width}%;--fit-height:${box.height}%` : undefined;
 };
 
 const durationsFor = (state: string) => states.find((item) => item.id === state)?.durations;

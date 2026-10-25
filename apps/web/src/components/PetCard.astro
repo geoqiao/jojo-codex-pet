@@ -1,6 +1,7 @@
 ---
 import type { Locale, Pet } from "@jojo-codex-pet/catalog";
 import { localize, route, ui } from "../lib/i18n";
+import { motionFitStyle } from "../lib/pet-motion";
 
 interface Props {
   pet: Pet;
@@ -36,6 +37,7 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
     <div class="pet-card-content">
       <div class="pet-art motion-frame" style={`--part-accent: var(--part-${pet.part})`}>
         {cardImages ? (
+          <span class="motion-stage" style={motionFitStyle(pet.id)}>
           <img
             src={cardImages.fallback}
             class="motion-static"
@@ -48,13 +50,14 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
             decoding="async"
             style={`view-transition-name: pet-${pet.id}`}
           />
+          <span class="motion-layer" data-motion-layer aria-hidden="true"></span>
+          </span>
         ) : (
           <div class="planned-art" aria-hidden="true">
             <span>{initial}</span>
             <i>{String(pet.part).padStart(2, "0")}</i>
           </div>
         )}
-        {cardImages && <span class="motion-layer" data-motion-layer aria-hidden="true"></span>}
         <span class="part-tag">PART {String(pet.part).padStart(2, "0")}</span>
       </div>
       <div class="pet-copy">
@@ -125,7 +128,6 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
   }
 
   .pet-art {
-    --motion-height: 89%;
     position: relative;
     display: grid;
     min-height: 290px;
@@ -148,30 +150,16 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
     border-radius: 50%;
   }
 
-  .pet-art img {
-    position: relative;
+  .pet-art .motion-stage {
+    --stage-filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
     z-index: 1;
-    width: min(92%, 330px);
-    height: 280px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
+    width: min(92%, 280px);
     transition: transform 180ms ease;
   }
 
-  .pet-art .motion-layer {
-    filter: drop-shadow(4px 5px 0 rgb(23 19 30 / 45%));
-    transition: scale 180ms ease;
-  }
-
-  .pet-card:hover .pet-art img,
-  .pet-card:focus-within .pet-art img {
+  .pet-card:hover .motion-stage,
+  .pet-card:focus-within .motion-stage {
     transform: scale(1.025);
-  }
-
-  .pet-card:hover .motion-layer,
-  .pet-card:focus-within .motion-layer {
-    scale: 1.025;
   }
 
   .planned-art {
@@ -279,15 +267,12 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
     }
 
     .pet-art {
-      --motion-height: 83%;
       min-height: 0;
       aspect-ratio: 1;
     }
 
-    .pet-art img {
+    .pet-art .motion-stage {
       width: 90%;
-      height: auto;
-      aspect-ratio: 1;
     }
 
     .part-tag {

@@ -140,7 +140,7 @@ const cssOutput = outputFiles
   .map((path) => readFileSync(path, "utf8"))
   .join("\n");
 expect(
-  /\.pet-art[^,{]*\s+img[^,{]*\{[^}]*image-rendering:\s*pixelated/.test(cssOutput),
+  /\.motion-stage\s+\.motion-static[^,{]*\{[^}]*image-rendering:\s*pixelated/.test(cssOutput),
   "built Gallery card CSS is missing pixelated rendering"
 );
 
