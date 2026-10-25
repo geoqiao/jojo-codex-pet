@@ -15,12 +15,11 @@ const structuredData = {
   "@type": "WebSite",
   url: "https://pixelstand.pet/",
   name: "JoJo Codex Pet",
-  description: "An unofficial, non-commercial JoJo-themed Codex pet gallery.",
   inLanguage: ["en", "zh-CN"]
 };
 const content = locale === "en" ? {
-  title: "JoJo Codex Pet — V2 companions across every Part",
-  description: "An unofficial, non-commercial JoJo-themed Codex pet gallery. Browse the locked 36-pet roster and the Part 3 Pilot Set.",
+  title: "JoJo Codex Pet — Animated companions across every Part",
+  description: "An unofficial, non-commercial gallery of 36 animated JoJo pets for OpenAI Codex, across Parts 1–9. Each one has 9 actions and installs with one command.",
   overline: "Unofficial · non-commercial · ad-free",
   hero: "A BIZARRE LITTLE COMPANION.",
   intro: "This is an unofficial gallery of animated JoJo character and Stand companions for OpenAI Codex Desktop. Every pet idles, runs, waves, jumps and more in 9 animated actions, and installs with one command.",
@@ -37,8 +36,8 @@ const content = locale === "en" ? {
   filterLabel: "Catalog filters",
   count: "pets shown"
 } : {
-  title: "JoJo Codex Pet — 横跨历代篇章的 V2 宠物",
-  description: "非官方、非商业的 JoJo 主题 Codex 宠物目录，展示锁定的 36 只名单与第三部 Pilot 四只。",
+  title: "JoJo Codex Pet — 横跨历代篇章的动画宠物",
+  description: "非官方、非商业的 JoJo 主题 Codex 宠物目录：36 只动画宠物，横跨第一至第九部，每只 9 种动作，一条命令即可安装。",
   overline: "非官方 · 非商业 · 无广告",
   hero: "一只奇妙的小伙伴。",
   intro: "这是一个面向 OpenAI Codex Desktop 的非官方 JoJo 角色与替身动画宠物目录。每只宠物都有待机、奔跑、挥手、跳跃等 9 种动作，一条命令即可安装。",
@@ -57,11 +56,11 @@ const content = locale === "en" ? {
 };
 ---
 
-<BaseLayout locale={locale} title={content.title} description={content.description} path="/" structuredData={structuredData}>
+<BaseLayout locale={locale} title={content.title} description={content.description} path="/" structuredData={{ ...structuredData, description: content.description }}>
   <section class="hero">
     <div class="shell hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">{content.overline}</p>
+        <p class="eyebrow">{content.overline.split(" · ").map((item, index, items) => <><span class="eyebrow-item">{item}</span>{index < items.length - 1 ? " · " : ""}</>)}</p>
         <h1 class="display">{content.hero}</h1>
         <p class="hero-intro">{content.intro}</p>
         <a class="button hero-cta" href={route(locale, "/install/")} data-home-install-cta>{content.installCta} ↗</a>
@@ -204,6 +203,10 @@ const content = locale === "en" ? {
     overflow: hidden;
     color: var(--paper-bright);
     background: var(--ink);
+  }
+
+  .eyebrow-item {
+    white-space: nowrap;
   }
 
   .hero::after {
