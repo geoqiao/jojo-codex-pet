@@ -48,8 +48,20 @@ const send = (payload: InstallActionPayload, preferBeacon = false) => {
   }
 };
 
+const announceCopyStatus = (button: HTMLButtonElement, message: string) => {
+  const scope = typeof button.closest === "function" ? button.closest("section, main, body") : null;
+  const status = scope?.querySelector<HTMLElement>("[data-copy-status]")
+    ?? (typeof document !== "undefined" ? document.querySelector<HTMLElement>("[data-copy-status]") : null);
+  if (!status) return;
+  status.textContent = "";
+  window.setTimeout(() => {
+    status.textContent = message;
+  }, 20);
+};
+
 const showTemporaryLabel = (button: HTMLButtonElement, label: string, restoreLabel: string) => {
   button.textContent = label;
+  announceCopyStatus(button, label);
   window.setTimeout(() => {
     button.textContent = restoreLabel;
   }, 1400);

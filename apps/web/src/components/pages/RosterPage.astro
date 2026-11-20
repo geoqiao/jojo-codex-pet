@@ -44,29 +44,34 @@ const content = locale === "en" ? {
             <span>{String(part.number).padStart(2, "0")}</span>
             <div><p>PART {part.number}</p><h2>{localize(part.title, locale)}</h2></div>
           </header>
-          <div class="roster-table" role="table" aria-label={`${localize(part.title, locale)} roster`}>
-            <div class="roster-row roster-head" role="row">
-              <span role="columnheader">#</span>
-              <span role="columnheader">{content.pet}</span>
-              <span role="columnheader">{content.identity}</span>
-              <span role="columnheader">{content.status}</span>
-            </div>
-            {pets.filter((pet) => pet.part === part.number).map((pet, index) => (
-              <div class="roster-row" role="row" data-motion-hover={pet.id}>
-                <span role="cell">{String(index + 1).padStart(2, "0")}</span>
-                <div class="roster-name" role="cell">
-                  <PetThumb petId={pet.id} />
-                  <div>
-                    <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
-                    <code>{pet.id}</code>
-                  </div>
-                </div>
-                <span role="cell">{copy.type[pet.type]} · {copy.role[pet.role]}</span>
-                <span class="status-pill" data-status={pet.status} role="cell">{copy.status[pet.status]}</span>
-              </div>
-            ))}
-            {part.number === 9 && <p class="part-note">{content.part9}</p>}
-          </div>
+          <table class="roster-table">
+            <caption class="visually-hidden">{`${localize(part.title, locale)} ${content.pet}`}</caption>
+            <thead>
+              <tr class="roster-row roster-head">
+                <th scope="col">#</th>
+                <th scope="col">{content.pet}</th>
+                <th scope="col">{content.identity}</th>
+                <th scope="col">{content.status}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pets.filter((pet) => pet.part === part.number).map((pet, index) => (
+                <tr class="roster-row" data-motion-hover={pet.id}>
+                  <td class="roster-index">{String(index + 1).padStart(2, "0")}</td>
+                  <td class="roster-name">
+                    <PetThumb petId={pet.id} />
+                    <div>
+                      <a href={route(locale, `/pets/${pet.id}/`)}>{localize(pet.name, locale)}</a>
+                      <code>{pet.id}</code>
+                    </div>
+                  </td>
+                  <td class="roster-type">{copy.type[pet.type]} · {copy.role[pet.role]}</td>
+                  <td class="roster-status"><span class="status-pill" data-status={pet.status}>{copy.status[pet.status]}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {part.number === 9 && <p class="part-note">{content.part9}</p>}
         </section>
       ))}
     </div>
@@ -129,6 +134,18 @@ const content = locale === "en" ? {
     line-height: 0.9;
   }
 
+  .roster-table {
+    display: block;
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 0;
+  }
+
+  .roster-table thead,
+  .roster-table tbody {
+    display: block;
+  }
+
   .roster-row {
     position: relative;
     display: grid;
@@ -140,9 +157,10 @@ const content = locale === "en" ? {
     border-top: 2px solid var(--ink);
   }
 
-  .roster-table,
   .roster-row > * {
     min-width: 0;
+    padding: 0;
+    text-align: start;
   }
 
   .roster-head {
@@ -156,11 +174,11 @@ const content = locale === "en" ? {
     text-transform: uppercase;
   }
 
-  .roster-head > span:first-child {
+  .roster-head > th:first-child {
     color: #aaa2b3;
   }
 
-  .roster-row > span:first-child {
+  .roster-index {
     color: var(--muted);
     font-size: 0.75rem;
     font-weight: 800;
@@ -178,6 +196,12 @@ const content = locale === "en" ? {
     font-size: 1.7rem;
     font-weight: 760;
     letter-spacing: -0.03em;
+  }
+
+  :global(:lang(zh-CN)) .roster-row > .roster-name a {
+    font-family: "Archivo Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
   /* The whole row opens the pet page. */
@@ -208,7 +232,7 @@ const content = locale === "en" ? {
     overflow-wrap: anywhere;
   }
 
-  .roster-row > span:nth-child(3) {
+  .roster-type {
     color: var(--muted);
     font-size: 0.75rem;
     font-weight: 750;
@@ -224,7 +248,7 @@ const content = locale === "en" ? {
     font-weight: 760;
   }
 
-  .roster-row.roster-head > span {
+  .roster-row.roster-head > th {
     grid-column: auto;
     justify-self: stretch;
     color: inherit;
@@ -243,8 +267,8 @@ const content = locale === "en" ? {
       padding-inline: 14px;
     }
 
-    .roster-row > span:nth-child(3),
-    .roster-row > span:nth-child(4) {
+    .roster-type,
+    .roster-status {
       grid-column: 2;
       justify-self: start;
     }
@@ -254,8 +278,8 @@ const content = locale === "en" ? {
       gap: 8px;
     }
 
-    .roster-head > span:nth-child(3),
-    .roster-head > span:nth-child(4) {
+    .roster-head > th:nth-child(3),
+    .roster-head > th:nth-child(4) {
       grid-column: auto;
     }
   }

@@ -34,6 +34,10 @@ const content = locale === "en" ? {
   hoverHint: " · hover a card to watch it move",
   filters: { all: "All", character: "Characters", stand: "Stands", part: (part: number) => `Part ${part}` },
   filterLabel: "Catalog filters",
+  searchLabel: "Search pets",
+  searchPlaceholder: "Search Jotaro, DIO, Tusk, 乔鲁诺...",
+  emptyMessage: "No pets match your search and filter.",
+  resetLabel: "Show all 36 pets",
   count: "pets shown"
 } : {
   title: "JoJo Codex Pet — 横跨历代篇章的动画宠物",
@@ -52,6 +56,10 @@ const content = locale === "en" ? {
   hoverHint: " · 鼠标悬停卡片可看它动起来",
   filters: { all: "全部", character: "角色", stand: "替身", part: (part: number) => `第 ${part} 部` },
   filterLabel: "宠物目录筛选",
+  searchLabel: "搜索宠物",
+  searchPlaceholder: "搜索 承太郎、DIO、白金之星、Tusk...",
+  emptyMessage: "没有找到匹配的宠物。",
+  resetLabel: "显示全部 36 只宠物",
   count: "只宠物"
 };
 ---
@@ -95,16 +103,40 @@ const content = locale === "en" ? {
   <section class="shell catalog-section" id="roster">
     <div class="section-title"><h2>{content.allTitle}</h2><span>{content.allNote}<span class="hover-hint">{content.hoverHint}</span></span></div>
     <div class="filter-bar" aria-label={content.filterLabel}>
+      <div class="filter-top">
+        <search class="gallery-search">
+          <label class="visually-hidden" for="gallery-search-input">{content.searchLabel}</label>
+          <input
+            id="gallery-search-input"
+            type="search"
+            placeholder={content.searchPlaceholder}
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            data-gallery-search
+          />
+        </search>
+        <span class="filter-count" aria-live="polite"><strong data-visible-count>{pets.length}</strong> {content.count}</span>
+      </div>
       <div class="filter-options">
         <button type="button" class="active" data-gallery-filter="all" aria-pressed="true" aria-controls="roster-grid">{content.filters.all}</button>
         <button type="button" data-gallery-filter="character" aria-pressed="false" aria-controls="roster-grid">{content.filters.character}</button>
         <button type="button" data-gallery-filter="stand" aria-pressed="false" aria-controls="roster-grid">{content.filters.stand}</button>
-        {[1,2,3,4,5,6,7,8,9].map((part) => <button type="button" data-gallery-filter={`part-${String(part).padStart(2, "0")}`} aria-pressed="false" aria-controls="roster-grid">{content.filters.part(part)}</button>)}
+        {[1,2,3,4,5,6,7,8,9].map((part) => (
+          <button type="button" class="part-filter-btn" data-gallery-filter={`part-${String(part).padStart(2, "0")}`} aria-pressed="false" aria-controls="roster-grid">
+            <span class="part-dot" style={`background: var(--part-${part})`} aria-hidden="true"></span>
+            {content.filters.part(part)}
+          </button>
+        ))}
       </div>
-      <span aria-live="polite"><strong data-visible-count>{pets.length}</strong> {content.count}</span>
     </div>
     <div class="pet-grid full-grid" id="roster-grid">
-      {pets.map((pet) => <PetCard pet={pet} locale={locale} />)}
+      {pets.map((pet, index) => <PetCard pet={pet} locale={locale} deferred={index >= 4} />)}
+    </div>
+    <div class="empty-state" data-gallery-empty hidden>
+      <p>{content.emptyMessage}</p>
+      <button type="button" class="button" data-gallery-reset>{content.resetLabel}</button>
     </div>
   </section>
 </BaseLayout>
@@ -155,31 +187,40 @@ const content = locale === "en" ? {
   const filterButtons = [...document.querySelectorAll("[data-gallery-filter]")];
   const cards = [...document.querySelectorAll("#roster [data-catalog-card]")];
   const visibleCount = document.querySelector("[data-visible-count]");
+  const searchInput = document.querySelector<HTMLInputElement>("[data-gallery-search]");
+  const emptyState = document.querySelector<HTMLElement>("[data-gallery-empty]");
+  const resetButton = document.querySelector<HTMLButtonElement>("[data-gallery-reset]");
+  let activeFilter = "all";
+  let lastCompositionEnd = -Infinity;
 
-  const applyFilter = (filter: string, syncUrl = true) => {
+  const renderCards = (syncUrl = true) => {
+    const query = (searchInput?.value ?? "").trim().toLowerCase();
     let visible = 0;
     for (const card of cards) {
-      const matches = filter === "all" || card.getAttribute("data-part") === filter || card.getAttribute("data-type") === filter || card.getAttribute("data-status") === filter;
+      const matchesFilter = activeFilter === "all" || card.getAttribute("data-part") === activeFilter || card.getAttribute("data-type") === activeFilter || card.getAttribute("data-status") === activeFilter;
+      const matchesSearch = !query || (card.getAttribute("data-search") ?? "").includes(query);
+      const matches = matchesFilter && matchesSearch;
       card.toggleAttribute("hidden", !matches);
       if (matches) visible += 1;
     }
     if (visibleCount) visibleCount.textContent = String(visible);
+    if (emptyState) emptyState.hidden = visible > 0;
     for (const button of filterButtons) {
-      const isActive = button.getAttribute("data-gallery-filter") === filter;
+      const isActive = button.getAttribute("data-gallery-filter") === activeFilter;
       button.classList.toggle("active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     }
 
     if (syncUrl) {
       const url = new URL(window.location.href);
-      if (filter === "all") {
+      if (activeFilter === "all") {
         url.searchParams.delete("filter");
         url.searchParams.delete("part");
-      } else if (/^part-0[1-9]$/.test(filter)) {
-        url.searchParams.set("part", String(Number(filter.slice(-2))));
+      } else if (/^part-0[1-9]$/.test(activeFilter)) {
+        url.searchParams.set("part", String(Number(activeFilter.slice(-2))));
         url.searchParams.delete("filter");
       } else {
-        url.searchParams.set("filter", filter);
+        url.searchParams.set("filter", activeFilter);
         url.searchParams.delete("part");
       }
       window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
@@ -187,14 +228,38 @@ const content = locale === "en" ? {
   };
 
   for (const button of filterButtons) {
-    button.addEventListener("click", () => applyFilter(button.getAttribute("data-gallery-filter") ?? "all"));
+    button.addEventListener("click", () => {
+      activeFilter = button.getAttribute("data-gallery-filter") ?? "all";
+      renderCards(true);
+    });
   }
+
+  searchInput?.addEventListener("compositionend", (event) => {
+    lastCompositionEnd = event.timeStamp;
+    renderCards(false);
+  });
+
+  searchInput?.addEventListener("input", () => renderCards(false));
+
+  searchInput?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    if (event.isComposing || event.timeStamp - lastCompositionEnd < 50) return;
+    event.preventDefault();
+    renderCards(false);
+  });
+
+  resetButton?.addEventListener("click", () => {
+    activeFilter = "all";
+    if (searchInput) searchInput.value = "";
+    renderCards(true);
+  });
 
   const params = new URLSearchParams(window.location.search);
   const part = params.get("part");
   const requestedFilter = params.get("filter") ?? (part && /^[1-9]$/.test(part) ? `part-${part.padStart(2, "0")}` : "all");
   const availableFilters = new Set(filterButtons.map((button) => button.getAttribute("data-gallery-filter")));
-  applyFilter(availableFilters.has(requestedFilter) ? requestedFilter : "all", false);
+  activeFilter = availableFilters.has(requestedFilter) ? requestedFilter : "all";
+  renderCards(false);
 </script>
 
 <style>
@@ -399,24 +464,50 @@ const content = locale === "en" ? {
   }
 
   .filter-bar {
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    justify-content: space-between;
+    display: grid;
+    gap: 12px;
     margin-bottom: 28px;
-    padding: 12px;
+    padding: 14px;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
+  }
+
+  .filter-top {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .gallery-search {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .gallery-search input {
+    width: 100%;
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    background: var(--paper);
+    font: inherit;
+    font-size: max(1rem, 1em);
+    font-weight: 600;
   }
 
   .filter-options {
     display: flex;
     gap: 7px;
     overflow-x: auto;
+    min-width: 0;
   }
 
   .filter-options button {
+    display: inline-flex;
     flex: 0 0 auto;
+    gap: 7px;
+    align-items: center;
     min-height: 44px;
     padding: 7px 12px;
     border: 2px solid var(--ink);
@@ -428,17 +519,34 @@ const content = locale === "en" ? {
     cursor: pointer;
   }
 
+  .part-dot {
+    width: 9px;
+    height: 9px;
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    flex: 0 0 auto;
+  }
+
   .filter-options button:hover,
   .filter-options button.active {
     background: var(--acid);
   }
 
-  .filter-bar > span {
+  .filter-count {
     flex: 0 0 auto;
     color: var(--muted);
     font-size: 0.75rem;
     font-weight: 760;
     text-transform: uppercase;
+  }
+
+  .empty-state[hidden] {
+    display: none;
+  }
+
+  .empty-state p {
+    margin: 0 0 16px;
+    font-weight: 700;
   }
 
   @media (max-width: 1180px) {
@@ -475,9 +583,10 @@ const content = locale === "en" ? {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .filter-bar {
-      align-items: stretch;
+    .filter-top {
       flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
     }
   }
 

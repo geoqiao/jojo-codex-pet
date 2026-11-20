@@ -6,11 +6,22 @@ import { motionFitStyle } from "../lib/pet-motion";
 interface Props {
   pet: Pet;
   locale: Locale;
+  deferred?: boolean;
 }
 
-const { pet, locale } = Astro.props;
+const { pet, locale, deferred = false } = Astro.props;
 const copy = ui[locale];
 const name = localize(pet.name, locale);
+const searchText = [
+  pet.name.en,
+  pet.name["zh-CN"],
+  pet.id,
+  `part ${pet.part}`,
+  `p${pet.part}`,
+  `第${pet.part}部`,
+  copy.type[pet.type],
+  pet.type
+].join(" ").toLowerCase();
 const detailUrl = route(locale, `/pets/${pet.id}/`);
 const initial = pet.name.en.replace(/^(The|Gold|Made)\s/i, "").charAt(0);
 const cardImages = pet.image ? {
@@ -26,12 +37,13 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
 ---
 
 <article
-  class="pet-card"
+  class:list={["pet-card", { "is-deferred": deferred }]}
   data-catalog-card
   data-pet-id={pet.id}
   data-part={`part-${String(pet.part).padStart(2, "0")}`}
   data-type={pet.type}
   data-status={pet.status}
+  data-search={searchText}
 >
   <a class="pet-card-link" href={detailUrl} aria-label={`${copy.open}: ${name}`} data-motion-hover={pet.id}>
     <div class="pet-card-content">
@@ -79,25 +91,22 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
   </a>
 </article>
 
-<style define:vars={{
-  "--part-1": "#d84b57",
-  "--part-2": "#e69a38",
-  "--part-3": "#7657d9",
-  "--part-4": "#e553a4",
-  "--part-5": "#d7b63f",
-  "--part-6": "#54a58a",
-  "--part-7": "#b56b3d",
-  "--part-8": "#4ca7ba",
-  "--part-9": "#6fbe5b"
-}}>
+<style>
   .pet-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
     overflow: hidden;
     border: 3px solid var(--ink);
     background: var(--paper-bright);
     box-shadow: 6px 6px 0 var(--ink);
     transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+
+  .pet-card.is-deferred {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 280px auto 440px;
   }
 
   .pet-card:hover,
@@ -112,11 +121,21 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
   }
 
   .pet-card-link {
-    display: block;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
     color: inherit;
     cursor: pointer;
     text-decoration: none;
     touch-action: manipulation;
+  }
+
+  .pet-card-content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
   }
 
   .pet-card-link:focus-visible {
@@ -206,6 +225,9 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
   }
 
   .pet-copy {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     padding: 20px;
   }
 
@@ -222,6 +244,13 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
     font-size: clamp(1.8rem, 3vw, 2.6rem);
     letter-spacing: -0.055em;
     line-height: 0.96;
+  }
+
+  :global(:lang(zh-CN)) h3 {
+    font-family: "Archivo Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    font-weight: 850;
+    letter-spacing: -0.01em;
+    line-height: 1.22;
   }
 
   .palette {
@@ -242,7 +271,7 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
     align-items: center;
     justify-content: space-between;
     min-height: 38px;
-    margin-top: 10px;
+    margin-top: auto;
     padding-top: 14px;
     border-top: 2px solid var(--ink);
   }
@@ -258,6 +287,10 @@ const paletteLabel = locale === "en" ? "Signature palette" : "标志配色";
   @media (max-width: 640px) {
     .pet-card {
       box-shadow: 4px 4px 0 var(--ink);
+    }
+
+    .pet-card.is-deferred {
+      contain-intrinsic-size: auto 170px auto 260px;
     }
 
     .pet-card:hover,

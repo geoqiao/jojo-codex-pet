@@ -9,9 +9,33 @@
   --coral: #ff5f6f;
   --violet: #7556df;
   --cyan: #52d6ce;
+  --part-1: #d84b57;
+  --part-2: #e69a38;
+  --part-3: #7657d9;
+  --part-4: #e553a4;
+  --part-5: #d7b63f;
+  --part-6: #54a58a;
+  --part-7: #b56b3d;
+  --part-8: #4ca7ba;
+  --part-9: #6fbe5b;
   --shadow: 7px 7px 0 var(--ink);
   font-family: "Archivo Variable", "Arial Narrow", sans-serif;
   font-synthesis: none;
+}
+
+:root:lang(zh-CN) {
+  font-family: "Archivo Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-synthesis: weight;
+}
+
+:lang(zh-CN) .display,
+:lang(zh-CN) .section-title h2,
+:lang(zh-CN) .prose-card h2,
+:lang(zh-CN) .prose-card h3 {
+  font-family: "Archivo Variable", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.18;
 }
 
 * {

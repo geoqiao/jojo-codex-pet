@@ -222,12 +222,11 @@ const content = locale === "en" ? {
               data-page-link-copy-label={content.copyPageLink}
               data-page-link-copied-label={content.pageLinkCopied}
               data-page-link-copy-failed-label={content.pageLinkCopyFailed}
-              aria-live="polite"
-              aria-atomic="true"
             >
               {content.copyPageLink}
             </button>
           </div>
+          <p class="visually-hidden" data-copy-status aria-live="polite" aria-atomic="true"></p>
           <details class="other-methods">
             <summary>{content.otherMethods}</summary>
             <div class="command-list">
@@ -244,8 +243,6 @@ const content = locale === "en" ? {
                     data-action-pet-id={pet.id}
                     data-action-method={method}
                     data-action-locale={locale}
-                    aria-live="polite"
-                    aria-atomic="true"
                   >
                     {content.copy}
                   </button>
@@ -491,7 +488,7 @@ const content = locale === "en" ? {
     z-index: 3;
     right: 24px;
     bottom: 24px;
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     gap: 8px;
     justify-content: end;
@@ -881,10 +878,11 @@ const content = locale === "en" ? {
 
   .command-row code {
     min-width: 0;
-    overflow-x: auto;
     color: var(--paper-bright);
-    font-size: 0.75rem;
-    white-space: nowrap;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
   }
 
   .command-row button {
@@ -958,7 +956,7 @@ const content = locale === "en" ? {
 
     .detail-art .motion-stage { width: min(88%, 278px); }
     .motion-controls { order: 1; border-bottom: 3px solid var(--ink); }
-    .detail-art-actions { right: 12px; bottom: 12px; left: 12px; }
+    .detail-art-actions { display: flex; right: 12px; bottom: 12px; left: 12px; }
     .page-link-transfer { display: grid; }
     .detail-part { top: 14px; left: 14px; }
   }

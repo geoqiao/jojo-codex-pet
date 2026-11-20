@@ -36,8 +36,8 @@ const socialImage = new URL(image, Astro.site);
 const openGraphLocale = locale === "en" ? "en_US" : "zh_CN";
 const alternateOpenGraphLocale = locale === "en" ? "zh_CN" : "en_US";
 const a11y = locale === "en"
-  ? { home: "JoJo Codex Pet home", nav: "Primary navigation", skip: "Skip to content", menu: "Menu" }
-  : { home: "JoJo Codex Pet 首页", nav: "主要导航", skip: "跳到主要内容", menu: "菜单" };
+  ? { home: "JoJo Codex Pet home", nav: "Primary", mobileNav: "Mobile", skip: "Skip to content", menu: "Menu" }
+  : { home: "JoJo Codex Pet 首页", nav: "主菜单", mobileNav: "移动端菜单", skip: "跳到主要内容", menu: "菜单" };
 const footer = locale === "en"
   ? {
       tagline: "Unofficial · non-commercial · ad-free",
@@ -103,9 +103,12 @@ const navigation = [
           <span><strong>JOJO</strong><small>CODEX PET</small></span>
         </a>
         <nav class="primary-nav" aria-label={a11y.nav}>
-          {navigation.map(([label, href]) => (
-            <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
-          ))}
+          {navigation.map(([label, href]) => {
+            const isActive = path === href || (href !== "/" && path.startsWith(href));
+            return (
+              <a class:list={{ active: isActive }} aria-current={isActive ? "page" : undefined} href={route(locale, href)}>{label}</a>
+            );
+          })}
         </nav>
         <div class="header-tools">
           <span>{copy.fanProject}</span>
@@ -116,10 +119,13 @@ const navigation = [
         <details class="menu" data-nav-menu>
           <summary>{a11y.menu}</summary>
           <div class="menu-panel">
-            <nav aria-label={a11y.nav}>
-              {navigation.map(([label, href]) => (
-                <a class:list={{ active: path === href || (href !== "/" && path.startsWith(href)) }} href={route(locale, href)}>{label}</a>
-              ))}
+            <nav aria-label={a11y.mobileNav}>
+              {navigation.map(([label, href]) => {
+                const isActive = path === href || (href !== "/" && path.startsWith(href));
+                return (
+                  <a class:list={{ active: isActive }} aria-current={isActive ? "page" : undefined} href={route(locale, href)}>{label}</a>
+                );
+              })}
             </nav>
             <div class="menu-tools">
               <a href={alternatePath} lang={alternateLocale} hreflang={alternateLocale}>{copy.language}</a>
@@ -234,6 +240,7 @@ const navigation = [
   }
 
   .primary-nav a {
+    position: relative;
     display: grid;
     place-items: center;
     padding: 0 16px;
@@ -251,9 +258,17 @@ const navigation = [
   }
 
   .primary-nav a:hover,
-  .primary-nav a.active {
+  .primary-nav a.active,
+  .primary-nav a[aria-current="page"] {
     color: var(--ink);
     background: var(--acid);
+  }
+
+  .primary-nav a[aria-current="page"]::after {
+    position: absolute;
+    inset: auto 0 0;
+    content: "";
+    border-block-end: 4px solid var(--ink);
   }
 
   .header-tools {
