@@ -1,5 +1,7 @@
 # JoJo Codex Pet
 
+- **Status**: maintenance (non-commercial open-source portfolio)
+
 [简体中文](docs/zh-CN/README.md)
 
 An unofficial, non-commercial, advertisement-free collection of JoJo-themed animated companions for Codex. Each named character and Stand has an independent pet identity in the public Part-by-Part gallery; completed V2 packages are installed one pet at a time.
