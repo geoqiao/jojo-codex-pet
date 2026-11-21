@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "pixelstand",
+  "account_id": "4c7b6a86dbcbd91469298d396009cccf",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [
+    {
+      "pattern": "pixelstand.geoqiao.me",
+      "custom_domain": true
+    }
+  ],
+  "assets": {
+    "directory": "./apps/web/dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

@@ -20,7 +20,7 @@ The approved launch roster contains 36 pets across three quality-gated waves. Se
 
 ## Gallery
 
-The canonical production site is the [JoJo Codex Pet gallery](https://pixelstand.pet/). English is the default language and Simplified Chinese is available.
+The canonical production site is the [JoJo Codex Pet gallery](https://pixelstand.geoqiao.me/), deployed as pure static assets on Cloudflare Workers (`wrangler.jsonc`). English is the default language and Simplified Chinese is available.
 
 Primary sections:
 
@@ -30,14 +30,14 @@ Primary sections:
 - Install
 - Contribute
 
-The site publishes aggregate pet-page view totals and records anonymous daily aggregates for successful command copies and `Open in Codex` clicks. These actions are directional install intent—not proof of a completed installation or a unique user. The first-party counters create no visitor identifiers and retain no cookies, IP addresses, User-Agent values, referrers, or query strings. The site sends no installer-completion events, runs no advertising analytics, and renders no ad units. It includes the owner's Google AdSense account-verification metadata only.
+The site is completely static, collects no analytics or usage counters, creates no visitor identifiers, retains no cookies or logs, and renders no ad units.
 
 ## Install a released pet
 
-Every method installs only the selected pet. Choose any of the 36 released stable IDs on the site's [Install page](https://pixelstand.pet/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
+Every method installs only the selected pet. Choose any of the 36 released stable IDs on the site's [Install page](https://pixelstand.geoqiao.me/install/). After installation, open Codex **Settings → Pets**, choose **Refresh**, then select the pet.
 
 ```bash
-curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo
+curl -fsSL https://pixelstand.geoqiao.me/install.sh | bash -s -- part-03-jotaro-kujo
 ```
 
 ```bash

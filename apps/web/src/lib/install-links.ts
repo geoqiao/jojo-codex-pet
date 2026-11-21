@@ -1,4 +1,4 @@
-const siteOrigin = "https://pixelstand.pet";
+const siteOrigin = "https://pixelstand.geoqiao.me";
 
 interface OpenInCodexPet {
   nameEn: string;

@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://pixelstand.pet',
+  site: 'https://pixelstand.geoqiao.me',
   integrations: [sitemap({ filter: (page) => !page.includes('/404') })],
   output: 'static',
   build: {

@@ -15,7 +15,7 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "build": "pnpm run catalog:export && pnpm run counter:stage && pnpm --filter @jojo-codex-pet/web build",
+    "build": "pnpm run catalog:export && pnpm --filter @jojo-codex-pet/web build",
     "check": "pnpm catalog:validate && pnpm --filter @jojo-codex-pet/web test && pnpm --filter @jojo-codex-pet/web check",
     "production:build": "node scripts/verify_production_source.mjs && pnpm check && pnpm build && pnpm site:validate",
     "site:validate": "node scripts/validate_web_output.mjs",

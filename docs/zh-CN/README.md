@@ -20,16 +20,16 @@
 
 ## 网站
 
-[JoJo Codex Pet 正式目录站](https://pixelstand.pet/) 现为可索引的正式站与 canonical 域名。默认英文，可切换简体中文。
+[JoJo Codex Pet 正式目录站](https://pixelstand.geoqiao.me/) 现部署为 Cloudflare Workers 纯静态站点（`wrangler.jsonc`），作为正式站与 canonical 域名。默认英文，可切换简体中文。
 
-站点公开累计宠物详情页浏览次数，并按天汇总成功复制安装命令与点击“在 Codex 中打开”的匿名次数。这些动作只表示安装意图，不代表安装完成，也不是独立用户数。第一方计数器不创建访客标识，也不保留 Cookie、IP、User-Agent、来源页或查询参数。站点不发送安装器完成事件，不接入广告分析，也不渲染广告位；目前只包含站长的 Google AdSense 账号验证元数据。
+站点完全静态，不运行浏览或点击计数器，不创建访客标识，不保留 Cookie、IP 或访问日志，也不渲染任何广告位。
 
 ## 安装已发布宠物
 
-每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.pet/zh-CN/install/)选择 36 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
+每种方式都只安装当前选择的宠物。你可以在网站的[安装页](https://pixelstand.geoqiao.me/zh-CN/install/)选择 36 个已发布稳定 ID 中的任意一个。安装后进入 Codex **Settings → Pets**，点击 **Refresh**，再选择对应宠物。
 
 ```bash
-curl -fsSL https://pixelstand.pet/install.sh | bash -s -- part-03-jotaro-kujo
+curl -fsSL https://pixelstand.geoqiao.me/install.sh | bash -s -- part-03-jotaro-kujo
 ```
 
 ```bash

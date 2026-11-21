@@ -28,8 +28,8 @@ const expect = (condition, message) => {
 
 expect(htmlFiles.length === 82, `expected 82 HTML files, found ${htmlFiles.length}`);
 expect(existsSync(notFoundFile), "missing 404.html");
-expect(existsSync(join(dist, "api/actions.php")), "missing staged action endpoint");
-expect(existsSync(join(dist, "api/views.php")), "missing staged page-view endpoint");
+expect(!existsSync(join(dist, "api/actions.php")), "legacy PHP action endpoint must not be staged in static dist");
+expect(!existsSync(join(dist, "api/views.php")), "legacy PHP view endpoint must not be staged in static dist");
 
 const releasedIdsPath = join(dist, "api/released-pet-ids.json");
 expect(existsSync(releasedIdsPath), "missing released-pet action allowlist");
@@ -169,13 +169,13 @@ for (const file of htmlFiles) {
       ? canonicalUrl.pathname.slice("/zh-CN".length)
       : canonicalUrl.pathname === "/zh-CN/" ? "/" : canonicalUrl.pathname;
     const zhPath = enPath === "/" ? "/zh-CN/" : `/zh-CN${enPath}`;
-    expect(alternates.en === `https://pixelstand.pet${enPath}`, `${route}: incorrect en alternate`);
-    expect(alternates["zh-CN"] === `https://pixelstand.pet${zhPath}`, `${route}: incorrect zh-CN alternate`);
-    expect(alternates["x-default"] === `https://pixelstand.pet${enPath}`, `${route}: incorrect x-default alternate`);
+    expect(alternates.en === `https://pixelstand.geoqiao.me${enPath}`, `${route}: incorrect en alternate`);
+    expect(alternates["zh-CN"] === `https://pixelstand.geoqiao.me${zhPath}`, `${route}: incorrect zh-CN alternate`);
+    expect(alternates["x-default"] === `https://pixelstand.geoqiao.me${enPath}`, `${route}: incorrect x-default alternate`);
   }
 
   expect(html.includes('<meta property="og:site_name" content="JoJo Codex Pet">'), `${route}: missing og:site_name`);
-  expect(/<meta property="og:image" content="https:\/\/pixelstand\.pet\/[^"]+">/.test(html), `${route}: missing absolute og:image`);
+  expect(/<meta property="og:image" content="https:\/\/pixelstand\.geoqiao\.me\/[^"]+">/.test(html), `${route}: missing absolute og:image`);
   expect(html.includes('<meta name="twitter:card" content="summary_large_image">'), `${route}: missing Twitter card`);
   expect(html.includes('<meta name="google-site-verification" content="tfvOJaUir_p6nethyb3vLwlTubhjqdMXfPyPLjA71_s">'), `${route}: missing Google site verification`);
   expect(html.includes('<meta name="google-adsense-account" content="ca-pub-3369430294552960">'), `${route}: missing Google AdSense account`);
@@ -282,7 +282,7 @@ for (const route of ["/", "/zh-CN/"]) {
     try {
       const data = JSON.parse(jsonLd);
       expect(data["@type"] === "WebSite", `${route}: JSON-LD is not WebSite`);
-      expect(data.url === "https://pixelstand.pet/", `${route}: JSON-LD has incorrect site URL`);
+      expect(data.url === "https://pixelstand.geoqiao.me/", `${route}: JSON-LD has incorrect site URL`);
       expect(data.name === "JoJo Codex Pet", `${route}: JSON-LD has incorrect site name`);
     } catch (error) {
       failures.push(`${route}: invalid JSON-LD (${error.message})`);
@@ -373,9 +373,9 @@ for (const file of htmlFiles.filter((path) => path.includes(`${sep}pets${sep}`))
       expect(Array.isArray(items) && items.length === 3, `${route}: BreadcrumbList must contain three visible levels`);
       if (Array.isArray(items) && items.length === 3) {
         const expectedUrls = [
-          "https://pixelstand.pet" + (route.startsWith("/zh-CN/") ? "/zh-CN/" : "/"),
-          "https://pixelstand.pet" + (route.startsWith("/zh-CN/") ? "/zh-CN/parts/" : "/parts/"),
-          "https://pixelstand.pet" + route
+          "https://pixelstand.geoqiao.me" + (route.startsWith("/zh-CN/") ? "/zh-CN/" : "/"),
+          "https://pixelstand.geoqiao.me" + (route.startsWith("/zh-CN/") ? "/zh-CN/parts/" : "/parts/"),
+          "https://pixelstand.geoqiao.me" + route
         ];
         expect(items.every((item, index) => item.position === index + 1 && item.item === expectedUrls[index]), `${route}: BreadcrumbList does not match visible targets`);
       }
@@ -462,8 +462,11 @@ if (existsSync(notFoundFile)) {
   for (const href of ["/", "/roster/", "/install/", "/zh-CN/", "/zh-CN/roster/", "/zh-CN/install/"]) {
     expect(html.includes(`href="${href}"`), `404.html: missing link to ${href}`);
   }
-  const htaccess = join(dist, ".htaccess");
-  expect(existsSync(htaccess) && /^ErrorDocument 404 \/404\.html$/m.test(readFileSync(htaccess, "utf8")), ".htaccess: missing ErrorDocument 404 /404.html");
+  const wranglerConfig = fileURLToPath(new URL("../wrangler.jsonc", import.meta.url));
+  expect(
+    existsSync(wranglerConfig) && /"not_found_handling"\s*:\s*"404-page"/.test(readFileSync(wranglerConfig, "utf8")),
+    "wrangler.jsonc: missing not_found_handling 404-page"
+  );
 }
 
 console.log(`Validated ${htmlFiles.length} HTML files: released pets are visible and SEO metadata is consistent.`);
