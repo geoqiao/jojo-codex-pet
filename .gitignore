@@ -15,3 +15,5 @@ apps/web/public/api/catalog-ids.json
 apps/web/public/api/released-pet-ids.json
 apps/web/public/packages/
 apps/web/public/pet-motion/
+
+.wrangler/
